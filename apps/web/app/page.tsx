@@ -1,5 +1,5 @@
 export default function page() {
   return (
-    <div>page</div>
+    <div className="text-amber-900 text-6xl">page</div>
   )
 }
