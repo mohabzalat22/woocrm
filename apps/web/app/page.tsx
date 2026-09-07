@@ -24,10 +24,10 @@ export default function page() {
         </p>
       </CardContent>
       <CardFooter>
-        <Button size="sm" className="w-full text-primary-foreground">
+        <Button size="sm" className="w-full bg-primary text-primary-foreground">
           Action
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
