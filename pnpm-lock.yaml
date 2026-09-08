@@ -114,6 +114,9 @@ importers:
       cn:
         specifier: ^0.2.6
         version: 0.2.6
+      lucide-react:
+        specifier: ^1.42.0
+        version: 1.42.0(react@19.2.0)
       next:
         specifier: 16.3.0
         version: 16.3.0(@babel/core@7.29.0)(@types/node@22.19.0)(react-dom@19.2.0)(react@19.2.0)
@@ -10410,6 +10413,14 @@ packages:
   /lru.min@1.1.5:
     resolution: {integrity: sha512-5J9ysMYUpYIg9RF2vJpy9SinEmSviFSe0GyPpCQ4L5QSkLAgeLXlTAOu2ZwWUU5m+0SBl6gUU1R1ZQB3aKypfA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
+
+  /lucide-react@1.42.0(react@19.2.0):
+    resolution: {integrity: sha512-b3jprplnoLS8n5etw1z8xODe3hF/yjKATrTitsrKrnjUhCef5BdDct6Ppv3zVvzFwmtfWgLO6XNM3C9fAD93ug==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+    dependencies:
+      react: 19.2.0
+    dev: false
 
   /magic-string@0.30.17:
     resolution: {integrity: sha512-sNPKHvyjVf7gyjwS4xGTaW/mCnF8wnjtifKBEhxfZ7E/S8tQ0rssrwGNn6q8JH/ohItJfSQp9mBtQYuTlH5QnA==}

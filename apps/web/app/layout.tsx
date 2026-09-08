@@ -2,7 +2,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -30,14 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );
