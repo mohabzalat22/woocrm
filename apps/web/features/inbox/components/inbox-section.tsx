@@ -58,10 +58,7 @@ export default function InboxSection() {
                 veritatis. Adipisci illum labore mollitia eum fugit minima, nisi
                 nulla vel accusantium, quisquam ullam.
               </p>
-              <Tag
-                className="bg-red-500 text-white text-xs rounded-full p-1.5"
-                name="LEAD"
-              />
+              <Tag className="bg-red-500 text-white" name="LEAD" />
             </div>
           </div>
           {/* unread message */}
