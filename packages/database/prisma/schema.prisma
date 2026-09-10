@@ -12,8 +12,52 @@ datasource db {
   provider = "postgresql"
 }
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-} 
+enum Role {
+  ADMIN
+  MANAGER
+  AGENT
+}
+
+model User {
+  id               String             @id @default(uuid())
+  email            String             @unique
+  name             String?
+  workspaceMembers WorkspaceMembers[]
+  workspaceInvites WorkspaceInvite[]  @relation("InviteCreator")
+}
+
+model Workspace {
+  id               String             @id @default(uuid())
+  name             String             @default("Main Workspace")
+  workspaceMembers WorkspaceMembers[]
+  workspaceInvites WorkspaceInvite[]
+}
+
+model WorkspaceMembers {
+  id          String    @id @default(uuid())
+  role        Role      @default(AGENT)
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, workspaceId])
+}
+
+model WorkspaceInvite {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  role      Role      @default(AGENT)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  createdBy   User   @relation("InviteCreator", fields: [createdById], references: [id])
+  createdById String
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+
+  @@index([workspaceId])
+}
