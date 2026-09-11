@@ -1,8 +1,13 @@
+// apps/api/tsconfig.json
 {
   "extends": "@repo/typescript-config/nestjs.json",
   "compilerOptions": {
-    "baseUrl": "./",
+    "rootDir": "./src",
     "outDir": "./dist",
-    "strictNullChecks": true
-  }
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test"]
 }

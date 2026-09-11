@@ -6,6 +6,7 @@ import { ZodExceptionFilter } from './common/filters/zod-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors();
   app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new ZodExceptionFilter());
