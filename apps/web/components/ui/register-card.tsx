@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import Link from "next/link";
 import { Button } from "@repo/ui/ui/button";
 import { Eye, EyeOff } from "lucide-react";
@@ -15,10 +15,65 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
+import { RegisterService } from "@/features/auth/services/register.service";
+import { useRouter } from "next/navigation";
+import { SignInService } from "@/features/auth/services/sign-in.service";
 
 export function RegisterCard() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    const registerService = new RegisterService();
+    const signInService = new SignInService();
+
+    try {
+      if (password != confirmPassword) {
+        throw new Error("Please confirm the password");
+      }
+
+      const data = await registerService.register({
+        name,
+        email,
+        password,
+        confirmPassword,
+      });
+
+      if (!data) {
+        throw Error("unable to register");
+      }
+
+      const { accessToken } = await signInService.signIn({
+        email,
+        password,
+      });
+
+      if (!accessToken) {
+        throw new Error("unable to login");
+      }
+      window.localStorage.setItem("accessToken", accessToken);
+      router.push("/dashboard");
+    } catch (registerError) {
+      setError(
+        registerError instanceof Error
+          ? registerError.message
+          : "Unable to register in. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <Card className="w-full max-w-xl">
@@ -34,11 +89,18 @@ export function RegisterCard() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form>
+        <form id="register-form" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="name">Full name</Label>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                required
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -47,6 +109,8 @@ export function RegisterCard() {
                 type="email"
                 placeholder="wasel@example.com"
                 required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -57,6 +121,8 @@ export function RegisterCard() {
                   type={showPassword ? "text" : "password"}
                   className="pr-16"
                   required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                 />
                 <button
                   type="button"
@@ -81,6 +147,8 @@ export function RegisterCard() {
                   type={showConfirmPassword ? "text" : "password"}
                   className="pr-16"
                   required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
                 />
                 <button
                   type="button"
@@ -102,11 +170,21 @@ export function RegisterCard() {
               </div>
             </div>
           </div>
+          {error && (
+            <p className="mt-4 text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Create account
+        <Button
+          form="register-form"
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Creating An Account ..." : "Create Account"}
         </Button>
         <Button variant="outline" className="w-full">
           Continue with Google

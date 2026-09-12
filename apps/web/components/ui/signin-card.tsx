@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import {
@@ -15,9 +16,37 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
+import { SignInService } from "@/features/auth/services/sign-in.service";
+
+const signInService = new SignInService();
 
 export function SignInCard() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const { accessToken } = await signInService.signIn({ email, password });
+      window.localStorage.setItem("accessToken", accessToken);
+      router.push("/dashboard");
+    } catch (signInError) {
+      setError(
+        signInError instanceof Error
+          ? signInError.message
+          : "Unable to sign in. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <Card className="w-full max-w-xl">
@@ -33,7 +62,7 @@ export function SignInCard() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <form>
+        <form id="sign-in-form" onSubmit={handleSubmit}>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -42,6 +71,8 @@ export function SignInCard() {
                 type="email"
                 placeholder="wasel@example.com"
                 required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -60,6 +91,8 @@ export function SignInCard() {
                   type={showPassword ? "text" : "password"}
                   className="pr-16"
                   required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                 />
                 <button
                   type="button"
@@ -77,13 +110,23 @@ export function SignInCard() {
               </div>
             </div>
           </div>
+          {error && (
+            <p className="mt-4 text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Login
+        <Button
+          form="sign-in-form"
+          type="submit"
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Logging in..." : "Login"}
         </Button>
-        <Button variant="outline" className="w-full">
+        <Button type="button" variant="outline" className="w-full">
           Continue with Google
         </Button>
       </CardFooter>
