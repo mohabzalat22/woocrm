@@ -1,6 +1,6 @@
-import InboxSection from "@/features/inbox/components/inbox-section";
-import ChatInterfaceSection from "@/features/inbox/components/chat-interface-section";
-import ProfileSection from "@/features/inbox/components/profile-section";
+import InboxSection from "@/features/dashboard/inbox/components/inbox-section";
+import ChatInterfaceSection from "@/features/dashboard/inbox/components/chat-interface-section";
+import ProfileSection from "@/features/dashboard/inbox/components/profile-section";
 
 export default function page() {
   return (

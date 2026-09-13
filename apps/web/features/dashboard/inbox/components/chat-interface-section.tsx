@@ -1,6 +1,6 @@
 import ChatInterfaceHeader from "./chat-interface-header";
 import ChatInterfaceMessagesSection from "./chat-interface-messages-section";
-import ChatInterfaceInputSection from "@/features/inbox/components/chat-interface-input-section";
+import ChatInterfaceInputSection from "@/features/dashboard/inbox/components/chat-interface-input-section";
 
 export default function ChatInterfaceSection() {
   return (
