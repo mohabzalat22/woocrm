@@ -3,12 +3,15 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "plugins": ["@nestjs/swagger/plugin"],
-    "builder": {
-      "type": "rspack",
-      "options": {
-        "configPath": "rspack.config.cjs"
+    "plugins": [
+      {
+        "name": "@nestjs/swagger/plugin",
+        "options": {
+          "classValidatorShim": true,
+          "introspectComments": true,
+          "dtoFileNameSuffix": [".dto.ts"]
+        }
       }
-    }
+    ]
   }
 }

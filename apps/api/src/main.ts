@@ -11,7 +11,8 @@ async function bootstrap() {
     .setTitle('wasel api')
     .setDescription("The wasel what's app API CRM")
     .setVersion('1.0')
-    .addTag('cats')
+    .addTag('wasel')
+    .addBearerAuth()
     .build();
 
   const documentFactory = () =>

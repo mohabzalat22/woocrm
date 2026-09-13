@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import prisma from '@repo/database';
 import type { CreateUserInput } from './schemas/create-user.schema';
 import {
@@ -6,6 +7,7 @@ import {
   UserWithPasswordDto,
 } from './dto/index';
 
+@Injectable()
 export class UserRepository {
   async findById(id: string): Promise<UserDto | null> {
     return await prisma.user.findUnique({ where: { id } });

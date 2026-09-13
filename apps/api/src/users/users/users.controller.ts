@@ -1,27 +1,38 @@
-import { JwtAuthGuard } from '@/common/guards/auth-guard';
 import {
   Body,
   Controller,
   Delete,
+  Get,
+  Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { Get, Request, Req, Param } from '@nestjs/common';
+import type { Request } from 'express';
+import { JwtAuthGuard } from '../../common/guards/auth-guard';
 import { UsersService } from '../users.service';
 import type { CreateUserInput } from '../schemas/create-user.schema';
+
+type AuthenticatedRequest = Request & {
+  user: { id: string; email: string };
+};
+
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
   @Get('me')
-  me(@Req() req: Request) {
+  me(@Req() req: AuthenticatedRequest) {
     return req.user;
   }
 
   @Patch('me')
-  async updateMe(@Req() req: Request, @Body() data: Record<string, unknown>) {
+  async updateMe(
+    @Req() req: AuthenticatedRequest,
+    @Body() data: Record<string, unknown>,
+  ) {
     return await this.userService.updateById(req.user.id, data);
   }
 
