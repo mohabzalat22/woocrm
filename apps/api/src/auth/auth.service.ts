@@ -7,6 +7,7 @@ import {
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from './types/jwt-payload.interface';
 import type { RegisterDto } from './dto/register.dto';
+import type { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -16,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(data: RegisterDto) {
+  async register(data: RegisterDto): Promise<UserDto> {
     const existingUser = await this.usersService.findByEmail(data.email);
 
     if (existingUser) {

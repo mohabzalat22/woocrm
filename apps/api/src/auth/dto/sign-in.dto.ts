@@ -1,4 +1,4 @@
-export interface SignInDto {
-  email: string;
-  password: string;
-}
+import { createZodDto } from 'nestjs-zod';
+import { SignInSchema } from '../schemas/index';
+
+export class SignInDto extends createZodDto(SignInSchema) {}

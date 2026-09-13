@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import prisma from '@repo/database';
 import type { CreateUserInput } from './schemas/create-user.schema';
-import {
-  UpdateUserDto,
-  UserDto,
-  UserWithPasswordDto,
-} from './dto/index';
+import type { UpdateUserInput } from './schemas/update-user.schema';
+import { UserDto, UserWithPasswordDto } from './dto/index';
 
 @Injectable()
 export class UserRepository {
@@ -21,7 +18,7 @@ export class UserRepository {
     return await prisma.user.findMany();
   }
 
-  async create(data: CreateUserInput): Promise<UserDto | null> {
+  async create(data: CreateUserInput): Promise<UserDto> {
     return await prisma.user.create({
       data,
       select: {
@@ -32,7 +29,7 @@ export class UserRepository {
     });
   }
 
-  async updateById(id: string, data: UpdateUserDto): Promise<UserDto | null> {
+  async updateById(id: string, data: UpdateUserInput): Promise<UserDto | null> {
     return await prisma.user.update({ where: { id }, data });
   }
 

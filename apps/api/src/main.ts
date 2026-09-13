@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ZodValidationPipe } from 'nestjs-zod';
+import { cleanupOpenApiDoc } from 'nestjs-zod';
 
 import { AppModule } from './app.module';
 import { ZodExceptionFilter } from './common/filters/zod-exception.filter';
@@ -8,24 +8,21 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
-    .setTitle('wasel api')
-    .setDescription("The wasel what's app API CRM")
+    .setTitle('Wasel API')
+    .setDescription("The Wasel WhatsApp CRM API")
     .setVersion('1.0')
-    .addTag('wasel')
+    .addTag('app', 'Application health')
+    .addTag('auth', 'Registration and login')
+    .addTag('users', 'User management')
     .addBearerAuth()
     .build();
 
-  const documentFactory = () =>
-    SwaggerModule.createDocument(app, config, {
-      ignoreGlobalPrefix: true,
-    });
-
   app.enableCors();
-  app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new ZodExceptionFilter());
   app.setGlobalPrefix('api');
 
-  SwaggerModule.setup('api/doc', app, documentFactory);
+  const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
+  SwaggerModule.setup('api/doc', app, document);
 
   await app.listen(3000);
 }
