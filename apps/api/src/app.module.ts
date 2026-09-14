@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guard';
+import { WorkspacesModule } from './workspaces/workspaces.module';
 @Module({
   controllers: [AppController],
   providers: [
@@ -34,6 +35,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     }),
     UsersModule,
     AuthModule,
+    WorkspacesModule,
   ],
 })
 export class AppModule {}

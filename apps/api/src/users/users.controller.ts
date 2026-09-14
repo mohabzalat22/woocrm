@@ -23,10 +23,10 @@ import {
 
 import type { Request } from 'express';
 import { ZodResponse } from 'nestjs-zod';
-import { JwtAuthGuard } from '../../common/guards/auth-guard';
-import { UsersService } from '../users.service';
+import { JwtAuthGuard } from '../common/guards/auth-guard';
+import { UsersService } from './users.service';
 
-import { CreateUserDto, UpdateUserDto, UserDto } from '../dto/index';
+import { CreateUserDto, UpdateUserDto, UserDto } from './dto/index';
 
 type AuthenticatedRequest = Request & {
   user: UserDto;

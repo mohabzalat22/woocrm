@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UserRepository } from './users.repository';
 import { UsersService } from './users.service';
-import { UsersController } from './users/users.controller';
+import { UsersController } from './users.controller';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
