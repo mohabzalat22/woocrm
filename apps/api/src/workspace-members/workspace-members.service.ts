@@ -1,35 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import prisma from '@repo/database';
-import { WorkspaceMemberDto } from './dto/index';
+import { WorkspaceMemberDto } from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
+import { WorkspaceMembersRepository } from './workspace-members.repository';
 
 @Injectable()
-export class WorkspaceMembersRepository {
+export class WorkspaceMembersService {
+  constructor(
+    private readonly workspaceMembersRepository: WorkspaceMembersRepository,
+  ) {}
+
   async findById(id: string): Promise<WorkspaceMemberDto | null> {
-    return await prisma.workspaceMember.findUnique({ where: { id } });
+    return await this.workspaceMembersRepository.findById(id);
   }
 
   async findAll(): Promise<WorkspaceMemberDto[] | null> {
-    return await prisma.workspaceMember.findMany();
+    return await this.workspaceMembersRepository.findAll();
   }
 
   async findAllByUserId(userId: string): Promise<WorkspaceMemberDto[] | null> {
-    return await prisma.workspaceMember.findMany({ where: { userId } });
+    return await this.workspaceMembersRepository.findAllByUserId(userId);
   }
 
   async create(data: CreateWorkspaceMemberInput): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.create({ data });
+    return await this.workspaceMembersRepository.create(data);
   }
 
   async updateById(
     id: string,
     data: UpdateWorkspaceMemberInput,
   ): Promise<WorkspaceMemberDto | null> {
-    return await prisma.workspaceMember.update({ where: { id }, data });
+    return await this.workspaceMembersRepository.updateById(id, data);
   }
 
   async deleteById(id: string): Promise<WorkspaceMemberDto | null> {
-    return await prisma.workspaceMember.delete({ where: { id } });
+    return await this.workspaceMembersRepository.deleteById(id);
   }
 }

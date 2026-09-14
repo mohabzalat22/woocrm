@@ -20,22 +20,22 @@ enum Role {
 }
 
 model User {
-  id               String             @id @default(uuid())
-  email            String             @unique
+  id               String            @id @default(uuid())
+  email            String            @unique
   name             String?
   password         String
-  workspaceMembers WorkspaceMembers[]
-  workspaceInvites WorkspaceInvite[]  @relation("InviteCreator")
+  workspaceMembers WorkspaceMember[]
+  workspaceInvites WorkspaceInvite[] @relation("InviteCreator")
 }
 
 model Workspace {
-  id               String             @id @default(uuid())
-  name             String             @default("Main Workspace")
-  workspaceMembers WorkspaceMembers[]
+  id               String            @id @default(uuid())
+  name             String            @default("Main Workspace")
+  workspaceMembers WorkspaceMember[]
   workspaceInvites WorkspaceInvite[]
 }
 
-model WorkspaceMembers {
+model WorkspaceMember {
   id          String    @id @default(uuid())
   role        Role      @default(AGENT)
   user        User      @relation(fields: [userId], references: [id])
