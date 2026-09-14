@@ -3,19 +3,35 @@ import prisma from '@repo/database';
 import { WorkspaceMemberDto } from './dto/index';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
-
 @Injectable()
 export class WorkspaceMembersRepository {
-  async findById(id: string): Promise<WorkspaceMemberDto | null> {
-    return await prisma.workspaceMember.findUnique({ where: { id } });
+  async findById(
+    id: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto | null> {
+    return await prisma.workspaceMember.findFirst({
+      where: { id, workspaceId },
+    });
   }
 
-  async findAll(): Promise<WorkspaceMemberDto[] | null> {
-    return await prisma.workspaceMember.findMany();
+  async findByUserId(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto | null> {
+    return prisma.workspaceMember.findUnique({
+      where: {
+        userId_workspaceId: {
+          userId,
+          workspaceId,
+        },
+      },
+    });
   }
 
-  async findAllByUserId(userId: string): Promise<WorkspaceMemberDto[] | null> {
-    return await prisma.workspaceMember.findMany({ where: { userId } });
+  async findAllByWorkspaceId(
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto[] | []> {
+    return await prisma.workspaceMember.findMany({ where: { workspaceId } });
   }
 
   async create(data: CreateWorkspaceMemberInput): Promise<WorkspaceMemberDto> {
@@ -25,11 +41,14 @@ export class WorkspaceMembersRepository {
   async updateById(
     id: string,
     data: UpdateWorkspaceMemberInput,
-  ): Promise<WorkspaceMemberDto | null> {
-    return await prisma.workspaceMember.update({ where: { id }, data });
+  ): Promise<WorkspaceMemberDto> {
+    return await prisma.workspaceMember.update({
+      where: { id },
+      data,
+    });
   }
 
-  async deleteById(id: string): Promise<WorkspaceMemberDto | null> {
+  async deleteById(id: string): Promise<WorkspaceMemberDto> {
     return await prisma.workspaceMember.delete({ where: { id } });
   }
 }

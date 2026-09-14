@@ -3,17 +3,18 @@ import { WorkspaceDto } from './dto';
 import { CreateWorkspaceInput } from './schemas/create-workspace.schema';
 import { UpdateWorkspaceInput } from './schemas/update-workspace.schema';
 import { WorkspaceRepository } from './workspaces.repository';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class WorkspaceService {
   constructor(private readonly workspaceRepository: WorkspaceRepository) {}
 
-  async findById(id: string): Promise<WorkspaceDto | null> {
-    return this.workspaceRepository.findById(id);
+  async findById(id: string, userId: string): Promise<WorkspaceDto | null> {
+    return this.workspaceRepository.findById(id, userId);
   }
 
-  async findAll(): Promise<WorkspaceDto[] | null> {
-    return await this.workspaceRepository.findAll();
+  async findAll(userId: string): Promise<WorkspaceDto[] | []> {
+    return await this.workspaceRepository.findAll(userId);
   }
 
   async create(
@@ -25,12 +26,24 @@ export class WorkspaceService {
 
   async updateById(
     id: string,
+    userId: string,
     data: UpdateWorkspaceInput,
-  ): Promise<WorkspaceDto | null> {
+  ): Promise<WorkspaceDto> {
+    const existing = await this.workspaceRepository.findById(id, userId);
+
+    if (!existing) {
+      throw new NotFoundException('Workspace not found');
+    }
+
     return await this.workspaceRepository.updateById(id, data);
   }
 
-  async deleteById(id: string): Promise<WorkspaceDto | null> {
+  async deleteById(id: string, userId: string): Promise<WorkspaceDto> {
+    const existing = await this.workspaceRepository.findById(id, userId);
+
+    if (!existing) {
+      throw new NotFoundException('Workspace not found');
+    }
     return await this.workspaceRepository.deleteById(id);
   }
 }

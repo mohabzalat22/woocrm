@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  Injectable,
+} from '@nestjs/common';
 import { WorkspaceMemberDto } from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
@@ -10,30 +14,72 @@ export class WorkspaceMembersService {
     private readonly workspaceMembersRepository: WorkspaceMembersRepository,
   ) {}
 
-  async findById(id: string): Promise<WorkspaceMemberDto | null> {
-    return await this.workspaceMembersRepository.findById(id);
+  async findById(
+    id: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto | null> {
+    return await this.workspaceMembersRepository.findById(id, workspaceId);
   }
 
-  async findAll(): Promise<WorkspaceMemberDto[] | null> {
-    return await this.workspaceMembersRepository.findAll();
+  async findByUserId(
+    userId: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto | null> {
+    return await this.workspaceMembersRepository.findByUserId(
+      userId,
+      workspaceId,
+    );
   }
 
-  async findAllByUserId(userId: string): Promise<WorkspaceMemberDto[] | null> {
-    return await this.workspaceMembersRepository.findAllByUserId(userId);
+  async findAllByWorkspaceId(
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto[] | []> {
+    return await this.workspaceMembersRepository.findAllByWorkspaceId(
+      workspaceId,
+    );
   }
 
   async create(data: CreateWorkspaceMemberInput): Promise<WorkspaceMemberDto> {
+    const existing = await this.workspaceMembersRepository.findByUserId(
+      data.userId,
+      data.workspaceId,
+    );
+    if (existing) {
+      throw new ConflictException('Member Already Exists');
+    }
+
     return await this.workspaceMembersRepository.create(data);
   }
 
   async updateById(
     id: string,
+    workspaceId: string,
     data: UpdateWorkspaceMemberInput,
-  ): Promise<WorkspaceMemberDto | null> {
+  ): Promise<WorkspaceMemberDto> {
+    const existing = await this.workspaceMembersRepository.findById(
+      id,
+      workspaceId,
+    );
+
+    if (!existing) {
+      throw new NotFoundException('Member not found in this workspace');
+    }
+
     return await this.workspaceMembersRepository.updateById(id, data);
   }
 
-  async deleteById(id: string): Promise<WorkspaceMemberDto | null> {
+  async deleteById(
+    id: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto> {
+    const existing = await this.workspaceMembersRepository.findById(
+      id,
+      workspaceId,
+    );
+
+    if (!existing) {
+      throw new NotFoundException('Member not found in this workspace');
+    }
     return await this.workspaceMembersRepository.deleteById(id);
   }
 }
