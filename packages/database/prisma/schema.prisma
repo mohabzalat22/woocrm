@@ -63,3 +63,21 @@ model WorkspaceInvite {
 
   @@index([workspaceId])
 }
+
+model Permission {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  role         Role
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([role, permissionId])
+  @@index([permissionId])
+}

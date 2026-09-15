@@ -15,6 +15,6 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    return matchRoles(Roles, user.roles);
+    return matchRoles(roles, user.roles);
   }
 }

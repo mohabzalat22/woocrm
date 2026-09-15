@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guard';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { WorkspaceMembersModule } from './workspace-members/workspace-members.module';
+import { PermissionsModule } from './permissions/permissions.module';
 @Module({
   controllers: [AppController],
   providers: [
@@ -38,6 +39,7 @@ import { WorkspaceMembersModule } from './workspace-members/workspace-members.mo
     AuthModule,
     WorkspacesModule,
     WorkspaceMembersModule,
+    PermissionsModule,
   ],
 })
 export class AppModule {}
