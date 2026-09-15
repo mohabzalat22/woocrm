@@ -9,7 +9,12 @@ import {
 import { ZodResponse } from 'nestjs-zod';
 import { AuthService } from './auth.service';
 
-import { AccessTokenDto, RegisterDto, SignInDto, UserDto } from './dto/index';
+import {
+  AccessTokenResponseDto,
+  RegisterDto,
+  SignInDto,
+  UserResponseDto,
+} from './dto/index';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -23,7 +28,7 @@ export class AuthController {
   @ZodResponse({
     status: 201,
     description: 'Created user',
-    type: UserDto,
+    type: UserResponseDto,
   })
   async register(@Body() dto: RegisterDto) {
     return await this.authService.register(dto);
@@ -37,7 +42,7 @@ export class AuthController {
   @ZodResponse({
     status: 200,
     description: 'JWT access token',
-    type: AccessTokenDto,
+    type: AccessTokenResponseDto,
   })
   async signIn(@Body() dto: SignInDto) {
     const accessToken = await this.authService.signIn(dto.email, dto.password);

@@ -23,9 +23,7 @@ import { ZodResponse } from 'nestjs-zod';
 import { WorkspacesService } from './workspaces.service';
 import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import {
-  WorkspaceDto,
-} from './dto';
+import { WorkspaceResponseDto } from './dto';
 import { UpdateWorkspaceInput } from './schemas/update-workspace.schema';
 import { CreateWorkspaceInput } from './schemas/create-workspace.schema';
 
@@ -39,7 +37,7 @@ export class WorkspacesController {
 
   @Get()
   @ApiOperation({ summary: 'List workspaces for the authenticated user' })
-  @ApiOkResponse({ type: [WorkspaceDto], description: 'User workspaces' })
+  @ApiOkResponse({ type: [WorkspaceResponseDto], description: 'User workspaces' })
   async findAll(@CurrentUser('id') userId: string) {
     return await this.workspacesService.findAll(userId);
   }
@@ -47,7 +45,7 @@ export class WorkspacesController {
   @Get(':id')
   @ApiOperation({ summary: 'Find a workspace by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: WorkspaceDto, description: 'Workspace' })
+  @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Workspace' })
   @ApiNotFoundResponse({ description: 'Workspace not found' })
   async findById(
     @Param('id') id: string,
@@ -62,7 +60,7 @@ export class WorkspacesController {
   @ZodResponse({
     status: 201,
     description: 'Created workspace',
-    type: WorkspaceDto,
+    type: WorkspaceResponseDto,
   })
   async create(
     @CurrentUser('id') userId: string,
@@ -75,7 +73,7 @@ export class WorkspacesController {
   @ApiOperation({ summary: 'Update a workspace by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiOkResponse({ type: WorkspaceDto, description: 'Updated workspace' })
+  @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Updated workspace' })
   async update(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
@@ -87,7 +85,7 @@ export class WorkspacesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a workspace by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: WorkspaceDto, description: 'Deleted workspace' })
+  @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Deleted workspace' })
   async delete(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return await this.workspacesService.deleteById(id, userId);
   }

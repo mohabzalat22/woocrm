@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const PermissionSchema = z.object({
   id: z.string(),
   name: z.string(),
-  describtion: z.string().optional(),
+  description: z.string().nullable(),
   createdAt: z.date(),
 });
 

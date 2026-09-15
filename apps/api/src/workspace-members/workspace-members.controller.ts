@@ -25,9 +25,7 @@ import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { WorkspaceMembersService } from './workspace-members.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
-import {
-  WorkspaceMemberDto,
-} from './dto';
+import { WorkspaceMemberResponseDto } from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
 
@@ -44,7 +42,7 @@ export class WorkspaceMembersController {
   @Get('workspaces/:workspaceId')
   @ApiOperation({ summary: 'List members of a workspace' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: [WorkspaceMemberDto] })
+  @ApiOkResponse({ type: [WorkspaceMemberResponseDto] })
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
   async findAll(
     @CurrentUser('id') userId: string,
@@ -60,7 +58,7 @@ export class WorkspaceMembersController {
   @ApiOperation({ summary: 'Find a workspace member by id' })
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: WorkspaceMemberDto })
+  @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async findById(
     @Param('id') id: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
@@ -75,7 +73,7 @@ export class WorkspaceMembersController {
   @ZodResponse({
     status: 201,
     description: 'Created workspace member',
-    type: WorkspaceMemberDto,
+    type: WorkspaceMemberResponseDto,
   })
   async create(@Body() data: CreateWorkspaceMemberInput) {
     return await this.workspaceMembersService.create(data);
@@ -87,7 +85,7 @@ export class WorkspaceMembersController {
   @ApiParam({ name: 'workspaceId' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
-  @ApiOkResponse({ type: WorkspaceMemberDto })
+  @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async update(
     @Param('id') id: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
@@ -101,7 +99,7 @@ export class WorkspaceMembersController {
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'workspaceId' })
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
-  @ApiOkResponse({ type: WorkspaceMemberDto })
+  @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async delete(
     @Param('id') id: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,

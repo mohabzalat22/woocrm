@@ -22,7 +22,7 @@ import { ZodResponse } from 'nestjs-zod';
 
 import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { PermissionsService } from './permissions.service';
-import { PermissionDto, RolePermissionDto } from './dto';
+import { PermissionResponseDto, RolePermissionResponseDto } from './dto';
 import { RoleInput } from '..//workspace-members/schemas/role.schema';
 import { UpdatePermissionInput } from './schemas/update-permission.schema';
 import { CreatePermissionInput } from './schemas/create-permission.schema';
@@ -37,7 +37,7 @@ export class PermissionsController {
 
   @Get()
   @ApiOperation({ summary: 'List all permissions' })
-  @ApiOkResponse({ type: [PermissionDto], description: 'All permissions' })
+  @ApiOkResponse({ type: [PermissionResponseDto], description: 'All permissions' })
   async findAll() {
     return await this.permissionsService.findAll();
   }
@@ -46,7 +46,7 @@ export class PermissionsController {
   @ApiOperation({ summary: 'List permissions assigned to a role' })
   @ApiParam({ name: 'role', enum: ['ADMIN', 'MANAGER', 'AGENT'] })
   @ApiOkResponse({
-    type: [PermissionDto],
+    type: [PermissionResponseDto],
     description: 'Permissions for the given role',
   })
   async findAllForRole(@Param('role') role: RoleInput) {
@@ -57,7 +57,7 @@ export class PermissionsController {
   @ApiOperation({ summary: 'Find a permission by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiOkResponse({
-    type: PermissionDto,
+    type: PermissionResponseDto,
     description: 'Permission, or null if not found',
   })
   @ApiNotFoundResponse({ description: 'Permission not found' })
@@ -71,7 +71,7 @@ export class PermissionsController {
   @ZodResponse({
     status: 201,
     description: 'Created permission',
-    type: PermissionDto,
+    type: PermissionResponseDto,
   })
   async create(@Body() data: CreatePermissionInput) {
     return await this.permissionsService.create(data);
@@ -81,7 +81,7 @@ export class PermissionsController {
   @ApiOperation({ summary: 'Update a permission by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiOkResponse({ type: PermissionDto, description: 'Updated permission' })
+  @ApiOkResponse({ type: PermissionResponseDto, description: 'Updated permission' })
   async update(@Param('id') id: string, @Body() data: UpdatePermissionInput) {
     return await this.permissionsService.updateById(id, data);
   }
@@ -89,7 +89,7 @@ export class PermissionsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a permission by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: PermissionDto, description: 'Deleted permission' })
+  @ApiOkResponse({ type: PermissionResponseDto, description: 'Deleted permission' })
   async delete(@Param('id') id: string) {
     return await this.permissionsService.deleteById(id);
   }
@@ -102,7 +102,7 @@ export class PermissionsController {
   @ZodResponse({
     status: 201,
     description: 'Role permission assignment',
-    type: RolePermissionDto,
+    type: RolePermissionResponseDto,
   })
   async assignToRole(@Param('id') id: string, @Param('role') role: RoleInput) {
     return await this.permissionsService.assignPermissionToRole(role, id);
@@ -114,7 +114,7 @@ export class PermissionsController {
   @ApiParam({ name: 'role', enum: ['ADMIN', 'MANAGER', 'AGENT'] })
   @ApiNotFoundResponse({ description: 'Permission not found' })
   @ApiOkResponse({
-    type: RolePermissionDto,
+    type: RolePermissionResponseDto,
     description: 'Detached role permission',
   })
   async detachFromRole(
