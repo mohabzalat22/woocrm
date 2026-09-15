@@ -32,8 +32,17 @@ export class WorkspaceMembersService {
   }
 
   async findAllByWorkspaceId(
+    userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMemberDto[] | []> {
+    const existing = await this.workspaceMembersRepository.findById(
+      userId,
+      workspaceId,
+    );
+
+    if (!existing) {
+      throw new NotFoundException('Member not found in this workspace');
+    }
     return await this.workspaceMembersRepository.findAllByWorkspaceId(
       workspaceId,
     );

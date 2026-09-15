@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 
@@ -21,16 +20,12 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import type { Request } from 'express';
 import { ZodResponse } from 'nestjs-zod';
 import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { UsersService } from './users.service';
 
 import { CreateUserDto, UpdateUserDto, UserDto } from './dto/index';
-
-type AuthenticatedRequest = Request & {
-  user: UserDto;
-};
+import { CurrentUser } from '@/common/decorators/current-user.decorator';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -47,8 +42,8 @@ export class UsersController {
     description: 'Authenticated user identity',
     type: UserDto,
   })
-  me(@Req() req: AuthenticatedRequest) {
-    return req.user;
+  me(@CurrentUser() currentUser: UserDto) {
+    return currentUser;
   }
 
   @Patch('me')
@@ -56,10 +51,10 @@ export class UsersController {
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @ApiOkResponse({ type: UserDto, description: 'Updated user' })
   async updateMe(
-    @Req() req: AuthenticatedRequest,
+    @CurrentUser() currentUser: UserDto,
     @Body() data: UpdateUserDto,
   ) {
-    return await this.userService.updateById(req.user.id, data);
+    return await this.userService.updateById(currentUser.id, data);
   }
 
   @Post()
@@ -87,7 +82,7 @@ export class UsersController {
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiOkResponse({ type: UserDto, description: 'User, or null if not found' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async finById(@Param('id') id: string) {
+  async findById(@Param('id') id: string) {
     return await this.userService.findById(id);
   }
 

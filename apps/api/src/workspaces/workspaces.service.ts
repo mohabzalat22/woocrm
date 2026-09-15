@@ -6,7 +6,7 @@ import { WorkspaceRepository } from './workspaces.repository';
 import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
-export class WorkspaceService {
+export class WorkspacesService {
   constructor(private readonly workspaceRepository: WorkspaceRepository) {}
 
   async findById(id: string, userId: string): Promise<WorkspaceDto | null> {
