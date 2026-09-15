@@ -13,12 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  AGENT
-}
-
 model User {
   id               String            @id @default(uuid())
   email            String            @unique
@@ -33,11 +27,13 @@ model Workspace {
   name             String            @default("Main Workspace")
   workspaceMembers WorkspaceMember[]
   workspaceInvites WorkspaceInvite[]
+  roles            Role[]
 }
 
 model WorkspaceMember {
   id          String    @id @default(uuid())
-  role        Role      @default(AGENT)
+  roleId      String
+  role        Role      @relation(fields: [roleId], references: [id])
   user        User      @relation(fields: [userId], references: [id])
   userId      String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
@@ -51,7 +47,7 @@ model WorkspaceMember {
 model WorkspaceInvite {
   id        String    @id @default(uuid())
   token     String    @unique
-  role      Role      @default(AGENT)
+  role      Role      @relation(fields: [roleId], references: [id])
   expiresAt DateTime?
   createdAt DateTime  @default(now())
 
@@ -60,8 +56,30 @@ model WorkspaceInvite {
 
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
   workspaceId String
+  roleId      String
 
   @@index([workspaceId])
+}
+
+enum RoleEnum {
+  ADMIN
+  MANAGER
+  AGENT
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        RoleEnum
+  description String?
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  permissions      RolePermission[]
+  members          WorkspaceMember[]
+  workspaceInvites WorkspaceInvite[]
+
+  @@unique([workspaceId, name])
 }
 
 model Permission {
@@ -74,10 +92,11 @@ model Permission {
 
 model RolePermission {
   id           String     @id @default(uuid())
-  role         Role
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
   permissionId String
   permission   Permission @relation(fields: [permissionId], references: [id])
 
-  @@unique([role, permissionId])
+  @@unique([roleId, permissionId])
   @@index([permissionId])
 }
