@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WorkspacesController } from './workspaces.controller';
+import { WorkspacesService } from './workspaces.service';
 import { describe, it, expect, beforeEach } from '@jest/globals';
 
 describe('WorkspacesController', () => {
@@ -8,6 +9,12 @@ describe('WorkspacesController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [WorkspacesController],
+      providers: [
+        {
+          provide: WorkspacesService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     controller = module.get<WorkspacesController>(WorkspacesController);

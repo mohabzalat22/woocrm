@@ -2,7 +2,7 @@ import { PermissionsRepository } from './permissions.repository';
 import { PermissionDto, RolePermissionDto } from './dto';
 import { CreatePermissionInput } from './schemas/create-permission.schema';
 import { UpdatePermissionInput } from './schemas/update-permission.schema';
-import { RoleInput } from '@/workspace-members/schemas/role.schema';
+import { RoleInput } from '../workspace-members/schemas/role.schema';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 @Injectable()
@@ -36,7 +36,7 @@ export class PermissionsService {
     return await this.permissionsRepository.deleteById(id);
   }
 
-  async AssignPermissionToRole(
+  async assignPermissionToRole(
     role: RoleInput,
     permissionId: string,
   ): Promise<RolePermissionDto> {
@@ -47,7 +47,7 @@ export class PermissionsService {
       throw new NotFoundException("Permission Doesn't Exist");
     }
 
-    return this.permissionsRepository.AssignPermissionToRole(
+    return this.permissionsRepository.assignPermissionToRole(
       role,
       permissionId,
     );

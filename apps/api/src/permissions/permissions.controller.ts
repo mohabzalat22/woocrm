@@ -21,14 +21,9 @@ import {
 import { ZodResponse } from 'nestjs-zod';
 
 import { JwtAuthGuard } from '../common/guards/auth-guard';
-import { PermissionsService } from './permissions.servie';
-import {
-  CreatePermissionDto,
-  PermissionDto,
-  RolePermissionDto,
-  UpdatePermissionDto,
-} from './dto';
-import { RoleInput } from '@/workspace-members/schemas/role.schema';
+import { PermissionsService } from './permissions.service';
+import { PermissionDto, RolePermissionDto } from './dto';
+import { RoleInput } from '..//workspace-members/schemas/role.schema';
 import { UpdatePermissionInput } from './schemas/update-permission.schema';
 import { CreatePermissionInput } from './schemas/create-permission.schema';
 
@@ -109,11 +104,8 @@ export class PermissionsController {
     description: 'Role permission assignment',
     type: RolePermissionDto,
   })
-  async assignToRole(
-    @Param('id') id: string,
-    @Param('role') role: RoleInput,
-  ) {
-    return await this.permissionsService.AssignPermissionToRole(role, id);
+  async assignToRole(@Param('id') id: string, @Param('role') role: RoleInput) {
+    return await this.permissionsService.assignPermissionToRole(role, id);
   }
 
   @Delete(':id/roles/:role')

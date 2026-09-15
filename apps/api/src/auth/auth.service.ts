@@ -24,12 +24,10 @@ export class AuthService {
       throw new ConflictException('Email is already registered');
     }
 
-    const password = await bcrypt.hash(data.password, 12);
-
     return await this.usersService.create({
       email: data.email,
       name: data.name,
-      password,
+      password: data.password,
     });
   }
 

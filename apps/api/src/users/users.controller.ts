@@ -25,7 +25,7 @@ import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { UsersService } from './users.service';
 
 import { CreateUserDto, UpdateUserDto, UserDto } from './dto/index';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -73,7 +73,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Find a user by email' })
   @ApiParam({ name: 'email', example: 'user@example.com' })
   @ApiOkResponse({ type: UserDto, description: 'User, or null if not found' })
-  async finByEmail(@Param('email') email: string) {
+  async findByEmail(@Param('email') email: string) {
     return await this.userService.findByEmail(email);
   }
 

@@ -8,13 +8,32 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../common/guards/auth-guard';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { ZodResponse } from 'nestjs-zod';
 
+import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { WorkspaceMembersService } from './workspace-members.service';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
+import {
+  WorkspaceMemberDto,
+} from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
-import { CurrentWorkspace } from '@/common/decorators/current-workspace.decorator';
+
+@ApiTags('workspace-members')
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('workspace-members')
 @UseGuards(JwtAuthGuard)
 export class WorkspaceMembersController {
@@ -22,17 +41,13 @@ export class WorkspaceMembersController {
     private readonly workspaceMembersService: WorkspaceMembersService,
   ) {}
 
-  @Get(':id/workspaces/:workspaceId')
-  async findById(
-    @Param('id') id: string,
-    @CurrentWorkspace('workspaceId') workspaceId: string,
-  ) {
-    return await this.workspaceMembersService.findById(id, workspaceId);
-  }
-
-  @Get('/workspaces/:workspaceId')
+  @Get('workspaces/:workspaceId')
+  @ApiOperation({ summary: 'List members of a workspace' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiOkResponse({ type: [WorkspaceMemberDto] })
+  @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
   async findAll(
-    @CurrentUser() userId: string,
+    @CurrentUser('id') userId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
   ) {
     return await this.workspaceMembersService.findAllByWorkspaceId(
@@ -41,12 +56,38 @@ export class WorkspaceMembersController {
     );
   }
 
+  @Get(':id/workspaces/:workspaceId')
+  @ApiOperation({ summary: 'Find a workspace member by id' })
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiOkResponse({ type: WorkspaceMemberDto })
+  async findById(
+    @Param('id') id: string,
+    @CurrentWorkspace('workspaceId') workspaceId: string,
+  ) {
+    return await this.workspaceMembersService.findById(id, workspaceId);
+  }
+
   @Post()
+  @ApiOperation({ summary: 'Add a member to a workspace' })
+  @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiConflictResponse({ description: 'Member already exists' })
+  @ZodResponse({
+    status: 201,
+    description: 'Created workspace member',
+    type: WorkspaceMemberDto,
+  })
   async create(@Body() data: CreateWorkspaceMemberInput) {
     return await this.workspaceMembersService.create(data);
   }
 
   @Patch(':id/workspaces/:workspaceId')
+  @ApiOperation({ summary: 'Update a workspace member' })
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
+  @ApiOkResponse({ type: WorkspaceMemberDto })
   async update(
     @Param('id') id: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
@@ -56,6 +97,11 @@ export class WorkspaceMembersController {
   }
 
   @Delete(':id/workspaces/:workspaceId')
+  @ApiOperation({ summary: 'Remove a workspace member' })
+  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
+  @ApiOkResponse({ type: WorkspaceMemberDto })
   async delete(
     @Param('id') id: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,

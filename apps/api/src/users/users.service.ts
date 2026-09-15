@@ -3,10 +3,12 @@ import { Injectable } from '@nestjs/common';
 import type { CreateUserInput } from './schemas/create-user.schema';
 import type { UpdateUserInput } from './schemas/update-user.schema';
 import { UserDto, UserWithPasswordDto } from './dto/index';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
+
   async findById(id: string): Promise<UserDto | null> {
     return await this.userRepository.findById(id);
   }
@@ -15,19 +17,30 @@ export class UsersService {
     return await this.userRepository.findByEmail(email);
   }
 
-  async findAll(): Promise<UserDto[] | null> {
+  async findAll(): Promise<UserDto[] | []> {
     return await this.userRepository.findAll();
   }
 
   async create(data: CreateUserInput): Promise<UserDto> {
-    return await this.userRepository.create(data);
+    const password = await bcrypt.hash(data.password, 12);
+
+    return await this.userRepository.create({
+      ...data,
+      password,
+    });
   }
 
-  async updateById(id: string, data: UpdateUserInput): Promise<UserDto | null> {
-    return await this.userRepository.updateById(id, data);
+  async updateById(id: string, data: UpdateUserInput): Promise<UserDto> {
+    const payload = { ...data };
+
+    if (payload.password) {
+      payload.password = await bcrypt.hash(payload.password, 12);
+    }
+
+    return await this.userRepository.updateById(id, payload);
   }
 
-  async deleteById(id: string): Promise<UserDto | null> {
+  async deleteById(id: string): Promise<UserDto> {
     return await this.userRepository.deleteById(id);
   }
 

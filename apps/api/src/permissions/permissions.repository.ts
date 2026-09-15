@@ -2,7 +2,7 @@ import prisma from '@repo/database';
 import { PermissionDto, RolePermissionDto } from './dto';
 import { CreatePermissionInput } from './schemas/create-permission.schema';
 import { UpdatePermissionInput } from './schemas/update-permission.schema';
-import { RoleInput } from '@/workspace-members/schemas/role.schema';
+import { RoleInput } from '../workspace-members/schemas/role.schema';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class PermissionsRepository {
     return await prisma.permission.delete({ where: { id } });
   }
 
-  async AssignPermissionToRole(
+  async assignPermissionToRole(
     role: RoleInput,
     permissionId: string,
   ): Promise<RolePermissionDto> {

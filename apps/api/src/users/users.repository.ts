@@ -14,7 +14,7 @@ export class UserRepository {
     return await prisma.user.findUnique({ where: { email } });
   }
 
-  async findAll(): Promise<UserDto[] | null> {
+  async findAll(): Promise<UserDto[] | []> {
     return await prisma.user.findMany();
   }
 
@@ -29,11 +29,11 @@ export class UserRepository {
     });
   }
 
-  async updateById(id: string, data: UpdateUserInput): Promise<UserDto | null> {
+  async updateById(id: string, data: UpdateUserInput): Promise<UserDto> {
     return await prisma.user.update({ where: { id }, data });
   }
 
-  async deleteById(id: string): Promise<UserDto | null> {
+  async deleteById(id: string): Promise<UserDto> {
     return await prisma.user.delete({ where: { id } });
   }
 
