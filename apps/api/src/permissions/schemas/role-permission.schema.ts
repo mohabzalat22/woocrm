@@ -1,9 +1,8 @@
 import { z } from 'zod';
-import { RoleSchema } from '../../workspace-members/schemas/role.schema';
 
 export const RolePermissionSchema = z.object({
   id: z.string(),
-  role: RoleSchema,
+  roleId: z.string(),
   permissionId: z.string(),
 });
 

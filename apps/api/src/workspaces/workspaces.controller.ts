@@ -23,10 +23,11 @@ import { ZodResponse } from 'nestjs-zod';
 import { WorkspacesService } from './workspaces.service';
 import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { WorkspaceResponseDto } from './dto';
-import { UpdateWorkspaceInput } from './schemas/update-workspace.schema';
-import { CreateWorkspaceInput } from './schemas/create-workspace.schema';
-
+import {
+  CreateWorkspaceDto,
+  UpdateWorkspaceDto,
+  WorkspaceResponseDto,
+} from './dto';
 @ApiTags('workspaces')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
@@ -37,7 +38,10 @@ export class WorkspacesController {
 
   @Get()
   @ApiOperation({ summary: 'List workspaces for the authenticated user' })
-  @ApiOkResponse({ type: [WorkspaceResponseDto], description: 'User workspaces' })
+  @ApiOkResponse({
+    type: [WorkspaceResponseDto],
+    description: 'User workspaces',
+  })
   async findAll(@CurrentUser('id') userId: string) {
     return await this.workspacesService.findAll(userId);
   }
@@ -47,10 +51,7 @@ export class WorkspacesController {
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Workspace' })
   @ApiNotFoundResponse({ description: 'Workspace not found' })
-  async findById(
-    @Param('id') id: string,
-    @CurrentUser('id') userId: string,
-  ) {
+  async findById(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return await this.workspacesService.findById(id, userId);
   }
 
@@ -64,7 +65,7 @@ export class WorkspacesController {
   })
   async create(
     @CurrentUser('id') userId: string,
-    @Body() data: CreateWorkspaceInput,
+    @Body() data: CreateWorkspaceDto,
   ) {
     return await this.workspacesService.create(userId, data);
   }
@@ -73,11 +74,14 @@ export class WorkspacesController {
   @ApiOperation({ summary: 'Update a workspace by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Updated workspace' })
+  @ApiOkResponse({
+    type: WorkspaceResponseDto,
+    description: 'Updated workspace',
+  })
   async update(
     @Param('id') id: string,
     @CurrentUser('id') userId: string,
-    @Body() data: UpdateWorkspaceInput,
+    @Body() data: UpdateWorkspaceDto,
   ) {
     return await this.workspacesService.updateById(id, userId, data);
   }
@@ -85,7 +89,10 @@ export class WorkspacesController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a workspace by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: WorkspaceResponseDto, description: 'Deleted workspace' })
+  @ApiOkResponse({
+    type: WorkspaceResponseDto,
+    description: 'Deleted workspace',
+  })
   async delete(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return await this.workspacesService.deleteById(id, userId);
   }

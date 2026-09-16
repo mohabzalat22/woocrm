@@ -3,34 +3,58 @@ import { Reflector } from '@nestjs/core';
 import { Permissions } from '../decorators/permissions.decorator';
 import { PermissionsService } from '../../permissions/permissions.service';
 import { matchPermissions } from '../utils/match-utils';
-
+import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
+import { PermissionDto } from '../../permissions/dto';
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
+    private readonly workspaceMembersService: WorkspaceMembersService,
     private readonly permissionsService: PermissionsService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const user = req.user;
-    const permissions = this.reflector.get(Permissions, context.getHandler());
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      Permissions,
+      [context.getHandler(), context.getClass()],
+    );
 
-    if (!permissions) {
+    if (!requiredPermissions) {
       return true;
     }
 
-    if (!user?.role) {
+    const req = context.switchToHttp().getRequest<{
+      user?: { id: string };
+      params?: { workspaceId?: string };
+    }>();
+    const user = req.user;
+    const workspaceId = req.params?.workspaceId;
+
+    if (!user?.id || !workspaceId) {
       return false;
     }
 
-    const rolePermissions = await this.permissionsService.findAllForRole(
-      user.role,
+    const member = await this.workspaceMembersService.findByUserId(
+      user.id,
+      workspaceId,
     );
 
-    return matchPermissions(
-      permissions,
-      rolePermissions.map((permission) => permission.name),
+    if (!member) {
+      return false;
+    }
+
+    const permissions = await this.permissionsService.findAllByRoleId(
+      member.roleId,
     );
+
+    if (!permissions) {
+      return false;
+    }
+
+    const permissionNames: string[] = permissions.map(
+      (permission: PermissionDto) => permission.name,
+    );
+
+    return matchPermissions(requiredPermissions, permissionNames);
   }
 }

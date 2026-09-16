@@ -3,8 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { WorkspaceDto } from './dto';
 import { CreateWorkspaceInput } from './schemas/create-workspace.schema';
 import { UpdateWorkspaceInput } from './schemas/update-workspace.schema';
+import { RolesRepository } from '../roles/roles.repository';
+
 @Injectable()
 export class WorkspaceRepository {
+  constructor(private readonly rolesRepository: RolesRepository) {}
   async findById(id: string, userId: string): Promise<WorkspaceDto | null> {
     return await prisma.workspace.findFirst({
       where: {
@@ -36,12 +39,16 @@ export class WorkspaceRepository {
   ): Promise<WorkspaceDto> {
     return prisma.$transaction(async (tx) => {
       const workspace = await tx.workspace.create({ data });
+      const adminRole = await this.rolesRepository.createDefaultsForWorkspace(
+        tx,
+        workspace.id,
+      );
 
       await tx.workspaceMember.create({
         data: {
           userId,
           workspaceId: workspace.id,
-          role: 'ADMIN',
+          roleId: adminRole.id,
         },
       });
 

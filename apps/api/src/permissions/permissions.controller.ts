@@ -11,6 +11,7 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -20,107 +21,174 @@ import {
 } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 
-import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { PermissionsService } from './permissions.service';
-import { PermissionResponseDto, RolePermissionResponseDto } from './dto';
-import { RoleInput } from '..//workspace-members/schemas/role.schema';
-import { UpdatePermissionInput } from './schemas/update-permission.schema';
-import { CreatePermissionInput } from './schemas/create-permission.schema';
+import {
+  CreatePermissionDto,
+  UpdatePermissionDto,
+  PermissionResponseDto,
+  RolePermissionResponseDto,
+} from './dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { JwtAuthGuard } from '../common/guards/auth-guard';
 
 @ApiTags('permissions')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
-@Controller('permissions')
+@Controller('workspaces/:workspaceId/roles/:roleId/permissions')
 @UseGuards(JwtAuthGuard)
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List all permissions' })
-  @ApiOkResponse({ type: [PermissionResponseDto], description: 'All permissions' })
-  async findAll() {
-    return await this.permissionsService.findAll();
-  }
-
-  @Get('roles/:role')
-  @ApiOperation({ summary: 'List permissions assigned to a role' })
-  @ApiParam({ name: 'role', enum: ['ADMIN', 'MANAGER', 'AGENT'] })
+  @ApiOperation({ summary: 'List permissions for a role' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
   @ApiOkResponse({
     type: [PermissionResponseDto],
-    description: 'Permissions for the given role',
+    description: 'Role permissions',
   })
-  async findAllForRole(@Param('role') role: RoleInput) {
-    return await this.permissionsService.findAllForRole(role);
+  @ApiNotFoundResponse({ description: 'Member or role not found' })
+  findAll(
+    @Param('workspaceId') workspaceId: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.permissionsService.findAll(userId, roleId, workspaceId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Find a permission by id' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({
-    type: PermissionResponseDto,
-    description: 'Permission, or null if not found',
-  })
-  @ApiNotFoundResponse({ description: 'Permission not found' })
-  async findById(@Param('id') id: string) {
-    return await this.permissionsService.findById(id);
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
+  @ApiParam({ name: 'id' })
+  @ApiOkResponse({ type: PermissionResponseDto, description: 'Permission' })
+  @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
+  findById(
+    @Param('id') id: string,
+    @Param('workspaceId') workspaceId: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.permissionsService.findById(id, userId, roleId, workspaceId);
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a permission' })
+  @ApiOperation({ summary: 'Create a permission for a role' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
+  @ApiNotFoundResponse({ description: 'Member or role not found' })
   @ZodResponse({
     status: 201,
     description: 'Created permission',
     type: PermissionResponseDto,
   })
-  async create(@Body() data: CreatePermissionInput) {
-    return await this.permissionsService.create(data);
+  create(
+    @Param('workspaceId') workspaceId: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser('id') userId: string,
+    @Body() data: CreatePermissionDto,
+  ) {
+    return this.permissionsService.create(userId, roleId, workspaceId, data);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a permission by id' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
+  @ApiParam({ name: 'id' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiOkResponse({ type: PermissionResponseDto, description: 'Updated permission' })
-  async update(@Param('id') id: string, @Body() data: UpdatePermissionInput) {
-    return await this.permissionsService.updateById(id, data);
+  @ApiOkResponse({
+    type: PermissionResponseDto,
+    description: 'Updated permission',
+  })
+  @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
+  updateById(
+    @Param('id') id: string,
+    @Param('workspaceId') workspaceId: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser('id') userId: string,
+    @Body() data: UpdatePermissionDto,
+  ) {
+    return this.permissionsService.updateById(
+      id,
+      userId,
+      roleId,
+      workspaceId,
+      data,
+    );
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a permission by id' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: PermissionResponseDto, description: 'Deleted permission' })
-  async delete(@Param('id') id: string) {
-    return await this.permissionsService.deleteById(id);
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
+  @ApiParam({ name: 'id' })
+  @ApiOkResponse({
+    type: PermissionResponseDto,
+    description: 'Deleted permission',
+  })
+  @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
+  deleteById(
+    @Param('id') id: string,
+    @Param('workspaceId') workspaceId: string,
+    @Param('roleId') roleId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.permissionsService.deleteById(id, userId, roleId, workspaceId);
   }
 
-  @Post(':id/roles/:role')
+  @Post(':permissionId/assign')
   @ApiOperation({ summary: 'Assign a permission to a role' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiParam({ name: 'role', enum: ['ADMIN', 'MANAGER', 'AGENT'] })
-  @ApiNotFoundResponse({ description: 'Permission not found' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
+  @ApiParam({ name: 'permissionId' })
+  @ApiNotFoundResponse({ description: 'Member or role not found' })
+  @ApiConflictResponse({
+    description: 'Permission already assigned to this role',
+  })
   @ZodResponse({
     status: 201,
-    description: 'Role permission assignment',
+    description: 'Assigned role permission',
     type: RolePermissionResponseDto,
   })
-  async assignToRole(@Param('id') id: string, @Param('role') role: RoleInput) {
-    return await this.permissionsService.assignPermissionToRole(role, id);
+  assignPermissionToRole(
+    @Param('permissionId') permissionId: string,
+    @Param('roleId') roleId: string,
+    @Param('workspaceId') workspaceId: string,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.permissionsService.assignPermissionToRole(
+      permissionId,
+      roleId,
+      userId,
+      workspaceId,
+    );
   }
 
-  @Delete(':id/roles/:role')
+  @Delete(':permissionId/detach')
   @ApiOperation({ summary: 'Detach a permission from a role' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiParam({ name: 'role', enum: ['ADMIN', 'MANAGER', 'AGENT'] })
-  @ApiNotFoundResponse({ description: 'Permission not found' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'roleId' })
+  @ApiParam({ name: 'permissionId' })
   @ApiOkResponse({
     type: RolePermissionResponseDto,
     description: 'Detached role permission',
   })
-  async detachFromRole(
-    @Param('id') id: string,
-    @Param('role') role: RoleInput,
+  @ApiNotFoundResponse({
+    description: 'Member, role, or assigned permission not found',
+  })
+  detachPermissionFromRole(
+    @Param('permissionId') permissionId: string,
+    @Param('roleId') roleId: string,
+    @Param('workspaceId') workspaceId: string,
+    @CurrentUser('id') userId: string,
   ) {
-    return await this.permissionsService.detachPermissionFromRole(role, id);
+    return this.permissionsService.detachPermissionFromRole(
+      permissionId,
+      roleId,
+      userId,
+      workspaceId,
+    );
   }
 }

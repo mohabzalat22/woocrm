@@ -3,6 +3,7 @@ import prisma from '@repo/database';
 import { WorkspaceMemberDto } from './dto/index';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
+
 @Injectable()
 export class WorkspaceMembersRepository {
   async findById(
@@ -31,7 +32,9 @@ export class WorkspaceMembersRepository {
   async findAllByWorkspaceId(
     workspaceId: string,
   ): Promise<WorkspaceMemberDto[] | []> {
-    return await prisma.workspaceMember.findMany({ where: { workspaceId } });
+    return await prisma.workspaceMember.findMany({
+      where: { workspaceId },
+    });
   }
 
   async create(data: CreateWorkspaceMemberInput): Promise<WorkspaceMemberDto> {
@@ -49,6 +52,8 @@ export class WorkspaceMembersRepository {
   }
 
   async deleteById(id: string): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.delete({ where: { id } });
+    return await prisma.workspaceMember.delete({
+      where: { id },
+    });
   }
 }

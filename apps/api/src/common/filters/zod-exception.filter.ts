@@ -3,7 +3,6 @@ import { ZodValidationException } from 'nestjs-zod';
 import { Response } from 'express';
 import { ZodError } from 'zod';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 @Catch(ZodValidationException)
 export class ZodExceptionFilter implements ExceptionFilter {
   catch(exception: ZodValidationException, host: ArgumentsHost) {

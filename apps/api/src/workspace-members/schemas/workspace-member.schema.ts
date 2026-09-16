@@ -1,10 +1,8 @@
 import { z } from 'zod';
-import { RoleSchema } from './role.schema';
-
 export const WorkspaceMemberSchema = z.object({
   id: z.string(),
-  role: RoleSchema,
   userId: z.string(),
+  roleId: z.string(),
   workspaceId: z.string(),
   createdAt: z.date(),
 });

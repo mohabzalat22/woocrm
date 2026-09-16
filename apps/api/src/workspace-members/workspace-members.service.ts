@@ -7,11 +7,13 @@ import { WorkspaceMemberDto } from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
 import { WorkspaceMembersRepository } from './workspace-members.repository';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class WorkspaceMembersService {
   constructor(
     private readonly workspaceMembersRepository: WorkspaceMembersRepository,
+    private readonly rolesService: RolesService,
   ) {}
 
   async findById(
@@ -35,7 +37,7 @@ export class WorkspaceMembersService {
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMemberDto[] | []> {
-    const existing = await this.workspaceMembersRepository.findById(
+    const existing = await this.workspaceMembersRepository.findByUserId(
       userId,
       workspaceId,
     );
@@ -56,6 +58,8 @@ export class WorkspaceMembersService {
     if (existing) {
       throw new ConflictException('Member Already Exists');
     }
+
+    await this.rolesService.findById(data.roleId, data.workspaceId);
 
     return await this.workspaceMembersRepository.create(data);
   }

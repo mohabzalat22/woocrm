@@ -2,7 +2,6 @@ import prisma from '@repo/database';
 import { PermissionDto, RolePermissionDto } from './dto';
 import { CreatePermissionInput } from './schemas/create-permission.schema';
 import { UpdatePermissionInput } from './schemas/update-permission.schema';
-import { RoleInput } from '../workspace-members/schemas/role.schema';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -11,22 +10,47 @@ export class PermissionsRepository {
     return await prisma.permission.findUnique({ where: { id } });
   }
 
-  async findAll(): Promise<PermissionDto[] | []> {
-    return await prisma.permission.findMany();
-  }
-
-  async findAllForRole(role: RoleInput): Promise<PermissionDto[] | []> {
-    return await prisma.permission.findMany({
+  async findByIdAndRoleId(
+    id: string,
+    roleId: string,
+  ): Promise<PermissionDto | null> {
+    return await prisma.permission.findFirst({
       where: {
+        id,
         roles: {
-          some: { role },
+          some: { roleId },
         },
       },
     });
   }
 
-  async create(data: CreatePermissionInput): Promise<PermissionDto> {
-    return await prisma.permission.create({ data });
+  async findAllByRoleId(roleId: string): Promise<PermissionDto[] | []> {
+    return await prisma.permission.findMany({
+      where: {
+        roles: {
+          some: { roleId },
+        },
+      },
+    });
+  }
+
+  async create(
+    roleId: string,
+    data: CreatePermissionInput,
+  ): Promise<PermissionDto> {
+    return prisma.$transaction(async (tx) => {
+      const permission = await tx.permission.create({ data });
+
+      // assign permission to the role
+      await tx.rolePermission.create({
+        data: {
+          roleId,
+          permissionId: permission.id,
+        },
+      });
+
+      return permission;
+    });
   }
 
   async updateById(
@@ -41,25 +65,25 @@ export class PermissionsRepository {
   }
 
   async assignPermissionToRole(
-    role: RoleInput,
+    roleId: string,
     permissionId: string,
   ): Promise<RolePermissionDto> {
-    return prisma.rolePermission.create({
+    return await prisma.rolePermission.create({
       data: {
-        role,
+        roleId,
         permissionId,
       },
     });
   }
 
   async detachPermissionFromRole(
-    role: RoleInput,
+    roleId: string,
     permissionId: string,
   ): Promise<RolePermissionDto> {
     return await prisma.rolePermission.delete({
       where: {
-        role_permissionId: {
-          role,
+        roleId_permissionId: {
+          roleId,
           permissionId,
         },
       },

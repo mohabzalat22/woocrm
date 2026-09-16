@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { WorkspaceMembersModule } from './workspace-members/workspace-members.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { RolesModule } from './roles/roles.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 
@@ -45,6 +46,7 @@ import { PermissionsGuard } from './common/guards/permissions.guard';
     WorkspacesModule,
     WorkspaceMembersModule,
     PermissionsModule,
+    RolesModule,
   ],
 })
 export class AppModule {}

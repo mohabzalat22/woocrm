@@ -1,12 +1,12 @@
 export function matchRoles(
   requiredRoles: string[],
-  userRoles: string[] | undefined,
+  userRole: string | undefined,
 ): boolean {
-  if (!userRoles?.length) {
+  if (!userRole) {
     return false;
   }
 
-  return requiredRoles.some((role) => userRoles.includes(role));
+  return requiredRoles.includes(userRole);
 }
 
 export function matchPermissions(
