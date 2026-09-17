@@ -1,5 +1,5 @@
 import { UserRepository } from './users.repository';
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import type { CreateUserInput } from './schemas/create-user.schema';
 import type { UpdateUserInput } from './schemas/update-user.schema';
 import { UserDto, UserWithPasswordDto } from './dto/index';
@@ -22,6 +22,10 @@ export class UsersService {
   }
 
   async create(data: CreateUserInput): Promise<UserDto> {
+    const exists = await this.userRepository.findByEmail(data.email);
+    if (exists) {
+      throw new ConflictException('User Already exists');
+    }
     const password = await bcrypt.hash(data.password, 12);
 
     return await this.userRepository.create({
@@ -31,6 +35,12 @@ export class UsersService {
   }
 
   async updateById(id: string, data: UpdateUserInput): Promise<UserDto> {
+    const exists = await this.userRepository.findById(id);
+
+    if (!exists) {
+      throw new ConflictException('User doesnot exists');
+    }
+
     const payload = { ...data };
 
     if (payload.password) {
@@ -41,6 +51,12 @@ export class UsersService {
   }
 
   async deleteById(id: string): Promise<UserDto> {
+    const exists = await this.userRepository.findById(id);
+
+    if (!exists) {
+      throw new ConflictException('User doesnot exists');
+    }
+
     return await this.userRepository.deleteById(id);
   }
 

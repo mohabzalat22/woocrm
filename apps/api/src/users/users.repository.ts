@@ -7,15 +7,35 @@ import { UserDto, UserWithPasswordDto } from './dto/index';
 @Injectable()
 export class UserRepository {
   async findById(id: string): Promise<UserDto | null> {
-    return await prisma.user.findUnique({ where: { id } });
+    return await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
   }
 
   async findByEmail(email: string): Promise<UserDto | null> {
-    return await prisma.user.findUnique({ where: { email } });
+    return await prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
   }
 
   async findAll(): Promise<UserDto[] | []> {
-    return await prisma.user.findMany();
+    return await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
   }
 
   async create(data: CreateUserInput): Promise<UserDto> {
@@ -30,11 +50,26 @@ export class UserRepository {
   }
 
   async updateById(id: string, data: UpdateUserInput): Promise<UserDto> {
-    return await prisma.user.update({ where: { id }, data });
+    return await prisma.user.update({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+      data,
+    });
   }
 
   async deleteById(id: string): Promise<UserDto> {
-    return await prisma.user.delete({ where: { id } });
+    return await prisma.user.delete({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    });
   }
 
   async findByEmailWithPassword(
