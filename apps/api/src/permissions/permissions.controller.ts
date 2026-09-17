@@ -51,9 +51,9 @@ export class PermissionsController {
   findAll(
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
   ) {
-    return this.permissionsService.findAll(userId, roleId, workspaceId);
+    return this.permissionsService.findAll(currentUserId, roleId, workspaceId);
   }
 
   @Get(':id')
@@ -67,9 +67,14 @@ export class PermissionsController {
     @Param('id') id: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
   ) {
-    return this.permissionsService.findById(id, userId, roleId, workspaceId);
+    return this.permissionsService.findById(
+      id,
+      currentUserId,
+      roleId,
+      workspaceId,
+    );
   }
 
   @Post()
@@ -86,10 +91,15 @@ export class PermissionsController {
   create(
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
     @Body() data: CreatePermissionDto,
   ) {
-    return this.permissionsService.create(userId, roleId, workspaceId, data);
+    return this.permissionsService.create(
+      currentUserId,
+      roleId,
+      workspaceId,
+      data,
+    );
   }
 
   @Patch(':id')
@@ -107,12 +117,12 @@ export class PermissionsController {
     @Param('id') id: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
     @Body() data: UpdatePermissionDto,
   ) {
     return this.permissionsService.updateById(
       id,
-      userId,
+      currentUserId,
       roleId,
       workspaceId,
       data,
@@ -133,9 +143,14 @@ export class PermissionsController {
     @Param('id') id: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
   ) {
-    return this.permissionsService.deleteById(id, userId, roleId, workspaceId);
+    return this.permissionsService.deleteById(
+      id,
+      currentUserId,
+      roleId,
+      workspaceId,
+    );
   }
 
   @Post(':permissionId/assign')
@@ -156,12 +171,12 @@ export class PermissionsController {
     @Param('permissionId') permissionId: string,
     @Param('roleId') roleId: string,
     @Param('workspaceId') workspaceId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
   ) {
     return this.permissionsService.assignPermissionToRole(
       permissionId,
       roleId,
-      userId,
+      currentUserId,
       workspaceId,
     );
   }
@@ -182,12 +197,12 @@ export class PermissionsController {
     @Param('permissionId') permissionId: string,
     @Param('roleId') roleId: string,
     @Param('workspaceId') workspaceId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
   ) {
     return this.permissionsService.detachPermissionFromRole(
       permissionId,
       roleId,
-      userId,
+      currentUserId,
       workspaceId,
     );
   }

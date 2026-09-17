@@ -25,9 +25,11 @@ import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { WorkspaceMembersService } from './workspace-members.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
-import { WorkspaceMemberResponseDto } from './dto';
-import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
-import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
+import {
+  CreateWorkspaceMemberDto,
+  UpdateWorkspaceMemberDto,
+  WorkspaceMemberResponseDto,
+} from './dto';
 
 @ApiTags('workspace-members')
 @ApiBearerAuth()
@@ -45,11 +47,11 @@ export class WorkspaceMembersController {
   @ApiOkResponse({ type: [WorkspaceMemberResponseDto] })
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
   async findAll(
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') currentUserId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
   ) {
     return await this.workspaceMembersService.findAllByWorkspaceId(
-      userId,
+      currentUserId,
       workspaceId,
     );
   }
@@ -61,9 +63,14 @@ export class WorkspaceMembersController {
   @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async findById(
     @Param('id') id: string,
+    @CurrentUser('id') currentUserId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
   ) {
-    return await this.workspaceMembersService.findById(id, workspaceId);
+    return await this.workspaceMembersService.findById(
+      id,
+      currentUserId,
+      workspaceId,
+    );
   }
 
   @Post()
@@ -75,8 +82,11 @@ export class WorkspaceMembersController {
     description: 'Created workspace member',
     type: WorkspaceMemberResponseDto,
   })
-  async create(@Body() data: CreateWorkspaceMemberInput) {
-    return await this.workspaceMembersService.create(data);
+  async create(
+    @Body() data: CreateWorkspaceMemberDto,
+    @CurrentUser('id') currentUserId: string,
+  ) {
+    return await this.workspaceMembersService.create(currentUserId, data);
   }
 
   @Patch(':id/workspaces/:workspaceId')
@@ -88,10 +98,16 @@ export class WorkspaceMembersController {
   @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async update(
     @Param('id') id: string,
+    @CurrentUser('id') currentUserId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
-    @Body() data: UpdateWorkspaceMemberInput,
+    @Body() data: UpdateWorkspaceMemberDto,
   ) {
-    return await this.workspaceMembersService.updateById(id, workspaceId, data);
+    return await this.workspaceMembersService.updateById(
+      id,
+      currentUserId,
+      workspaceId,
+      data,
+    );
   }
 
   @Delete(':id/workspaces/:workspaceId')
@@ -102,8 +118,13 @@ export class WorkspaceMembersController {
   @ApiOkResponse({ type: WorkspaceMemberResponseDto })
   async delete(
     @Param('id') id: string,
+    @CurrentUser('id') currentUserId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
   ) {
-    return await this.workspaceMembersService.deleteById(id, workspaceId);
+    return await this.workspaceMembersService.deleteById(
+      id,
+      currentUserId,
+      workspaceId,
+    );
   }
 }

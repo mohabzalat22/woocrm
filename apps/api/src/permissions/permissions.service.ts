@@ -20,11 +20,11 @@ export class PermissionsService {
 
   async findById(
     id: string,
-    userId: string,
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
   ): Promise<PermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
@@ -39,38 +39,39 @@ export class PermissionsService {
   }
 
   async findAll(
-    userId: string,
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
   ): Promise<PermissionDto[] | []> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     return await this.permissionsRepository.findAllByRoleId(roleId);
   }
 
   async findAllByRoleId(roleId: string): Promise<PermissionDto[] | []> {
+    // TODO: check authorization and security
     return await this.permissionsRepository.findAllByRoleId(roleId);
   }
 
   async create(
-    userId: string,
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
     data: CreatePermissionInput,
   ): Promise<PermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     return await this.permissionsRepository.create(roleId, data);
   }
 
   async updateById(
     id: string,
-    userId: string,
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
     data: UpdatePermissionInput,
   ): Promise<PermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
@@ -86,11 +87,11 @@ export class PermissionsService {
 
   async deleteById(
     id: string,
-    userId: string,
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
   ): Promise<PermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
@@ -107,10 +108,10 @@ export class PermissionsService {
   async assignPermissionToRole(
     permissionId: string,
     roleId: string,
-    userId: string,
+    CurrentUserId: string,
     workspaceId: string,
   ): Promise<RolePermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     const permission = await this.permissionsRepository.findById(permissionId);
 
@@ -136,10 +137,10 @@ export class PermissionsService {
   async detachPermissionFromRole(
     permissionId: string,
     roleId: string,
-    userId: string,
+    CurrentUserId: string,
     workspaceId: string,
   ): Promise<RolePermissionDto> {
-    await this.assertMemberAndRole(userId, roleId, workspaceId);
+    await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       permissionId,
@@ -156,13 +157,14 @@ export class PermissionsService {
     );
   }
 
-  private async assertMemberAndRole(
-    userId: string,
+  private async checkMemberAndRole(
+    CurrentUserId: string,
     roleId: string,
     workspaceId: string,
   ): Promise<void> {
     const member = await this.workspaceMembersService.findByUserId(
-      userId,
+      CurrentUserId,
+      CurrentUserId,
       workspaceId,
     );
 

@@ -36,6 +36,7 @@ export class RolesGuard implements CanActivate {
 
     const member = await this.workspaceMembersService.findByUserId(
       user.id,
+      user.id,
       workspaceId,
     );
 

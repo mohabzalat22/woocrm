@@ -5,6 +5,7 @@ import { PermissionsService } from '../../permissions/permissions.service';
 import { matchPermissions } from '../utils/match-utils';
 import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
 import { PermissionDto } from '../../permissions/dto';
+
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(
@@ -35,6 +36,7 @@ export class PermissionsGuard implements CanActivate {
     }
 
     const member = await this.workspaceMembersService.findByUserId(
+      user.id,
       user.id,
       workspaceId,
     );
