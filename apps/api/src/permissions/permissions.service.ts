@@ -172,7 +172,7 @@ export class PermissionsService {
       throw new NotFoundException('Member not found in this workspace');
     }
 
-    const role = this.rolesService.findById(roleId, workspaceId);
+    const role = await this.rolesService.findById(roleId, workspaceId);
 
     if (!role) {
       throw new NotFoundException('Role not found in this workspace');

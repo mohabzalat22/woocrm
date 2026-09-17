@@ -56,21 +56,21 @@ export class PermissionsController {
     return this.permissionsService.findAll(currentUserId, roleId, workspaceId);
   }
 
-  @Get(':id')
+  @Get(':permissionId')
   @ApiOperation({ summary: 'Find a permission by id' })
+  @ApiParam({ name: 'permissionId' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
-  @ApiParam({ name: 'id' })
   @ApiOkResponse({ type: PermissionResponseDto, description: 'Permission' })
   @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
   findById(
-    @Param('id') id: string,
+    @Param('permissionId') permissionId: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
     @CurrentUser('id') currentUserId: string,
   ) {
     return this.permissionsService.findById(
-      id,
+      permissionId,
       currentUserId,
       roleId,
       workspaceId,
@@ -102,11 +102,11 @@ export class PermissionsController {
     );
   }
 
-  @Patch(':id')
+  @Patch(':permissionId')
   @ApiOperation({ summary: 'Update a permission by id' })
+  @ApiParam({ name: 'permissionId' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
-  @ApiParam({ name: 'id' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @ApiOkResponse({
     type: PermissionResponseDto,
@@ -114,14 +114,14 @@ export class PermissionsController {
   })
   @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
   updateById(
-    @Param('id') id: string,
+    @Param('permissionId') permissionId: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
     @CurrentUser('id') currentUserId: string,
     @Body() data: UpdatePermissionDto,
   ) {
     return this.permissionsService.updateById(
-      id,
+      permissionId,
       currentUserId,
       roleId,
       workspaceId,
@@ -129,24 +129,24 @@ export class PermissionsController {
     );
   }
 
-  @Delete(':id')
+  @Delete(':permissionId')
   @ApiOperation({ summary: 'Delete a permission by id' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
-  @ApiParam({ name: 'id' })
+  @ApiParam({ name: 'permissionId' })
   @ApiOkResponse({
     type: PermissionResponseDto,
     description: 'Deleted permission',
   })
   @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
   deleteById(
-    @Param('id') id: string,
+    @Param('permissionId') permissionId: string,
     @Param('workspaceId') workspaceId: string,
     @Param('roleId') roleId: string,
     @CurrentUser('id') currentUserId: string,
   ) {
     return this.permissionsService.deleteById(
-      id,
+      permissionId,
       currentUserId,
       roleId,
       workspaceId,
