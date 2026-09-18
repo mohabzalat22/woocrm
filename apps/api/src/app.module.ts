@@ -13,6 +13,7 @@ import { WorkspaceMembersModule } from './workspace-members/workspace-members.mo
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { AuthorizationModule } from './authorization/authorization.module';
+import { InvitationsModule } from './invitations/invitations.module';
 
 @Module({
   controllers: [AppController],
@@ -39,6 +40,7 @@ import { AuthorizationModule } from './authorization/authorization.module';
     WorkspaceMembersModule,
     PermissionsModule,
     RolesModule,
+    InvitationsModule,
   ],
 })
 export class AppModule {}
