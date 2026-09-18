@@ -4,6 +4,7 @@ import { Roles } from '../decorators/roles.decorator';
 import { matchRoles } from '../utils/match-utils';
 import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
 import { RolesRepository } from '../../roles/roles.repository';
+import { Role } from '@repo/shared-types';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -14,10 +15,10 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(Roles, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const requiredRoles: Role[] = this.reflector.getAllAndOverride<Role[]>(
+      Roles,
+      [context.getHandler(), context.getClass()],
+    );
 
     if (!requiredRoles) {
       return true;
@@ -53,6 +54,8 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    return matchRoles(requiredRoles, role.name);
+    const roleName = role.name as Role;
+
+    return matchRoles(requiredRoles, roleName);
   }
 }

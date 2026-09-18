@@ -47,6 +47,9 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -292,6 +295,12 @@ importers:
         version: 16.3.0(@babel/core@7.29.7)(react-dom@19.3.0)(react@19.3.0)
       typescript:
         specifier: ^6.0.3
+        version: 6.0.3
+
+  packages/shared-types:
+    devDependencies:
+      typescript:
+        specifier: 6.0.3
         version: 6.0.3
 
   packages/tailwind-config:

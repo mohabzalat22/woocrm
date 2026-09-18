@@ -1,6 +1,8 @@
+import { Permission, Role } from '@repo/shared-types';
+
 export function matchRoles(
-  requiredRoles: string[],
-  userRole: string | undefined,
+  requiredRoles: Role[],
+  userRole: Role | undefined,
 ): boolean {
   if (!userRole) {
     return false;
@@ -10,8 +12,8 @@ export function matchRoles(
 }
 
 export function matchPermissions(
-  requiredPermissions: string[],
-  userPermissions: string[] | undefined,
+  requiredPermissions: Permission[],
+  userPermissions: Permission[] | undefined,
 ): boolean {
   if (!userPermissions?.length) {
     return false;

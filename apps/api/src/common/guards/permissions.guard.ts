@@ -1,29 +1,20 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { Permissions } from '../decorators/permissions.decorator';
 import { PermissionsService } from '../../permissions/permissions.service';
 import { matchPermissions } from '../utils/match-utils';
 import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
 import { PermissionDto } from '../../permissions/dto';
+import { RolesService } from '../../roles/roles.service';
+import { Permission, RolePermissions, Role } from '@repo/shared-types';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(
-    private readonly reflector: Reflector,
     private readonly workspaceMembersService: WorkspaceMembersService,
     private readonly permissionsService: PermissionsService,
+    private readonly rolesService: RolesService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
-      Permissions,
-      [context.getHandler(), context.getClass()],
-    );
-
-    if (!requiredPermissions) {
-      return true;
-    }
-
     const req = context.switchToHttp().getRequest<{
       user?: { id: string };
       params?: { workspaceId?: string };
@@ -45,6 +36,24 @@ export class PermissionsGuard implements CanActivate {
       return false;
     }
 
+    if (!member.roleId) {
+      return false;
+    }
+
+    const role = await this.rolesService.findById(member.roleId, workspaceId);
+
+    if (!role.name) {
+      return false;
+    }
+
+    const roleName = role.name as Role;
+
+    const requiredPermissions = RolePermissions[roleName];
+
+    if (!requiredPermissions) {
+      return true;
+    }
+
     const permissions = await this.permissionsService.findAllByRoleId(
       member.roleId,
     );
@@ -53,8 +62,8 @@ export class PermissionsGuard implements CanActivate {
       return false;
     }
 
-    const permissionNames: string[] = permissions.map(
-      (permission: PermissionDto) => permission.name,
+    const permissionNames: Permission[] = permissions.map(
+      (permission: PermissionDto) => permission.name as Permission,
     );
 
     return matchPermissions(requiredPermissions, permissionNames);
