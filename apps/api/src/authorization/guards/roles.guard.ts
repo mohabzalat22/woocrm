@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from '../decorators/roles.decorator';
-import { matchRoles } from '../utils/match-utils';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { matchRoles } from '../../common/utils/match-utils';
 import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
 import { RolesRepository } from '../../roles/roles.repository';
 import { Role } from '@repo/shared-types';
@@ -54,7 +54,7 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    const roleName = role.name as Role;
+    const roleName = role.name.toLowerCase() as Role;
 
     return matchRoles(requiredRoles, roleName);
   }

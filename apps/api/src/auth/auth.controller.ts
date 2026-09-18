@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { AuthService } from './auth.service';
+import { Public } from '../common/decorators/public.decorator';
 
 import {
   AccessTokenResponseDto,
@@ -18,6 +19,7 @@ import {
 
 @ApiTags('auth')
 @Controller('auth')
+@Public()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

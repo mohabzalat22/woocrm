@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { resolve } from 'node:path';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { ConfigModule } from '@nestjs/config';
@@ -12,21 +12,12 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
 import { WorkspaceMembersModule } from './workspace-members/workspace-members.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
-import { RolesGuard } from './common/guards/roles.guard';
-import { PermissionsGuard } from './common/guards/permissions.guard';
+import { AuthorizationModule } from './authorization/authorization.module';
 
 @Module({
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: PermissionsGuard,
-    },
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
@@ -43,6 +34,7 @@ import { PermissionsGuard } from './common/guards/permissions.guard';
     }),
     UsersModule,
     AuthModule,
+    AuthorizationModule,
     WorkspacesModule,
     WorkspaceMembersModule,
     PermissionsModule,

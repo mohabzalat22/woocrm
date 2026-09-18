@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -29,13 +28,11 @@ import {
   RolePermissionResponseDto,
 } from './dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../common/guards/auth-guard';
 
 @ApiTags('permissions')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('workspaces/:workspaceId/roles/:roleId/permissions')
-@UseGuards(JwtAuthGuard)
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 

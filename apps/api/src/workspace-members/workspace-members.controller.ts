@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -21,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 
-import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { WorkspaceMembersService } from './workspace-members.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
@@ -30,12 +28,10 @@ import {
   UpdateWorkspaceMemberDto,
   WorkspaceMemberResponseDto,
 } from './dto';
-
 @ApiTags('workspace-members')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('workspace-members')
-@UseGuards(JwtAuthGuard)
 export class WorkspaceMembersController {
   constructor(
     private readonly workspaceMembersService: WorkspaceMembersService,

@@ -6,7 +6,6 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 
 import {
@@ -21,7 +20,6 @@ import {
 } from '@nestjs/swagger';
 
 import { ZodResponse } from 'nestjs-zod';
-import { JwtAuthGuard } from '../common/guards/auth-guard';
 import { UsersService } from './users.service';
 
 import {
@@ -36,7 +34,6 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
