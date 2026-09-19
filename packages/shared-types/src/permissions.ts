@@ -41,6 +41,9 @@ export enum Permission {
   TEAM_MANAGE = "team:manage", // invite/remove/edit roles
   TEAM_VIEW_AUDIT_LOG = "team:view_audit_log",
 
+  // Workspace administration
+  WORKSPACE_MANAGE = "workspace:manage",
+
   // Settings
   SETTINGS_VIEW = "settings:view",
   SETTINGS_EDIT = "settings:edit",

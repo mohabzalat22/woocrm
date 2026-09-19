@@ -9,6 +9,7 @@ import { JwtPayload } from './types/jwt-payload.interface';
 import type { RegisterDto } from './dto/register.dto';
 import type { UserDto } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { SystemRole } from '@repo/shared-types';
 
 @Injectable()
 export class AuthService {
@@ -48,6 +49,7 @@ export class AuthService {
       sub: user.id,
       name: user.name,
       email: user.email,
+      systemRole: user.systemRole as SystemRole,
     };
 
     return this.jwtService.signAsync(payload);

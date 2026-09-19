@@ -4,6 +4,7 @@ import { PermissionSchema } from './permission.schema';
 export const CreatePermissionSchema = PermissionSchema.omit({
   id: true,
   createdAt: true,
+  workspaceId: true,
 });
 
 export type CreatePermissionInput = z.infer<typeof CreatePermissionSchema>;

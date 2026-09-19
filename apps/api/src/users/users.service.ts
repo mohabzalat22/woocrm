@@ -4,6 +4,7 @@ import type { CreateUserInput } from './schemas/create-user.schema';
 import type { UpdateUserInput } from './schemas/update-user.schema';
 import { UserDto, UserWithPasswordDto } from './dto/index';
 import * as bcrypt from 'bcrypt';
+import { FindByEmailUserDto } from './dto/find-by-email-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,7 +14,7 @@ export class UsersService {
     return await this.userRepository.findById(id);
   }
 
-  async findByEmail(email: string): Promise<UserDto | null> {
+  async findByEmail(email: string): Promise<FindByEmailUserDto | null> {
     return await this.userRepository.findByEmail(email);
   }
 

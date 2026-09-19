@@ -23,12 +23,14 @@ import { ZodResponse } from 'nestjs-zod';
 import { UsersService } from './users.service';
 
 import {
-  CreateUserDto,
+  // CreateUserDto,
   UpdateUserDto,
   UserDto,
   UserResponseDto,
 } from './dto/index';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { PlatformRoles } from '../common/decorators/platform-roles.decorator';
+import { SystemRole } from '@repo/shared-types';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -59,17 +61,18 @@ export class UsersController {
     return await this.userService.updateById(currentUser.id, data);
   }
 
-  @Post()
-  @ApiOperation({ summary: 'Create a user' })
-  @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ZodResponse({
-    status: 201,
-    description: 'Created user',
-    type: UserResponseDto,
-  })
-  async create(@Body() data: CreateUserDto) {
-    return await this.userService.create(data);
-  }
+  // @Post()
+  // @PlatformRoles(SystemRole.ADMIN)
+  // @ApiOperation({ summary: 'Create a user' })
+  // @ApiBadRequestResponse({ description: 'Validation failed' })
+  // @ZodResponse({
+  //   status: 201,
+  //   description: 'Created user',
+  //   type: UserResponseDto,
+  // })
+  // async create(@Body() data: CreateUserDto) {
+  //   return await this.userService.create(data);
+  // }
 
   @Get('email/:email')
   @ApiOperation({ summary: 'Find a user by email' })
@@ -83,6 +86,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @PlatformRoles(SystemRole.ADMIN)
   @ApiOperation({ summary: 'Find a user by id' })
   @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
   @ApiOkResponse({
@@ -94,20 +98,22 @@ export class UsersController {
     return await this.userService.findById(id);
   }
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a user by id' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiOkResponse({ type: UserResponseDto, description: 'Updated user' })
-  async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
-    return await this.userService.updateById(id, data);
-  }
+  // @Patch(':id')
+  // @PlatformRoles(SystemRole.ADMIN)
+  // @ApiOperation({ summary: 'Update a user by id' })
+  // @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
+  // @ApiBadRequestResponse({ description: 'Validation failed' })
+  // @ApiOkResponse({ type: UserResponseDto, description: 'Updated user' })
+  // async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
+  //   return await this.userService.updateById(id, data);
+  // }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by id' })
-  @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
-  @ApiOkResponse({ type: UserResponseDto, description: 'Deleted user' })
-  async delete(@Param('id') id: string) {
-    return await this.userService.deleteById(id);
-  }
+  // @Delete(':id')
+  // @PlatformRoles(SystemRole.ADMIN)
+  // @ApiOperation({ summary: 'Delete a user by id' })
+  // @ApiParam({ name: 'id', example: '04916981-b958-4ba6-854c-d99c47f25cd3' })
+  // @ApiOkResponse({ type: UserResponseDto, description: 'Deleted user' })
+  // async delete(@Param('id') id: string) {
+  //   return await this.userService.deleteById(id);
+  // }
 }

@@ -1,22 +1,23 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Roles } from '../../common/decorators/roles.decorator';
+import { ROLES_KEY } from '../../common/decorators/roles.decorator';
 import { matchRoles } from '../../common/utils/match-utils';
-import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
+import { WorkspaceContextService } from '../workspace-context.service';
 import { RolesRepository } from '../../roles/roles.repository';
 import { Role } from '@repo/shared-types';
+import { ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly workspaceMembersService: WorkspaceMembersService,
+    private readonly workspaceContext: WorkspaceContextService,
     private readonly rolesRepository: RolesRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const requiredRoles: Role[] = this.reflector.getAllAndOverride<Role[]>(
-      Roles,
+      ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
 
@@ -31,19 +32,9 @@ export class RolesGuard implements CanActivate {
     const user = req.user;
     const workspaceId = req.params?.workspaceId;
 
-    if (!user?.id || !workspaceId) {
-      return false;
-    }
+    if (!user?.id || !workspaceId) throw new ForbiddenException('Unauthorized request');
 
-    const member = await this.workspaceMembersService.findByUserId(
-      user.id,
-      user.id,
-      workspaceId,
-    );
-
-    if (!member) {
-      return false;
-    }
+    const member = await this.workspaceContext.requireMembership(user.id, workspaceId);
 
     const role = await this.rolesRepository.findById(
       member.roleId,
@@ -51,11 +42,15 @@ export class RolesGuard implements CanActivate {
     );
 
     if (!role) {
-      return false;
+      throw new ForbiddenException('Unauthorized request');
     }
 
     const roleName = role.name.toLowerCase() as Role;
 
-    return matchRoles(requiredRoles, roleName);
+    if (!matchRoles(requiredRoles, roleName)) {
+      throw new ForbiddenException('Unauthorized request');
+    }
+
+    return true;
   }
 }

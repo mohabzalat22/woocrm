@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import prisma, { PrismaClient } from '@repo/database';
 import { RoleDto } from './dto';
+import { Permission, Role, RolePermissions } from '@repo/shared-types';
 
-type TransactionClient = { role: PrismaClient['role'] };
+type TransactionClient = Pick<PrismaClient, 'role' | 'permission' | 'rolePermission'>;
 
 const DEFAULT_ROLE_NAMES = ['ADMIN', 'MANAGER', 'AGENT'] as const;
 
@@ -37,6 +38,23 @@ export class RolesRepository {
     if (!adminRole) {
       throw new Error('Failed to create default workspace roles');
     }
+
+    const roles = await tx.role.findMany({ where: { workspaceId } });
+    const permissions = await Promise.all(
+      Object.values(Permission).map((name) =>
+        tx.permission.create({
+          data: { name, workspaceId },
+        }),
+      ),
+    );
+    await tx.rolePermission.createMany({
+      data: roles.flatMap((role) =>
+        RolePermissions[role.name.toLowerCase() as Role].map((permissionName) => ({
+          roleId: role.id,
+          permissionId: permissions.find((permission) => permission.name === permissionName)!.id,
+        })),
+      ),
+    });
 
     return adminRole;
   }

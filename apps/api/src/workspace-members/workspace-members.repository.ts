@@ -37,23 +37,39 @@ export class WorkspaceMembersRepository {
     });
   }
 
-  async create(data: CreateWorkspaceMemberInput): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.create({ data });
+  async countByWorkspaceAndRoleName(
+    workspaceId: string,
+    roleName: 'ADMIN' | 'MANAGER' | 'AGENT',
+  ): Promise<number> {
+    return prisma.workspaceMember.count({
+      where: { workspaceId, role: { name: roleName } },
+    });
+  }
+
+  async create(
+    data: CreateWorkspaceMemberInput,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto> {
+    return await prisma.workspaceMember.create({ data: { ...data, workspaceId } });
   }
 
   async updateById(
     id: string,
+    workspaceId: string,
     data: UpdateWorkspaceMemberInput,
   ): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.update({
-      where: { id },
+    const result = await prisma.workspaceMember.updateMany({
+      where: { id, workspaceId },
       data,
     });
+    if (result.count !== 1) throw new Error('Member not found in this workspace');
+    return (await prisma.workspaceMember.findFirst({ where: { id, workspaceId } }))!;
   }
 
-  async deleteById(id: string): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.delete({
-      where: { id },
-    });
+  async deleteById(id: string, workspaceId: string): Promise<WorkspaceMemberDto> {
+    const existing = await prisma.workspaceMember.findFirst({ where: { id, workspaceId } });
+    if (!existing) throw new Error('Member not found in this workspace');
+    await prisma.workspaceMember.deleteMany({ where: { id, workspaceId } });
+    return existing;
   }
 }

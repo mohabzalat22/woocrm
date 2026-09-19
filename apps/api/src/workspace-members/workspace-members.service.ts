@@ -1,7 +1,6 @@
 import {
   ConflictException,
   NotFoundException,
-  BadRequestException,
   Injectable,
 } from '@nestjs/common';
 import { WorkspaceMemberDto } from './dto';
@@ -53,36 +52,34 @@ export class WorkspaceMembersService {
 
   async create(
     currentUserId: string,
+    workspaceId: string,
     data: CreateWorkspaceMemberInput,
   ): Promise<WorkspaceMemberDto> {
-    await this.userExistsIntheWorkspace(currentUserId, data.workspaceId);
+    await this.userExistsIntheWorkspace(currentUserId, workspaceId);
 
     const existing = await this.workspaceMembersRepository.findByUserId(
       data.userId,
-      data.workspaceId,
+      workspaceId,
     );
 
     if (existing) {
       throw new ConflictException('Member Already Exists');
     }
 
-    const role = await this.rolesService.findById(
-      data.roleId,
-      data.workspaceId,
-    );
+    const role = await this.rolesService.findById(data.roleId, workspaceId);
 
     if (!role) {
       throw new ConflictException('Role Doesnot Exists in the workspace');
     }
 
-    return await this.workspaceMembersRepository.create(data);
+    return await this.workspaceMembersRepository.create(data, workspaceId);
   }
 
   async updateById(
     id: string,
     currentUserId: string,
     workspaceId: string,
-    data: UpdateWorkspaceMemberInput, // now: userId, workspaceId, roleId all required
+    data: UpdateWorkspaceMemberInput,
   ): Promise<WorkspaceMemberDto> {
     await this.userExistsIntheWorkspace(currentUserId, workspaceId);
 
@@ -94,40 +91,39 @@ export class WorkspaceMembersService {
       throw new NotFoundException('Member not found in this workspace');
     }
 
-    if (data.userId !== targetMember.userId) {
-      throw new BadRequestException(
-        'userId does not match the member being updated',
-      );
-    }
+    if (!data.roleId || data.roleId === targetMember.roleId)
+      return targetMember;
 
-    const isMovingWorkspace = data.workspaceId !== workspaceId;
-
-    if (isMovingWorkspace) {
-      await this.userExistsIntheWorkspace(currentUserId, data.workspaceId);
-
-      const UserAlreadyExistsInTargetWorkspace =
-        await this.workspaceMembersRepository.findByUserId(
-          targetMember.userId,
-          data.workspaceId,
-        );
-      if (UserAlreadyExistsInTargetWorkspace) {
-        throw new ConflictException(
-          'User is already a member of the target workspace',
-        );
-      }
-    }
-
-    const role = await this.rolesService.findById(
+    const targetRole = await this.rolesService.findById(
       data.roleId,
-      data.workspaceId,
+      workspaceId,
     );
-    if (!role) {
+    if (!targetRole) {
       throw new NotFoundException(
         "this role doesn't relate to the targeted workspace",
       );
     }
 
-    return await this.workspaceMembersRepository.updateById(id, data);
+    const currentRole = await this.rolesService.findById(
+      targetMember.roleId,
+      workspaceId,
+    );
+    if (
+      currentRole.name === 'ADMIN' &&
+      targetRole.name !== 'ADMIN' &&
+      (await this.workspaceMembersRepository.countByWorkspaceAndRoleName(
+        workspaceId,
+        'ADMIN',
+      )) <= 1
+    ) {
+      throw new ConflictException('The last workspace admin cannot be removed');
+    }
+
+    return await this.workspaceMembersRepository.updateById(
+      id,
+      workspaceId,
+      data,
+    );
   }
 
   async deleteById(
@@ -145,7 +141,21 @@ export class WorkspaceMembersService {
     if (!existing) {
       throw new NotFoundException('Member not found in this workspace');
     }
-    return await this.workspaceMembersRepository.deleteById(id);
+
+    const targetRole = await this.rolesService.findById(
+      existing.roleId,
+      workspaceId,
+    );
+    if (
+      targetRole.name === 'ADMIN' &&
+      (await this.workspaceMembersRepository.countByWorkspaceAndRoleName(
+        workspaceId,
+        'ADMIN',
+      )) <= 1
+    ) {
+      throw new ConflictException('The last workspace admin cannot be removed');
+    }
+    return await this.workspaceMembersRepository.deleteById(id, workspaceId);
   }
 
   private async userExistsIntheWorkspace(

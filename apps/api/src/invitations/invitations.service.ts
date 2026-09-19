@@ -26,6 +26,11 @@ export class InvitationsService {
   ) {
     await this.rolesService.findById(data.roleId, workspaceId);
     const user = await this.usersRepository.findByEmail(data.email);
+    if (!user) {
+      throw new ConflictException(
+        'Make Sure the invited user is registered workspace',
+      );
+    }
     const invitedUserAlreadyExists = await this.membersRepository.findByUserId(
       user.id,
       workspaceId,

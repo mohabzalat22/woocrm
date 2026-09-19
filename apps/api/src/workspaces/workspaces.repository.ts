@@ -52,6 +52,20 @@ export class WorkspaceRepository {
         },
       });
 
+      const creatorMembership = await tx.workspaceMember.findUnique({
+        where: {
+          userId_workspaceId: {
+            userId,
+            workspaceId: workspace.id,
+          },
+        },
+      });
+      if (!creatorMembership || creatorMembership.roleId !== adminRole.id) {
+        throw new Error(
+          'Failed to assign the creator the workspace ADMIN role',
+        );
+      }
+
       return workspace;
     });
   }

@@ -28,6 +28,8 @@ import {
   RolePermissionResponseDto,
 } from './dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
+import { Permission } from '@repo/shared-types';
 
 @ApiTags('permissions')
 @ApiBearerAuth()
@@ -37,6 +39,7 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Get()
+  @RequirePermissions(Permission.SETTINGS_VIEW)
   @ApiOperation({ summary: 'List permissions for a role' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
@@ -54,6 +57,7 @@ export class PermissionsController {
   }
 
   @Get(':permissionId')
+  @RequirePermissions(Permission.SETTINGS_VIEW)
   @ApiOperation({ summary: 'Find a permission by id' })
   @ApiParam({ name: 'permissionId' })
   @ApiParam({ name: 'workspaceId' })
@@ -75,6 +79,7 @@ export class PermissionsController {
   }
 
   @Post()
+  @RequirePermissions(Permission.SETTINGS_EDIT)
   @ApiOperation({ summary: 'Create a permission for a role' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
@@ -100,6 +105,7 @@ export class PermissionsController {
   }
 
   @Patch(':permissionId')
+  @RequirePermissions(Permission.SETTINGS_EDIT)
   @ApiOperation({ summary: 'Update a permission by id' })
   @ApiParam({ name: 'permissionId' })
   @ApiParam({ name: 'workspaceId' })
@@ -127,6 +133,7 @@ export class PermissionsController {
   }
 
   @Delete(':permissionId')
+  @RequirePermissions(Permission.SETTINGS_EDIT)
   @ApiOperation({ summary: 'Delete a permission by id' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
@@ -151,6 +158,7 @@ export class PermissionsController {
   }
 
   @Post(':permissionId/assign')
+  @RequirePermissions(Permission.SETTINGS_EDIT)
   @ApiOperation({ summary: 'Assign a permission to a role' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })
@@ -179,6 +187,7 @@ export class PermissionsController {
   }
 
   @Delete(':permissionId/detach')
+  @RequirePermissions(Permission.SETTINGS_EDIT)
   @ApiOperation({ summary: 'Detach a permission from a role' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'roleId' })

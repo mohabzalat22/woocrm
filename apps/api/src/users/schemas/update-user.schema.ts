@@ -6,6 +6,7 @@ export const UpdateUserSchema = UserSchema.extend({
 })
   .omit({
     id: true,
+    systemRole: true,
   })
   .partial();
 

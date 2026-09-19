@@ -3,6 +3,8 @@ import prisma from '@repo/database';
 import type { CreateUserInput } from './schemas/create-user.schema';
 import type { UpdateUserInput } from './schemas/update-user.schema';
 import { UserDto, UserWithPasswordDto } from './dto/index';
+import { SystemRole } from '@repo/shared-types';
+import { FindByEmailUserDto } from './dto/find-by-email-user.dto';
 
 @Injectable()
 export class UserRepository {
@@ -13,11 +15,12 @@ export class UserRepository {
         id: true,
         email: true,
         name: true,
+        systemRole: true,
       },
     });
   }
 
-  async findByEmail(email: string): Promise<UserDto | null> {
+  async findByEmail(email: string): Promise<FindByEmailUserDto | null> {
     return await prisma.user.findUnique({
       where: { email },
       select: {
@@ -34,17 +37,19 @@ export class UserRepository {
         id: true,
         email: true,
         name: true,
+        systemRole: true,
       },
     });
   }
 
   async create(data: CreateUserInput): Promise<UserDto> {
     return await prisma.user.create({
-      data,
+      data: { ...data, systemRole: SystemRole.USER },
       select: {
         id: true,
         email: true,
         name: true,
+        systemRole: true,
       },
     });
   }
@@ -56,6 +61,7 @@ export class UserRepository {
         id: true,
         email: true,
         name: true,
+        systemRole: true,
       },
       data,
     });
@@ -68,6 +74,7 @@ export class UserRepository {
         id: true,
         email: true,
         name: true,
+        systemRole: true,
       },
     });
   }
@@ -77,6 +84,13 @@ export class UserRepository {
   ): Promise<UserWithPasswordDto | null> {
     return await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+        systemRole: true,
+      },
     });
   }
 }

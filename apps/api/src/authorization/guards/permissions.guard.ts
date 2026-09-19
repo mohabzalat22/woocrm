@@ -1,78 +1,58 @@
 import {
   CanActivate,
-  ConflictException,
   ExecutionContext,
   Injectable,
+  ForbiddenException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { PermissionsService } from '../../permissions/permissions.service';
 import { matchPermissions } from '../../common/utils/match-utils';
-import { WorkspaceMembersService } from '../../workspace-members/workspace-members.service';
 import { PermissionDto } from '../../permissions/dto';
-import { RolesService } from '../../roles/roles.service';
-import { Permission, RolePermissions, Role } from '@repo/shared-types';
+import { Permission } from '@repo/shared-types';
+import { REQUIRED_PERMISSIONS_KEY } from '../../common/decorators/permissions.decorator';
+import { WorkspaceContextService } from '../workspace-context.service';
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
   constructor(
-    private readonly workspaceMembersService: WorkspaceMembersService,
+    private readonly reflector: Reflector,
+    private readonly workspaceContext: WorkspaceContextService,
     private readonly permissionsService: PermissionsService,
-    private readonly rolesService: RolesService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const requiredPermissions = this.reflector.getAllAndOverride<Permission[]>(
+      REQUIRED_PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     const req = context.switchToHttp().getRequest<{
       user?: { id: string };
       params?: { workspaceId?: string };
+      workspaceMembership?: { roleId: string };
     }>();
     const user = req.user;
     const workspaceId = req.params?.workspaceId;
 
-    // Only workspace-scoped routes need permission checks. This lets the
-    // global guard coexist with auth, user, and other non-workspace routes.
-    if (!workspaceId) {
+    if (!workspaceId && !requiredPermissions) {
       return true;
     }
 
-    if (!user?.id) {
-      throw new ConflictException('UnAuthorized Request');
+    if (!workspaceId || !user?.id) {
+      throw new ForbiddenException('Unauthorized request');
     }
 
-    const member = await this.workspaceMembersService.findByUserId(
-      user.id,
-      user.id,
-      workspaceId,
-    );
+    const member = await this.workspaceContext.requireMembership(user.id, workspaceId);
+    req.workspaceMembership = member;
 
-    if (!member) {
-      throw new ConflictException('UnAuthorized Request');
-    }
-
-    if (!member.roleId) {
-      throw new ConflictException('UnAuthorized Request');
-    }
-
-    const role = await this.rolesService.findById(member.roleId, workspaceId);
-
-    if (!role.name) {
-      throw new ConflictException('UnAuthorized Request');
-    }
-
-    // Prisma stores role names as uppercase values while the shared enum uses
-    // lowercase values for permission-map keys.
-    const roleName = role.name.toLowerCase() as Role;
-
-    const requiredPermissions = RolePermissions[roleName];
-
-    if (!requiredPermissions) {
-      return true;
-    }
+    if (!requiredPermissions?.length) return true;
 
     const permissions = await this.permissionsService.findAllByRoleId(
       member.roleId,
+      workspaceId,
     );
 
     if (!permissions) {
-      throw new ConflictException('UnAuthorized Request');
+      throw new ForbiddenException('Unauthorized request');
     }
 
     const permissionNames: Permission[] = permissions.map(
@@ -80,7 +60,7 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (!matchPermissions(requiredPermissions, permissionNames)) {
-      throw new ConflictException('UnAuthorized Request');
+      throw new ForbiddenException('Unauthorized request');
     }
 
     return true;

@@ -18,6 +18,7 @@ model User {
   email            String            @unique
   name             String?
   password         String
+  systemRole       SystemRole        @default(USER)
   workspaceMembers WorkspaceMember[]
   workspaceInvites WorkspaceInvite[] @relation("InviteCreator")
 }
@@ -28,6 +29,7 @@ model Workspace {
   workspaceMembers WorkspaceMember[]
   workspaceInvites WorkspaceInvite[]
   roles            Role[]
+  permissions      Permission[]
 }
 
 model WorkspaceMember {
@@ -47,6 +49,7 @@ model WorkspaceMember {
 model WorkspaceInvite {
   id        String    @id @default(uuid())
   token     String    @unique
+  email     String
   role      Role      @relation(fields: [roleId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   expiresAt DateTime?
   createdAt DateTime  @default(now())
@@ -65,6 +68,11 @@ enum RoleEnum {
   ADMIN
   MANAGER
   AGENT
+}
+
+enum SystemRole {
+  USER
+  ADMIN
 }
 
 model Role {
@@ -86,8 +94,13 @@ model Permission {
   id          String           @id @default(uuid())
   name        String
   description String?
+  workspaceId String
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   roles       RolePermission[]
   createdAt   DateTime         @default(now())
+
+  @@unique([workspaceId, name])
+  @@index([workspaceId])
 }
 
 model RolePermission {

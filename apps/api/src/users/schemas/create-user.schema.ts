@@ -5,6 +5,7 @@ export const CreateUserSchema = UserSchema.extend({
   password: z.string().min(8).max(50),
 }).omit({
   id: true,
+  systemRole: true,
 });
 
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;

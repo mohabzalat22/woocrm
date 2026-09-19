@@ -8,6 +8,6 @@ import { RolesModule } from '../roles/roles.module';
   imports: [RolesModule],
   controllers: [WorkspaceMembersController],
   providers: [WorkspaceMembersService, WorkspaceMembersRepository],
-  exports: [WorkspaceMembersService],
+  exports: [WorkspaceMembersService, WorkspaceMembersRepository],
 })
 export class WorkspaceMembersModule {}

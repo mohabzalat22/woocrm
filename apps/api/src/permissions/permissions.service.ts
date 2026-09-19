@@ -29,6 +29,7 @@ export class PermissionsService {
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
       roleId,
+      workspaceId,
     );
 
     if (!permission) {
@@ -45,12 +46,11 @@ export class PermissionsService {
   ): Promise<PermissionDto[] | []> {
     await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
-    return await this.permissionsRepository.findAllByRoleId(roleId);
+    return await this.permissionsRepository.findAllByRoleId(roleId, workspaceId);
   }
 
-  async findAllByRoleId(roleId: string): Promise<PermissionDto[] | []> {
-    // TODO: check authorization and security
-    return await this.permissionsRepository.findAllByRoleId(roleId);
+  async findAllByRoleId(roleId: string, workspaceId: string): Promise<PermissionDto[] | []> {
+    return await this.permissionsRepository.findAllByRoleId(roleId, workspaceId);
   }
 
   async create(
@@ -61,7 +61,7 @@ export class PermissionsService {
   ): Promise<PermissionDto> {
     await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
-    return await this.permissionsRepository.create(roleId, data);
+    return await this.permissionsRepository.create(roleId, workspaceId, data);
   }
 
   async updateById(
@@ -76,13 +76,14 @@ export class PermissionsService {
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
       roleId,
+      workspaceId,
     );
 
     if (!permission) {
       throw new NotFoundException('Permission not found');
     }
 
-    return await this.permissionsRepository.updateById(permission.id, data);
+    return await this.permissionsRepository.updateById(permission.id, workspaceId, data);
   }
 
   async deleteById(
@@ -96,13 +97,14 @@ export class PermissionsService {
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       id,
       roleId,
+      workspaceId,
     );
 
     if (!permission) {
       throw new NotFoundException('Permission not found');
     }
 
-    return await this.permissionsRepository.deleteById(permission.id);
+    return await this.permissionsRepository.deleteById(permission.id, workspaceId);
   }
 
   async assignPermissionToRole(
@@ -113,7 +115,7 @@ export class PermissionsService {
   ): Promise<RolePermissionDto> {
     await this.checkMemberAndRole(CurrentUserId, roleId, workspaceId);
 
-    const permission = await this.permissionsRepository.findById(permissionId);
+    const permission = await this.permissionsRepository.findById(permissionId, workspaceId);
 
     if (!permission) {
       throw new NotFoundException('Permission not found');
@@ -122,6 +124,7 @@ export class PermissionsService {
     const alreadyAssigned = await this.permissionsRepository.findByIdAndRoleId(
       permissionId,
       roleId,
+      workspaceId,
     );
 
     if (alreadyAssigned) {
@@ -131,6 +134,7 @@ export class PermissionsService {
     return this.permissionsRepository.assignPermissionToRole(
       roleId,
       permissionId,
+      workspaceId,
     );
   }
 
@@ -145,6 +149,7 @@ export class PermissionsService {
     const permission = await this.permissionsRepository.findByIdAndRoleId(
       permissionId,
       roleId,
+      workspaceId,
     );
 
     if (!permission) {
@@ -154,6 +159,7 @@ export class PermissionsService {
     return await this.permissionsRepository.detachPermissionFromRole(
       roleId,
       permissionId,
+      workspaceId,
     );
   }
 
