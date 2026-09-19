@@ -1,5 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { Permission } from '@repo/shared-types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -16,6 +21,7 @@ export class InvitationsController {
 
   @Post('workspaces/:workspaceId/invitations')
   @RequirePermissions(Permission.TEAM_MANAGE)
+  @ApiParam({ name: 'workspaceId' })
   @ZodResponse({ status: 201, type: InvitationResponseDto })
   create(
     @CurrentUser('id') userId: string,
@@ -26,6 +32,7 @@ export class InvitationsController {
   }
 
   @Post('invitations/:token/accept')
+  @ApiParam({ name: 'token' })
   @ApiOperation({ summary: 'Accept a workspace invitation' })
   accept(
     @Param('token') token: string,
