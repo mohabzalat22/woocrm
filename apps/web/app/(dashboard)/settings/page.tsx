@@ -1,4 +1,4 @@
-import { UserSettingsForm } from "@/features/components/user-settings-form";
+import { UserSettingsForm } from "@/features/auth/components/user-settings-form";
 
 export default function SettingsPage() {
   return (

@@ -13,10 +13,10 @@ import {
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
 import { Eye, EyeOff, LogOut } from "lucide-react";
-import { useLogout } from "../auth/hooks/logout";
-import { useMe, useUpdateMe } from "../auth/hooks/me";
-import { UpdateMeSchema } from "../auth/schemas";
-import { WorkspaceList } from "../workspaces/components/workspace-list";
+import { useLogout } from "../hooks/logout";
+import { useMe, useUpdateMe } from "../hooks/me";
+import { UpdateMeSchema } from "../schemas";
+import { WorkspaceList } from "../../workspaces/components/workspace-list";
 
 const getInitials = (name: string | null | undefined) => {
   if (!name) return "?";

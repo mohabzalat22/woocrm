@@ -15,8 +15,8 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { useRegister } from "../auth/hooks/register";
-import { RegisterSchema } from "../auth/schemas";
+import { useRegister } from "../hooks/register";
+import { RegisterSchema } from "../schemas";
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);

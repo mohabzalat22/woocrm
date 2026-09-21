@@ -15,8 +15,8 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { useLogin } from "../auth/hooks/login";
-import { LoginSchema } from "../auth/schemas";
+import { useLogin } from "../hooks/login";
+import { LoginSchema } from "../schemas";
 
 export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
