@@ -15,8 +15,10 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@repo/ui/ui/dropdown-menu";
 
@@ -32,8 +34,9 @@ import {
   Users,
 } from "lucide-react";
 import SettingsButton from "./settings-button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWorkspaces } from "@/features/workspaces/hooks/workspaces";
+import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
 import { CreateWorkspaceDialog } from "@/features/workspaces/components/create-workspace-dialog";
 
 const menuItems = [
@@ -46,8 +49,25 @@ const menuItems = [
 export function AppSidebar() {
   const pathname = usePathname();
   const workspaces = useWorkspaces();
+  const { activeWorkspaceId, clearWorkspace, selectWorkspace } =
+    useActiveWorkspace();
   const [createWorkspaceOpenDialog, setCreateWorkspaceOpenDialog] =
     useState(false);
+  const activeWorkspace = workspaces.data?.find(
+    (workspace) => workspace.id === activeWorkspaceId,
+  );
+
+  useEffect(() => {
+    if (
+      !activeWorkspaceId ||
+      !workspaces.data ||
+      workspaces.data.some((workspace) => workspace.id === activeWorkspaceId)
+    ) {
+      return;
+    }
+
+    clearWorkspace();
+  }, [activeWorkspaceId, clearWorkspace, workspaces.data]);
 
   return (
     <Sidebar collapsible="icon">
@@ -62,12 +82,12 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
-                  title="Select Workspace"
+                  title={activeWorkspace?.name ?? "Select Workspace"}
                   className="h-9 !bg-transparent"
                 >
                   <Building2 />
                   <span className="group-data-[collapsible=icon]:hidden">
-                    Select Workspace
+                    {activeWorkspace?.name ?? "Select Workspace"}
                   </span>
                   <ChevronDown className="ml-auto group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
@@ -94,12 +114,20 @@ export function AppSidebar() {
                       No workspaces yet
                     </DropdownMenuItem>
                   )}
-                {workspaces.data?.map((workspace) => (
-                  <DropdownMenuItem key={workspace.id}>
-                    <Building2 />
-                    <span className="truncate">{workspace.name}</span>
-                  </DropdownMenuItem>
-                ))}
+                <DropdownMenuRadioGroup
+                  value={activeWorkspaceId ?? undefined}
+                  onValueChange={selectWorkspace}
+                >
+                  {workspaces.data?.map((workspace) => (
+                    <DropdownMenuRadioItem
+                      key={workspace.id}
+                      value={workspace.id}
+                    >
+                      <Building2 />
+                      <span className="truncate">{workspace.name}</span>
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => setCreateWorkspaceOpenDialog(true)}
