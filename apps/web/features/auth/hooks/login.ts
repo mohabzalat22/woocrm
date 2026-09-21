@@ -11,7 +11,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (data: LoginRespone) => {
-      queryClient.setQueryData(AUTH_KEY, data);
+      queryClient.setQueryData(AUTH_KEY, data.user);
       router.push("/dashboard");
     },
   });

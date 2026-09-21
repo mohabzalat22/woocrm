@@ -1,3 +1,5 @@
+import { CurrentUser } from "./current-user.interface";
+
 export interface LoginRespone {
-  accessToken: string;
+  user: CurrentUser;
 }

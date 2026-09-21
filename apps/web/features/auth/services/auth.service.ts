@@ -10,13 +10,13 @@ export const authApi = {
   login: (data: LoginPayload): Promise<LoginRespone> =>
     request("auth/login", { method: "POST", body: JSON.stringify(data) }),
 
-  register: (data: RegisterPayload): Promise<CurrentUser> =>
+  register: (data: RegisterPayload): Promise<LoginRespone> =>
     request("auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  logout: (): Promise<CurrentUser> =>
+  logout: (): Promise<void> =>
     request("auth/logout", { method: "POST" }),
 
   me: (): Promise<CurrentUser> => request("users/me", { method: "GET" }),

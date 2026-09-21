@@ -26,7 +26,11 @@ async function bootstrap() {
   app.useGlobalFilters(new ZodExceptionFilter());
   app.setGlobalPrefix('api');
 
-  const document = cleanupOpenApiDoc(SwaggerModule.createDocument(app, config));
+  const document = cleanupOpenApiDoc(
+    SwaggerModule.createDocument(app, config, {
+      ignoreGlobalPrefix: true,
+    }),
+  );
   SwaggerModule.setup('api/doc', app, document);
 
   await app.listen(3000);

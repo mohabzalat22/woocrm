@@ -9,7 +9,7 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: authApi.register,
     onSuccess: (data) => {
-      queryClient.setQueryData(AUTH_KEY, data);
+      queryClient.setQueryData(AUTH_KEY, data.user);
       router.push("/login");
     },
   });
