@@ -11,7 +11,7 @@ export const useMe = () => {
   });
 };
 
-export const updateMe = () => {
+export const useUpdateMe = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

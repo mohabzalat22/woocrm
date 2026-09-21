@@ -19,6 +19,7 @@ const pageLabels: Record<string, string> = {
   contacts: "Contacts",
   pipeline: "Pipeline",
   reports: "Reports",
+  settings: "Settings",
 };
 
 export function DashboardHeader() {
