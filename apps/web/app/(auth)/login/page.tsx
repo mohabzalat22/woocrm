@@ -1,4 +1,4 @@
-import { SignInCard } from "@/components/ui/signin-card";
+import { SignInForm } from "@/features/components/signin-form";
 import Image from "next/image";
 export default function page() {
   return (
@@ -13,7 +13,7 @@ export default function page() {
         />
       </div>
       <div className="w-full">
-        <SignInCard />
+        <SignInForm />
       </div>
     </div>
   );

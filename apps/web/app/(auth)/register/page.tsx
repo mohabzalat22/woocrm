@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { RegisterCard } from "@/components/ui/register-card";
+import { RegisterForm } from "@/features/components/register-form";
 
 export default function Page() {
   return (
@@ -14,7 +14,7 @@ export default function Page() {
         />
       </div>
       <div className="w-full">
-        <RegisterCard />
+        <RegisterForm />
       </div>
     </div>
   );

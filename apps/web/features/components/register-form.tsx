@@ -15,12 +15,10 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { RegisterService } from "@/features/auth/services/register.service";
-import { useRouter } from "next/navigation";
-import { SignInService } from "@/features/auth/services/sign-in.service";
+import { useRegister } from "../auth/hooks/register";
+import { RegisterSchema } from "../auth/schemas";
 
-export function RegisterCard() {
-  const router = useRouter();
+export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState("");
@@ -29,41 +27,30 @@ export function RegisterCard() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const register = useRegister();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
-    const registerService = new RegisterService();
-    const signInService = new SignInService();
+    const validation = RegisterSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!validation.success) {
+      setError(
+        validation.error.issues[0]?.message ?? "Invalid registration details",
+      );
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
-      if (password != confirmPassword) {
-        throw new Error("Please confirm the password");
-      }
-
-      const data = await registerService.register({
-        name,
-        email,
-        password,
-        confirmPassword,
-      });
-
-      if (!data) {
-        throw Error("unable to register");
-      }
-
-      const { accessToken } = await signInService.signIn({
-        email,
-        password,
-      });
-
-      if (!accessToken) {
-        throw new Error("unable to login");
-      }
-      window.localStorage.setItem("accessToken", accessToken);
-      router.push("/dashboard");
+      await register.mutateAsync(validation.data);
     } catch (registerError) {
       setError(
         registerError instanceof Error

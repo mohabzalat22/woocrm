@@ -2,7 +2,6 @@
 
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import {
@@ -16,27 +15,35 @@ import {
 } from "@repo/ui/ui/card";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
-import { SignInService } from "@/features/auth/services/sign-in.service";
+import { useLogin } from "../auth/hooks/login";
+import { LoginSchema } from "../auth/schemas";
 
-const signInService = new SignInService();
-
-export function SignInCard() {
-  const router = useRouter();
+export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const login = useLogin();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setIsSubmitting(true);
 
+    const validation = LoginSchema.safeParse({
+      email,
+      password,
+    });
+
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message ?? "Invalid login details");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      const { accessToken } = await signInService.signIn({ email, password });
-      window.localStorage.setItem("accessToken", accessToken);
-      router.push("/dashboard");
+      await login.mutateAsync(validation.data);
     } catch (signInError) {
       setError(
         signInError instanceof Error
