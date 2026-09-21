@@ -1,8 +1,13 @@
 import { Button } from "@repo/ui/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/ui/avatar";
 import { Settings } from "lucide-react";
+import { useMe } from "@/features/auth/hooks/me";
 
 export default function SettingsButton() {
+  const me = useMe();
+  const name = me.data?.name;
+  const systemRole = me.data?.systemRole;
+
   return (
     <Button
       variant="ghost"
@@ -13,8 +18,10 @@ export default function SettingsButton() {
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1 text-start group-data-[collapsible=icon]:hidden">
-        <p className="truncate text-sm font-medium">Mohab ali</p>
-        <p className="truncate text-xs text-sidebar-foreground/70">admin</p>
+        <p className="truncate text-sm font-medium">{name}</p>
+        <p className="truncate text-xs text-sidebar-foreground/70">
+          {systemRole}
+        </p>
       </div>
       <Settings className="size-4 shrink-0 text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden" />
     </Button>

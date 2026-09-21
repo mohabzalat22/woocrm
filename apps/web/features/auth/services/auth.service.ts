@@ -19,7 +19,7 @@ export const authApi = {
   logout: (): Promise<CurrentUser> =>
     request("auth/logout", { method: "POST" }),
 
-  me: (): Promise<CurrentUser> => request("/api/auth/me", { method: "GET" }),
+  me: (): Promise<CurrentUser> => request("users/me", { method: "GET" }),
 
   updateMe: (): Promise<CurrentUser> => request("auth/me", { method: "PATCH" }),
 };
