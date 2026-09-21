@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useWorkspaceStore } from "@/store";
+import { useWorkspaceStore } from "@/features/workspaces/store";
 
 export function useActiveWorkspace() {
   const activeWorkspaceId = useWorkspaceStore(
