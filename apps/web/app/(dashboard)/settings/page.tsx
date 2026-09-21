@@ -1,4 +1,4 @@
-import { UserSettingsForm } from "@/features/auth/components/user-settings-form";
+import { SettingsTabs } from "@/features/settings/components/settings-tabs";
 
 export default function SettingsPage() {
   return (
@@ -6,10 +6,10 @@ export default function SettingsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage your profile and account information.
+          Manage your profile, account, and team settings.
         </p>
       </div>
-      <UserSettingsForm />
+      <SettingsTabs />
     </div>
   );
 }
