@@ -16,6 +16,7 @@ import { Eye, EyeOff, LogOut } from "lucide-react";
 import { useLogout } from "../auth/hooks/logout";
 import { useMe, useUpdateMe } from "../auth/hooks/me";
 import { UpdateMeSchema } from "../auth/schemas";
+import { WorkspaceList } from "../workspaces/components/workspace-list";
 
 const getInitials = (name: string | null | undefined) => {
   if (!name) return "?";
@@ -256,6 +257,8 @@ export function UserSettingsForm() {
           </div>
         </CardContent>
       </Card>
+
+      <WorkspaceList />
 
       <Card size="sm">
         <CardHeader>

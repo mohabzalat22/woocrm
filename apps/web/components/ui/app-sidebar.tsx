@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@repo/ui/ui/dropdown-menu";
 
 import Link from "next/link";
@@ -26,9 +28,13 @@ import {
   ChevronDown,
   Inbox,
   Kanban,
+  Plus,
   Users,
 } from "lucide-react";
 import SettingsButton from "./settings-button";
+import { useState } from "react";
+import { useWorkspaces } from "@/features/workspaces/hooks/workspaces";
+import { CreateWorkspaceDialog } from "@/features/workspaces/components/create-workspace-dialog";
 
 const menuItems = [
   { label: "Inbox", href: "/inbox", icon: Inbox },
@@ -39,6 +45,9 @@ const menuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const workspaces = useWorkspaces();
+  const [createWorkspaceOpenDialog, setCreateWorkspaceOpenDialog] =
+    useState(false);
 
   return (
     <Sidebar collapsible="icon">
@@ -67,11 +76,43 @@ export function AppSidebar() {
                 align="end"
                 className="w-[--radix-popper-anchor-width]"
               >
-                <DropdownMenuItem>
-                  <span>Acme Inc</span>
+                <DropdownMenuLabel>Your workspaces</DropdownMenuLabel>
+                {workspaces.isLoading && (
+                  <DropdownMenuItem disabled>
+                    Loading workspaces...
+                  </DropdownMenuItem>
+                )}
+                {workspaces.isError && (
+                  <DropdownMenuItem disabled>
+                    Unable to load workspaces
+                  </DropdownMenuItem>
+                )}
+                {!workspaces.isLoading &&
+                  !workspaces.isError &&
+                  workspaces.data?.length === 0 && (
+                    <DropdownMenuItem disabled>
+                      No workspaces yet
+                    </DropdownMenuItem>
+                  )}
+                {workspaces.data?.map((workspace) => (
+                  <DropdownMenuItem key={workspace.id}>
+                    <Building2 />
+                    <span className="truncate">{workspace.name}</span>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={() => setCreateWorkspaceOpenDialog(true)}
+                >
+                  <Plus />
+                  <span>Add workspace</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <CreateWorkspaceDialog
+              open={createWorkspaceOpenDialog}
+              onOpenChange={setCreateWorkspaceOpenDialog}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
