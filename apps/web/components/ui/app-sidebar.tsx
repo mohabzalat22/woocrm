@@ -24,6 +24,7 @@ import {
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { WorkspaceDialog } from "@/common/components/workspace-dialog";
 import {
   BarChart3,
   Building2,
@@ -35,9 +36,8 @@ import {
 } from "lucide-react";
 import SettingsButton from "./settings-button";
 import { useEffect, useState } from "react";
-import { useWorkspaces } from "@/features/workspaces/hooks/workspaces";
+import { useWorkspaces } from "@/features/workspaces/hooks/use-workspaces";
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
-import { CreateWorkspaceDialog } from "@/features/workspaces/components/create-workspace-dialog";
 
 const menuItems = [
   { label: "Inbox", href: "/inbox", icon: Inbox },
@@ -137,7 +137,8 @@ export function AppSidebar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <CreateWorkspaceDialog
+            <WorkspaceDialog
+              mode="create"
               open={createWorkspaceOpenDialog}
               onOpenChange={setCreateWorkspaceOpenDialog}
             />

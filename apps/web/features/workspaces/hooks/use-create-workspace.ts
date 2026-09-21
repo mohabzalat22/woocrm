@@ -1,18 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  WORKSPACES_KEY,
-  workspacesApi,
-  type CreateWorkspacePayload,
-} from "../services/workspaces.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { WORKSPACES_KEY, workspacesApi } from "../services/workspaces.service";
+import type { CreateWorkspacePayload } from "../types/create-workspace.interface";
 import type { Workspace } from "../types/workspace.interface";
-
-export const useWorkspaces = () =>
-  useQuery({
-    queryKey: WORKSPACES_KEY,
-    queryFn: workspacesApi.findAll,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-  });
 
 export const useCreateWorkspace = () => {
   const queryClient = useQueryClient();
