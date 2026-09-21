@@ -10,7 +10,7 @@ import {
 
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -33,7 +33,7 @@ import { PlatformRoles } from '../common/decorators/platform-roles.decorator';
 import { SystemRole } from '@repo/shared-types';
 
 @ApiTags('users')
-@ApiBearerAuth()
+@ApiCookieAuth('access_token')
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('users')
 export class UsersController {

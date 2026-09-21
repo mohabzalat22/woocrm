@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
 
 @Global()
@@ -27,6 +28,7 @@ import { JwtAuthGuard } from '../common/guards/auth.guard';
   providers: [
     AuthService,
     JwtStrategy,
+    RefreshTokenStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

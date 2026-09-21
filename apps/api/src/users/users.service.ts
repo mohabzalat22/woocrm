@@ -66,4 +66,17 @@ export class UsersService {
   ): Promise<UserWithPasswordDto | null> {
     return await this.userRepository.findByEmailWithPassword(email);
   }
+
+  async findByIdWithRefreshTokenHash(
+    id: string,
+  ): Promise<{ id: string; refreshTokenHash: string | null } | null> {
+    return await this.userRepository.findByIdWithRefreshTokenHash(id);
+  }
+
+  async updateRefreshTokenHash(
+    id: string,
+    refreshTokenHash: string | null,
+  ): Promise<void> {
+    await this.userRepository.updateRefreshTokenHash(id, refreshTokenHash);
+  }
 }

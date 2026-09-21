@@ -93,4 +93,26 @@ export class UserRepository {
       },
     });
   }
+
+  async findByIdWithRefreshTokenHash(
+    id: string,
+  ): Promise<{ id: string; refreshTokenHash: string | null } | null> {
+    return await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        refreshTokenHash: true,
+      },
+    });
+  }
+
+  async updateRefreshTokenHash(
+    id: string,
+    refreshTokenHash: string | null,
+  ): Promise<void> {
+    await prisma.user.update({
+      where: { id },
+      data: { refreshTokenHash },
+    });
+  }
 }

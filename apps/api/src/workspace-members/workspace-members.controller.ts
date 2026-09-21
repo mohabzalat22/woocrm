@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -31,7 +31,7 @@ import {
   WorkspaceMemberResponseDto,
 } from './dto';
 @ApiTags('workspace-members')
-@ApiBearerAuth()
+@ApiCookieAuth('access_token')
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('workspaces/:workspaceId/members')
 export class WorkspaceMembersController {

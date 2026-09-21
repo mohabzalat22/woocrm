@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { ConfigService } from '@nestjs/config';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -13,6 +14,13 @@ describe('AuthController', () => {
         {
           provide: AuthService,
           useValue: {},
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn(),
+            getOrThrow: jest.fn(),
+          },
         },
       ],
     }).compile();

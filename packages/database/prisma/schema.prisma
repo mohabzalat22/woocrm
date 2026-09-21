@@ -18,6 +18,7 @@ model User {
   email            String            @unique
   name             String?
   password         String
+  refreshTokenHash String? // TODO: fix multiple sessions
   systemRole       SystemRole        @default(USER)
   workspaceMembers WorkspaceMember[]
   workspaceInvites WorkspaceInvite[] @relation("InviteCreator")

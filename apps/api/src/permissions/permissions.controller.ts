@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -32,7 +32,7 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { Permission } from '@repo/shared-types';
 
 @ApiTags('permissions')
-@ApiBearerAuth()
+@ApiCookieAuth('access_token')
 @ApiUnauthorizedResponse({ description: 'Missing or invalid access token' })
 @Controller('workspaces/:workspaceId/roles/:roleId/permissions')
 export class PermissionsController {

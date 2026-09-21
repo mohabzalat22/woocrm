@@ -1,6 +1,6 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiOperation,
   ApiParam,
   ApiTags,
@@ -14,7 +14,7 @@ import { CreateInvitationDto, InvitationResponseDto } from './dto';
 import { InvitationsService } from './invitations.service';
 
 @ApiTags('invitations')
-@ApiBearerAuth()
+@ApiCookieAuth('access_token')
 @Controller()
 export class InvitationsController {
   constructor(private readonly invitationsService: InvitationsService) {}

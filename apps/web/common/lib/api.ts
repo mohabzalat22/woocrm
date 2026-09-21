@@ -18,6 +18,7 @@ export const request = async <T>(
 ): Promise<T> => {
   const res = await fetch(PUBLIC_API_URL + url, {
     ...options,
+    credentials: "include",
     headers: { "Content-Type": "application/json", ...options.headers },
   });
 
