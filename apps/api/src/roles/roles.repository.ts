@@ -9,6 +9,13 @@ const DEFAULT_ROLE_NAMES = ['ADMIN', 'MANAGER', 'AGENT'] as const;
 
 @Injectable()
 export class RolesRepository {
+  async findAllByWorkspaceId(workspaceId: string): Promise<RoleDto[]> {
+    return await prisma.role.findMany({
+      where: { workspaceId },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findById(id: string, workspaceId: string): Promise<RoleDto | null> {
     return await prisma.role.findFirst({
       where: { id, workspaceId },

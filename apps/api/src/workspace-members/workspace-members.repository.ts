@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import prisma from '@repo/database';
-import { WorkspaceMemberDto } from './dto/index';
+import {
+  WorkspaceMemberDto,
+  WorkspaceMemberWithRelationsDto,
+} from './dto/index';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
 
@@ -31,9 +34,19 @@ export class WorkspaceMembersRepository {
 
   async findAllByWorkspaceId(
     workspaceId: string,
-  ): Promise<WorkspaceMemberDto[] | []> {
+  ): Promise<WorkspaceMemberWithRelationsDto[] | []> {
     return await prisma.workspaceMember.findMany({
       where: { workspaceId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+        role: true,
+      },
     });
   }
 
@@ -50,7 +63,9 @@ export class WorkspaceMembersRepository {
     data: CreateWorkspaceMemberInput,
     workspaceId: string,
   ): Promise<WorkspaceMemberDto> {
-    return await prisma.workspaceMember.create({ data: { ...data, workspaceId } });
+    return await prisma.workspaceMember.create({
+      data: { ...data, workspaceId },
+    });
   }
 
   async updateById(
@@ -62,12 +77,20 @@ export class WorkspaceMembersRepository {
       where: { id, workspaceId },
       data,
     });
-    if (result.count !== 1) throw new Error('Member not found in this workspace');
-    return (await prisma.workspaceMember.findFirst({ where: { id, workspaceId } }))!;
+    if (result.count !== 1)
+      throw new Error('Member not found in this workspace');
+    return (await prisma.workspaceMember.findFirst({
+      where: { id, workspaceId },
+    }))!;
   }
 
-  async deleteById(id: string, workspaceId: string): Promise<WorkspaceMemberDto> {
-    const existing = await prisma.workspaceMember.findFirst({ where: { id, workspaceId } });
+  async deleteById(
+    id: string,
+    workspaceId: string,
+  ): Promise<WorkspaceMemberDto> {
+    const existing = await prisma.workspaceMember.findFirst({
+      where: { id, workspaceId },
+    });
     if (!existing) throw new Error('Member not found in this workspace');
     await prisma.workspaceMember.deleteMany({ where: { id, workspaceId } });
     return existing;

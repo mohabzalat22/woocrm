@@ -1,10 +1,9 @@
 import { z } from 'zod';
-import { PermissionSchema } from './permission.schema';
 
-export const UpdatePermissionSchema = PermissionSchema.omit({
-  id: true,
-  createdAt: true,
-  workspaceId: true,
-}).partial();
+export const UpdatePermissionSchema = z
+  .object({
+    description: z.string().nullable().optional(),
+  })
+  .strict();
 
 export type UpdatePermissionInput = z.infer<typeof UpdatePermissionSchema>;

@@ -18,6 +18,19 @@ export class PermissionsService {
     private readonly workspaceMembersService: WorkspaceMembersService,
   ) {}
 
+  async findAllByWorkspaceId(
+    CurrentUserId: string,
+    workspaceId: string,
+  ): Promise<PermissionDto[]> {
+    await this.workspaceMembersService.findByUserId(
+      CurrentUserId,
+      CurrentUserId,
+      workspaceId,
+    );
+
+    return this.permissionsRepository.findAllByWorkspaceId(workspaceId);
+  }
+
   async findById(
     id: string,
     CurrentUserId: string,

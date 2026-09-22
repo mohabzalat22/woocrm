@@ -6,7 +6,7 @@ export const UpdateWorkspaceMemberSchema = WorkspaceMemberSchema.omit({
   createdAt: true,
   userId: true,
   workspaceId: true,
-}).partial();
+}).partial(); // only roleID could be updated
 
 export type UpdateWorkspaceMemberInput = z.infer<
   typeof UpdateWorkspaceMemberSchema

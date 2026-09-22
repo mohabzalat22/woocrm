@@ -1,15 +1,5 @@
 "use client";
 
-import { UserPlus, Users } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -17,39 +7,7 @@ import {
   TabsTrigger,
 } from "@repo/ui/ui/tabs";
 import { UserSettingsForm } from "@/features/auth/components/user-settings-form";
-
-function TeamsSettings() {
-  return (
-    <div className="grid max-w-3xl gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Team members</CardTitle>
-          <CardDescription>
-            Invite people to your workspace and manage their access.
-          </CardDescription>
-          <CardAction>
-            <Button type="button" variant="outline" disabled>
-              <UserPlus />
-              Invite member
-            </Button>
-          </CardAction>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed px-6 py-12 text-center">
-            <div className="mb-3 flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Users className="size-5" aria-hidden="true" />
-            </div>
-            <p className="font-medium">No team members yet</p>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Team members and their roles will appear here once team
-              management is connected.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+import { TeamsSettings } from "@/features/settings/components/teams-settings";
 
 export function SettingsTabs() {
   return (

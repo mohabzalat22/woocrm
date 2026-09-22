@@ -6,6 +6,10 @@ import { RolesRepository } from './roles.repository';
 export class RolesService {
   constructor(private readonly rolesRepository: RolesRepository) {}
 
+  async findAllByWorkspaceId(workspaceId: string): Promise<RoleDto[]> {
+    return this.rolesRepository.findAllByWorkspaceId(workspaceId);
+  }
+
   async findById(id: string, workspaceId: string): Promise<RoleDto> {
     const role = await this.rolesRepository.findById(id, workspaceId);
 

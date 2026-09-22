@@ -6,6 +6,13 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class PermissionsRepository {
+  async findAllByWorkspaceId(workspaceId: string): Promise<PermissionDto[]> {
+    return await prisma.permission.findMany({
+      where: { workspaceId },
+      orderBy: { name: 'asc' },
+    });
+  }
+
   async findById(
     id: string,
     workspaceId: string,

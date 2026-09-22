@@ -5,12 +5,12 @@ import {
   Get,
   Param,
   Patch,
-  Post,
+  // Post,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCookieAuth,
-  ApiConflictResponse,
+  // ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,9 +26,10 @@ import { CurrentWorkspace } from '../common/decorators/current-workspace.decorat
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { Permission } from '@repo/shared-types';
 import {
-  CreateWorkspaceMemberDto,
+  // CreateWorkspaceMemberDto,
   UpdateWorkspaceMemberDto,
   WorkspaceMemberResponseDto,
+  WorkspaceMemberWithRelationsResponseDto,
 } from './dto';
 @ApiTags('workspace-members')
 @ApiCookieAuth('access_token')
@@ -43,7 +44,8 @@ export class WorkspaceMembersController {
   @RequirePermissions(Permission.TEAM_VIEW)
   @ApiOperation({ summary: 'List members of a workspace' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: [WorkspaceMemberResponseDto] })
+  @ApiOkResponse({ type: [WorkspaceMemberWithRelationsResponseDto] })
+  @ZodResponse({ status: 200, type: [WorkspaceMemberWithRelationsResponseDto] })
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
   async findAll(
     @CurrentUser('id') currentUserId: string,
@@ -73,28 +75,28 @@ export class WorkspaceMembersController {
     );
   }
 
-  @Post()
-  @RequirePermissions(Permission.TEAM_MANAGE)
-  @ApiParam({ name: 'workspaceId' })
-  @ApiOperation({ summary: 'Add a member to a workspace' })
-  @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiConflictResponse({ description: 'Member already exists' })
-  @ZodResponse({
-    status: 201,
-    description: 'Created workspace member',
-    type: WorkspaceMemberResponseDto,
-  })
-  async create(
-    @Body() data: CreateWorkspaceMemberDto,
-    @CurrentUser('id') currentUserId: string,
-    @CurrentWorkspace('workspaceId') workspaceId: string,
-  ) {
-    return await this.workspaceMembersService.create(
-      currentUserId,
-      workspaceId,
-      data,
-    );
-  }
+  // @Post()
+  // @RequirePermissions(Permission.TEAM_MANAGE)
+  // @ApiParam({ name: 'workspaceId' })
+  // @ApiOperation({ summary: 'Add a member to a workspace' })
+  // @ApiBadRequestResponse({ description: 'Validation failed' })
+  // @ApiConflictResponse({ description: 'Member already exists' })
+  // @ZodResponse({
+  //   status: 201,
+  //   description: 'Created workspace member',
+  //   type: WorkspaceMemberResponseDto,
+  // })
+  // async create(
+  //   @Body() data: CreateWorkspaceMemberDto,
+  //   @CurrentUser('id') currentUserId: string,
+  //   @CurrentWorkspace('workspaceId') workspaceId: string,
+  // ) {
+  //   return await this.workspaceMembersService.create(
+  //     currentUserId,
+  //     workspaceId,
+  //     data,
+  //   );
+  // }
 
   @Patch(':memberId')
   @RequirePermissions(Permission.TEAM_MANAGE)

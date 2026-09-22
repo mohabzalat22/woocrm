@@ -22,7 +22,7 @@ import { ZodResponse } from 'nestjs-zod';
 
 import { PermissionsService } from './permissions.service';
 import {
-  CreatePermissionDto,
+  // CreatePermissionDto,
   UpdatePermissionDto,
   PermissionResponseDto,
   RolePermissionResponseDto,
@@ -78,31 +78,31 @@ export class PermissionsController {
     );
   }
 
-  @Post()
-  @RequirePermissions(Permission.SETTINGS_EDIT)
-  @ApiOperation({ summary: 'Create a permission for a role' })
-  @ApiParam({ name: 'workspaceId' })
-  @ApiParam({ name: 'roleId' })
-  @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ApiNotFoundResponse({ description: 'Member or role not found' })
-  @ZodResponse({
-    status: 201,
-    description: 'Created permission',
-    type: PermissionResponseDto,
-  })
-  create(
-    @Param('workspaceId') workspaceId: string,
-    @Param('roleId') roleId: string,
-    @CurrentUser('id') currentUserId: string,
-    @Body() data: CreatePermissionDto,
-  ) {
-    return this.permissionsService.create(
-      currentUserId,
-      roleId,
-      workspaceId,
-      data,
-    );
-  }
+  // @Post()
+  // @RequirePermissions(Permission.SETTINGS_EDIT)
+  // @ApiOperation({ summary: 'Create a permission for a role' })
+  // @ApiParam({ name: 'workspaceId' })
+  // @ApiParam({ name: 'roleId' })
+  // @ApiBadRequestResponse({ description: 'Validation failed' })
+  // @ApiNotFoundResponse({ description: 'Member or role not found' })
+  // @ZodResponse({
+  //   status: 201,
+  //   description: 'Created permission',
+  //   type: PermissionResponseDto,
+  // })
+  // create(
+  //   @Param('workspaceId') workspaceId: string,
+  //   @Param('roleId') roleId: string,
+  //   @CurrentUser('id') currentUserId: string,
+  //   @Body() data: CreatePermissionDto,
+  // ) {
+  //   return this.permissionsService.create(
+  //     currentUserId,
+  //     roleId,
+  //     workspaceId,
+  //     data,
+  //   );
+  // }
 
   @Patch(':permissionId')
   @RequirePermissions(Permission.SETTINGS_EDIT)
@@ -132,30 +132,30 @@ export class PermissionsController {
     );
   }
 
-  @Delete(':permissionId')
-  @RequirePermissions(Permission.SETTINGS_EDIT)
-  @ApiOperation({ summary: 'Delete a permission by id' })
-  @ApiParam({ name: 'workspaceId' })
-  @ApiParam({ name: 'roleId' })
-  @ApiParam({ name: 'permissionId' })
-  @ApiOkResponse({
-    type: PermissionResponseDto,
-    description: 'Deleted permission',
-  })
-  @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
-  deleteById(
-    @Param('permissionId') permissionId: string,
-    @Param('workspaceId') workspaceId: string,
-    @Param('roleId') roleId: string,
-    @CurrentUser('id') currentUserId: string,
-  ) {
-    return this.permissionsService.deleteById(
-      permissionId,
-      currentUserId,
-      roleId,
-      workspaceId,
-    );
-  }
+  // @Delete(':permissionId')
+  // @RequirePermissions(Permission.SETTINGS_EDIT)
+  // @ApiOperation({ summary: 'Delete a permission by id' })
+  // @ApiParam({ name: 'workspaceId' })
+  // @ApiParam({ name: 'roleId' })
+  // @ApiParam({ name: 'permissionId' })
+  // @ApiOkResponse({
+  //   type: PermissionResponseDto,
+  //   description: 'Deleted permission',
+  // })
+  // @ApiNotFoundResponse({ description: 'Member, role, or permission not found' })
+  // deleteById(
+  //   @Param('permissionId') permissionId: string,
+  //   @Param('workspaceId') workspaceId: string,
+  //   @Param('roleId') roleId: string,
+  //   @CurrentUser('id') currentUserId: string,
+  // ) {
+  //   return this.permissionsService.deleteById(
+  //     permissionId,
+  //     currentUserId,
+  //     roleId,
+  //     workspaceId,
+  //   );
+  // }
 
   @Post(':permissionId/assign')
   @RequirePermissions(Permission.SETTINGS_EDIT)

@@ -3,7 +3,7 @@ import {
   NotFoundException,
   Injectable,
 } from '@nestjs/common';
-import { WorkspaceMemberDto } from './dto';
+import { WorkspaceMemberDto, WorkspaceMemberWithRelationsDto } from './dto';
 import { CreateWorkspaceMemberInput } from './schemas/create-workspace-member.schema';
 import { UpdateWorkspaceMemberInput } from './schemas/update-workspace-member.schema';
 import { WorkspaceMembersRepository } from './workspace-members.repository';
@@ -42,7 +42,7 @@ export class WorkspaceMembersService {
   async findAllByWorkspaceId(
     currentUserId: string,
     workspaceId: string,
-  ): Promise<WorkspaceMemberDto[] | []> {
+  ): Promise<WorkspaceMemberWithRelationsDto[] | []> {
     await this.userExistsIntheWorkspace(currentUserId, workspaceId);
 
     return await this.workspaceMembersRepository.findAllByWorkspaceId(
