@@ -1,8 +1,12 @@
-export type ChannelName = 'whatsapp' | 'slack';
+/**
+ * Channel names are intentionally open-ended. A new provider only needs to
+ * implement MessageChannel and register it with MessageChannelRegistry.
+ */
+export type ChannelName = string;
 
 export interface Recipient {
   contactId: string; // platform based
-  phone?: string; // E.164 format, e.g. "+15551234567" — required for WhatsApp
+  phone?: string; // E.164 format, e.g. "+15551234567" - required for WhatsApp
   slackUserId?: string;
 }
 
@@ -23,6 +27,7 @@ export interface IncomingMessage {
 }
 
 export interface OutgoingMessage {
+  workspaceId: string;
   recipient: Recipient;
   text?: string;
   /** WhatsApp-only: required when sending outside the 24h session window. */
@@ -44,4 +49,21 @@ export interface MessageChannel {
    * actual messages (delivery receipts, status updates, etc.).
    */
   parseIncoming(rawPayload: unknown): IncomingMessage | null;
+
+  /** Optional channel-specific work after an inbound message is normalized. */
+  onIncoming?(message: IncomingMessage): Promise<void>;
+}
+
+/** Additional contract required by channels exposed through a webhook. */
+export interface WebhookMessageChannel extends MessageChannel {
+  verifySubscription(
+    mode: string | undefined,
+    verifyToken: string | undefined,
+    challenge: string | undefined,
+  ): string;
+
+  assertValidSignature(
+    signature: string | undefined,
+    rawBody: Buffer | undefined,
+  ): void;
 }

@@ -15,6 +15,14 @@ export class WhatsAppConnectionRepository {
     return prisma.whatsAppConnection.findUnique({ where: { workspaceId } });
   }
 
+  findByWhatsAppBusinessAccountId(
+    whatsappBusinessAccountId: string,
+  ): Promise<WhatsAppConnectionDto | null> {
+    return prisma.whatsAppConnection.findFirst({
+      where: { whatsappBusinessAccountId },
+    });
+  }
+
   upsert(
     workspaceId: string,
     data: UpsertWhatsAppConnectionDto,

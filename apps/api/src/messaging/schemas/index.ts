@@ -4,3 +4,4 @@ export * from './whatsapp-connection.schema';
 export * from './whatsapp-oauth-callback.schema';
 export * from './whatsapp-oauth-state.schema';
 export * from './whatsapp-connection-response.schema';
+export * from './send-message.schema';
