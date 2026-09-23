@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SettingsTabs } from "@/features/settings/components/settings-tabs";
 
 export default function SettingsPage() {
@@ -9,7 +10,9 @@ export default function SettingsPage() {
           Manage your profile, account, and team settings.
         </p>
       </div>
-      <SettingsTabs />
+      <Suspense fallback={null}>
+        <SettingsTabs />
+      </Suspense>
     </div>
   );
 }

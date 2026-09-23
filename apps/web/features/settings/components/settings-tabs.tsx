@@ -1,18 +1,26 @@
 "use client";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/ui/tabs";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/ui/tabs";
 import { UserSettingsForm } from "@/features/auth/components/user-settings-form";
 import { TeamsSettings } from "@/features/settings/components/teams-settings";
+import { ChannelsSettings } from "@/features/settings/components/channels-settings";
 
 export function SettingsTabs() {
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState("general");
+
+  useEffect(() => {
+    setActiveTab(
+      searchParams.get("tab") === "channels" ? "channels" : "general",
+    );
+  }, [searchParams]);
   return (
     <Tabs
-      defaultValue="general"
+      value={activeTab}
+      onValueChange={setActiveTab}
       orientation="vertical"
       className="min-w-0 flex-col gap-6 md:flex-row md:items-start"
     >
@@ -32,6 +40,12 @@ export function SettingsTabs() {
         >
           Teams
         </TabsTrigger>
+        <TabsTrigger
+          value="channels"
+          className="h-auto flex-none justify-start px-3 py-2 text-left"
+        >
+          Channels
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="general" className="min-w-0">
@@ -39,6 +53,9 @@ export function SettingsTabs() {
       </TabsContent>
       <TabsContent value="teams" className="min-w-0">
         <TeamsSettings />
+      </TabsContent>
+      <TabsContent value="channels" className="min-w-0">
+        <ChannelsSettings />
       </TabsContent>
     </Tabs>
   );

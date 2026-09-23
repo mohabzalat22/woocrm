@@ -14,6 +14,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { InvitationsModule } from './invitations/invitations.module';
+import { MessagingModule } from './messaging/messaging.module';
 
 @Module({
   controllers: [AppController],
@@ -41,6 +42,7 @@ import { InvitationsModule } from './invitations/invitations.module';
     PermissionsModule,
     RolesModule,
     InvitationsModule,
+    MessagingModule,
   ],
 })
 export class AppModule {}

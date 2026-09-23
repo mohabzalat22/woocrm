@@ -17,5 +17,6 @@ import { WorkspaceContextService } from './workspace-context.service';
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
   ],
+  exports: [WorkspaceContextService],
 })
 export class AuthorizationModule {}

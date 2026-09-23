@@ -11,6 +11,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@repo/shared-types": "workspace:*",
     "@phosphor-icons/react": "^2.1.10",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.103.1",

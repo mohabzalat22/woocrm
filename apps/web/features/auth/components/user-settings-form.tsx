@@ -41,6 +41,11 @@ export function UserSettingsForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true); // TODO: make a proper fix
+  }, []);
 
   useEffect(() => {
     if (!me.data) return;
@@ -90,7 +95,10 @@ export function UserSettingsForm() {
     }
   }
 
-  if (me.isLoading) {
+  // The server cannot share the browser's React Query cache. Keep the first
+  // client render identical to the server render when the query was already
+  // resolved elsewhere in the dashboard (for example, the sidebar).
+  if (!hasMounted || me.isLoading) {
     return <p className="text-sm text-muted-foreground">Loading settings...</p>;
   }
 
