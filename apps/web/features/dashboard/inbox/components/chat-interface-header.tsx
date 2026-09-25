@@ -97,7 +97,7 @@ export default function ChatInterfaceHeader({
           </DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
           <p className="px-1.5 py-1 text-[11px] text-muted-foreground">
-            Open the profile sidebar to see contact details and activity.
+            Client Details
           </p>
         </DropdownMenuContent>
       </DropdownMenu>
