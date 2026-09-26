@@ -15,6 +15,7 @@ import { RolesModule } from './roles/roles.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { InvitationsModule } from './invitations/invitations.module';
 import { MessagingModule } from './messaging/messaging.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   controllers: [AppController],
@@ -43,6 +44,7 @@ import { MessagingModule } from './messaging/messaging.module';
     RolesModule,
     InvitationsModule,
     MessagingModule,
+    ContactsModule,
   ],
 })
 export class AppModule {}

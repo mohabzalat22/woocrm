@@ -13,6 +13,7 @@ export enum Permission {
 
   // Contacts
   CONTACT_VIEW = "contact:view",
+  CONTACT_CREATE = "contact:create",
   CONTACT_EDIT = "contact:edit",
   CONTACT_DELETE = "contact:delete",
   CONTACT_IMPORT = "contact:import",
@@ -65,6 +66,7 @@ export const RolePermissions: Record<Role, Permission[]> = {
     Permission.INBOX_TAG,
     Permission.INBOX_ADD_NOTE,
     Permission.CONTACT_VIEW,
+    Permission.CONTACT_CREATE,
     Permission.CONTACT_EDIT,
     Permission.CONTACT_DELETE,
     Permission.CONTACT_IMPORT,

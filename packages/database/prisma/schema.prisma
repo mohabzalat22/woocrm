@@ -32,6 +32,7 @@ model Workspace {
   workspaceInvites    WorkspaceInvite[]
   roles               Role[]
   permissions         Permission[]
+  contacts            Contact[]
   whatsappConnection  WhatsAppConnection?
   whatsappOAuthStates WhatsAppOAuthState[]
 }
@@ -159,4 +160,41 @@ model WhatsAppOAuthState {
   @@index([workspaceId])
   @@index([userId])
   @@index([expiresAt])
+}
+
+enum ContactState {
+  NEW
+  LEAD
+  CUSTOMER
+  VIP
+  IMPORTANT
+  FOLLOWUP
+  INTERESTED
+  INACTIVE
+  PARTNER
+}
+
+model Contact {
+  id           String        @id @default(uuid())
+  name         String
+  contactInfos ContactInfo[]
+  state        ContactState  @default(NEW)
+  workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workspaceId  String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([workspaceId])
+}
+
+model ContactInfo {
+  id        String   @id @default(uuid())
+  identity  String // phone , email etc
+  source    String // linkedin etc
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  contactId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([contactId])
 }
