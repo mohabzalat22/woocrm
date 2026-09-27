@@ -48,14 +48,7 @@ export default function ChatInterfaceHeader({
         </div>
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-2">
-            <p className="truncate text-sm font-semibold sm:text-base">
-              Mohab Ali
-            </p>
-            <Marker role="status" className="hidden text-[11px] sm:flex">
-              <MarkerContent className="text-primary font-bold animate-pulse">
-                is typing...
-              </MarkerContent>
-            </Marker>
+            <p className="text-sm font-semibold sm:text-base">Mohab Ali</p>
           </div>
           <div className="mt-1 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
             <span className="truncate">Usually replies within an hour</span>
