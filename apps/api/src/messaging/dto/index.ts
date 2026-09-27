@@ -5,3 +5,6 @@ export { CreateWhatsAppOAuthStateDto } from './create-whatsapp-oauth-state.dto';
 export { WhatsAppOAuthStateDto } from './whatsapp-oauth-state.dto';
 export { WhatsAppConnectionResponseDto } from './whatsapp-connection-response.dto';
 export { SendMessageDto } from './send-message.dto';
+export { SetWorkspaceChannelDto } from './set-workspace-channel.dto';
+export { WorkspaceChannelResponseDto } from './workspace-channel-response.dto';
+export { WorkspaceChannelSettingDto } from './workspace-channel-setting.dto';

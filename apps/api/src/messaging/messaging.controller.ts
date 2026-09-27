@@ -33,7 +33,7 @@ export class MessagingController {
     @Param('channel') channelName: string,
     @Body() message: SendMessageDto,
   ): Promise<SendResult> {
-    const channel = this.channelRegistry.get(channelName); // REGISTERY
+    const channel = this.channelRegistry.get(channelName); // TODO: make dynamic REGISTERY
 
     const recipient: Recipient = message.recipient;
 

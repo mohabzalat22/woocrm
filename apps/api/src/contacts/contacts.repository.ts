@@ -171,4 +171,14 @@ export class ContactsRepository {
     });
     return existing;
   }
+
+  async findContactChannelIdentity(
+    contactId: string,
+    channel: string,
+  ): Promise<ContactInfoDto | null> {
+    return prisma.contactInfo.findFirst({
+      where: { contactId, source: channel },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
 }

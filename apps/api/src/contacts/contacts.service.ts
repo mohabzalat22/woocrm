@@ -139,6 +139,19 @@ export class ContactsService {
     return deleted;
   }
 
+  async findContactChannelIdentity(
+    contactId: string,
+    channel: string,
+  ): Promise<ContactInfoDto | null> {
+    if (!contactId) throw new NotFoundException('contact not found');
+    if (!channel) throw new NotFoundException('channel not found');
+
+    return this.contactsRepository.findContactChannelIdentity(
+      contactId,
+      channel,
+    );
+  }
+
   private async getContact(
     workspaceId: string,
     contactId: string,

@@ -23,6 +23,12 @@ export class WhatsAppConnectionRepository {
     });
   }
 
+  findByPhoneNumberId(
+    phoneNumberId: string,
+  ): Promise<WhatsAppConnectionDto | null> {
+    return prisma.whatsAppConnection.findFirst({ where: { phoneNumberId } });
+  }
+
   upsert(
     workspaceId: string,
     data: UpsertWhatsAppConnectionDto,

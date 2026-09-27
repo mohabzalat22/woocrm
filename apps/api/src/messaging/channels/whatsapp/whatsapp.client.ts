@@ -65,7 +65,7 @@ export class WhatsAppClient {
   }
 
   /** Marks an inbound message as read — optional, but improves the UX on the user's WhatsApp. */
-  async markRead(messageId: string): Promise<void> {
+  async markAsRead(messageId: string): Promise<void> {
     await fetch(this.endpoint, {
       method: 'POST',
       headers: {

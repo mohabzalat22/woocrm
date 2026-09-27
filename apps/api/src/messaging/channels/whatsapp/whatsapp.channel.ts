@@ -9,6 +9,7 @@ import {
   SendResult,
   Recipient,
   IncomingMessage,
+  MessageStatusUpdate,
   WebhookMessageChannel,
 } from '../message-channel.interface';
 import { WhatsAppClient } from './whatsapp.client';
@@ -173,41 +174,92 @@ export class WhatsAppChannel implements WebhookMessageChannel {
   }
 
   parseIncoming(rawPayload: unknown): IncomingMessage | null {
+    return this.parseIncomingMessages(rawPayload)[0] ?? null;
+  }
+
+  parseIncomingMessages(rawPayload: unknown): IncomingMessage[] {
     const value = this.getFirstWebhookValue(rawPayload);
     const messages = value?.messages;
-    const message =
-      Array.isArray(messages) && isRecord(messages[0])
-        ? messages[0]
-        : undefined;
-    if (
-      !message ||
-      typeof message.id !== 'string' ||
-      typeof message.from !== 'string'
-    ) {
-      return null;
-    }
+    if (!Array.isArray(messages)) return [];
 
-    const timestamp =
-      typeof message.timestamp === 'string'
-        ? Number(message.timestamp)
-        : typeof message.timestamp === 'number'
-          ? message.timestamp
+    return messages.flatMap((candidate) => {
+      if (!isRecord(candidate) || typeof candidate.id !== "string" || typeof candidate.from !== "string") {
+        return [];
+      }
+
+      const timestamp =
+        typeof candidate.timestamp === "string"
+          ? Number(candidate.timestamp)
+          : typeof candidate.timestamp === "number"
+            ? candidate.timestamp
+            : NaN;
+      const text =
+        isRecord(candidate.text) && typeof candidate.text.body === "string"
+          ? candidate.text.body
+          : "";
+
+      return [{
+        channel: this.name,
+        externalMessageId: candidate.id,
+        from: { contactId: candidate.from, phone: candidate.from },
+        text,
+        receivedAt: Number.isFinite(timestamp)
+          ? new Date(timestamp * 1000)
+          : new Date(),
+        raw: rawPayload,
+      }];
+    });
+  }
+
+  async resolveWorkspaceId(rawPayload: unknown): Promise<string | null> {
+    const value = this.getFirstWebhookValue(rawPayload);
+    const metadata = value?.metadata;
+    const phoneNumberId =
+      isRecord(metadata) && typeof metadata.phone_number_id === 'string'
+        ? metadata.phone_number_id
+        : null;
+    if (!phoneNumberId) return null;
+
+    const connection =
+      await this.connectionRepository.findByPhoneNumberId(phoneNumberId);
+    return connection?.workspaceId ?? null;
+  }
+
+  parseStatusUpdates(rawPayload: unknown): MessageStatusUpdate[] {
+    const value = this.getFirstWebhookValue(rawPayload);
+    if (!Array.isArray(value?.statuses)) return [];
+
+    const statusMap = {
+      sent: 'SENT',
+      delivered: 'DELIVERED',
+      read: 'READ',
+      failed: 'FAILED',
+    } as const;
+
+    return value.statuses.flatMap((rawStatus): MessageStatusUpdate[] => {
+      if (
+        !isRecord(rawStatus) ||
+        typeof rawStatus.id !== 'string' ||
+        typeof rawStatus.status !== 'string'
+      ) {
+        return [];
+      }
+      const normalized = statusMap[rawStatus.status as keyof typeof statusMap];
+      if (!normalized) return [];
+      const timestamp =
+        typeof rawStatus.timestamp === 'string'
+          ? Number(rawStatus.timestamp)
           : NaN;
-    const text =
-      isRecord(message.text) && typeof message.text.body === 'string'
-        ? message.text.body
-        : '';
-
-    return {
-      channel: this.name,
-      externalMessageId: message.id,
-      from: { contactId: message.from, phone: message.from },
-      text,
-      receivedAt: Number.isFinite(timestamp)
-        ? new Date(timestamp * 1000)
-        : new Date(),
-      raw: rawPayload,
-    };
+      return [
+        {
+          externalMessageId: rawStatus.id,
+          status: normalized,
+          occurredAt: Number.isFinite(timestamp)
+            ? new Date(timestamp * 1000)
+            : undefined,
+        },
+      ];
+    });
   }
 
   async onIncoming(message: IncomingMessage): Promise<void> {

@@ -18,7 +18,7 @@ export class MessageChannelRegistry {
   private readonly channels = new Map<ChannelName, MessageChannel>(); // TODO: MAYBE COULD BE ENHANCED
 
   constructor(whatsAppChannel: WhatsAppChannel) {
-    this.register(whatsAppChannel);
+    this.register(whatsAppChannel); // TODO: check the registery here
   }
 
   register(channel: MessageChannel): void {

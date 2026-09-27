@@ -26,8 +26,8 @@ model User {
 }
 
 model Workspace {
-  id                  String               @id @default(uuid())
-  name                String               @default("Main Workspace")
+  id                  String                   @id @default(uuid())
+  name                String                   @default("Main Workspace")
   workspaceMembers    WorkspaceMember[]
   workspaceInvites    WorkspaceInvite[]
   roles               Role[]
@@ -35,6 +35,8 @@ model Workspace {
   contacts            Contact[]
   whatsappConnection  WhatsAppConnection?
   whatsappOAuthStates WhatsAppOAuthState[]
+  channelSetting      WorkspaceChannelSetting?
+  conversations       Conversation[]
 }
 
 model WorkspaceMember {
@@ -46,7 +48,9 @@ model WorkspaceMember {
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   workspaceId String
 
-  createdAt DateTime @default(now())
+  createdAt     DateTime       @default(now())
+  conversations Conversation[]
+  messages      Message[]
 
   @@unique([userId, workspaceId])
 }
@@ -183,6 +187,7 @@ model Contact {
   workspaceId  String
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  conversation Conversation?
 
   @@index([workspaceId])
 }
@@ -197,4 +202,70 @@ model ContactInfo {
   updatedAt DateTime @updatedAt
 
   @@index([contactId])
+}
+
+enum ConversationStatus {
+  OPEN
+  RESOLVED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+model Conversation {
+  id            String             @id @default(uuid())
+  workspaceId   String
+  channel       String
+  contactId     String             @unique
+  status        ConversationStatus @default(OPEN)
+  assignedToId  String? // WorkspaceMember.id
+  lastMessageAt DateTime?
+  lastReadAt    DateTime? // when the assignee last saw the conversation
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  workspace  Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  contact    Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  assignedTo WorkspaceMember? @relation(fields: [assignedToId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  messages   Message[]
+
+  @@index([workspaceId, status])
+  @@index([assignedToId])
+  @@index([contactId])
+}
+
+model Message {
+  id             String           @id @default(cuid())
+  conversationId String
+  direction      MessageDirection
+  content        String
+  status         MessageStatus    @default(SENT)
+  senderMemberId String? // set for OUTBOUND messages only
+  externalId     String? // provider message id, for status-webhook correlation
+  raw            Json? // raw webhook payload for inbound messages
+  createdAt      DateTime         @default(now())
+
+  conversation Conversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  senderMember WorkspaceMember? @relation(fields: [senderMemberId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([externalId])
+}
+
+model WorkspaceChannelSetting {
+  id          String   @id @default(cuid())
+  workspaceId String   @unique
+  channel     String
+  lockedAt    DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

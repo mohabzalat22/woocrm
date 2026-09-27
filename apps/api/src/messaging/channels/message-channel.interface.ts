@@ -5,9 +5,9 @@
 export type ChannelName = string;
 
 export interface Recipient {
-  contactId: string; // platform based
-  phone?: string; // E.164 format, e.g. "+15551234567" - required for WhatsApp
-  slackUserId?: string;
+  contactId: string;
+  phone?: string;
+  externalUserId?: string;
 }
 
 export interface SendResult {
@@ -23,14 +23,19 @@ export interface IncomingMessage {
   from: Recipient;
   text: string;
   receivedAt: Date;
-  raw: unknown; // original webhook payload, kept for debugging/audit
+  raw: unknown;
+}
+
+export interface MessageStatusUpdate {
+  externalMessageId: string;
+  status: 'SENT' | 'DELIVERED' | 'READ' | 'FAILED';
+  occurredAt?: Date;
 }
 
 export interface OutgoingMessage {
   workspaceId: string;
   recipient: Recipient;
   text?: string;
-  /** WhatsApp-only: required when sending outside the 24h session window. */
   templateKey?: string;
   templateParams?: Record<string, string>;
   metadata?: Record<string, unknown>;
@@ -43,18 +48,17 @@ export interface MessageChannel {
 
   isAvailable(recipient: Recipient): Promise<boolean>;
 
-  /**
-   * Normalizes a raw inbound webhook payload for this channel into the
-   * shared IncomingMessage shape. Returns null for payloads that aren't
-   * actual messages (delivery receipts, status updates, etc.).
-   */
   parseIncoming(rawPayload: unknown): IncomingMessage | null;
 
-  /** Optional channel-specific work after an inbound message is normalized. */
+  parseIncomingMessages?(rawPayload: unknown): IncomingMessage[];
+
+  parseStatusUpdates?(rawPayload: unknown): MessageStatusUpdate[];
+
+  resolveWorkspaceId?(rawPayload: unknown): Promise<string | null>;
+
   onIncoming?(message: IncomingMessage): Promise<void>;
 }
 
-/** Additional contract required by channels exposed through a webhook. */
 export interface WebhookMessageChannel extends MessageChannel {
   verifySubscription(
     mode: string | undefined,

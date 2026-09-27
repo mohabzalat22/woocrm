@@ -5,3 +5,6 @@ export * from './whatsapp-oauth-callback.schema';
 export * from './whatsapp-oauth-state.schema';
 export * from './whatsapp-connection-response.schema';
 export * from './send-message.schema';
+export * from './set-workspace-channel.schema';
+export * from './workspace-channel-response.schema';
+export * from './workspace-channel-setting.schema';

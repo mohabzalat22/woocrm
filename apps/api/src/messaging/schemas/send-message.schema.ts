@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 const RecipientSchema = z.object({
-  contactId: z.string().min(1),
+  contactId: z.string().min(1), // internal contact id
   phone: z.string().min(1).optional(),
-  slackUserId: z.string().min(1).optional(),
+  externalUserId: z.string().min(1).optional(),
 });
 
 export const SendMessageSchema = z

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Param,
   Query,
   Req,
 } from '@nestjs/common';
@@ -19,15 +20,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
-import { WhatsAppWebhookService } from './whatsapp-webhook.service';
+import { WebhookService } from './webhook.service';
 
 @ApiTags('webhooks')
 @Public()
-@Controller('webhooks/whatsapp')
-export class WhatsAppWebhookController {
-  constructor(
-    private readonly whatsAppWebhookService: WhatsAppWebhookService,
-  ) {}
+@Controller('webhooks/:channel')
+export class WebhookController {
+  constructor(private readonly WebhookService: WebhookService) {}
 
   @Get()
   @HttpCode(HttpStatus.OK)
@@ -53,11 +52,13 @@ export class WhatsAppWebhookController {
     schema: { type: 'string', example: '1234567890' },
   })
   verify(
+    @Param('channel') channelName: string,
     @Query('hub.mode') mode: string | undefined,
     @Query('hub.verify_token') verifyToken: string | undefined,
     @Query('hub.challenge') challenge: string | undefined,
   ): string {
-    return this.whatsAppWebhookService.verifySubscription(
+    return this.WebhookService.verifySubscription(
+      channelName,
       mode,
       verifyToken,
       challenge,
@@ -91,13 +92,15 @@ export class WhatsAppWebhookController {
   })
   async receive(
     @Req() request: RawBodyRequest<Request>,
+    @Param('channel') channelName: string,
     @Body() payload: unknown,
   ): Promise<void> {
-    this.whatsAppWebhookService.assertValidSignature(
+    this.WebhookService.assertValidSignature(
+      channelName,
       request.header('x-hub-signature-256'),
       request.rawBody,
     );
 
-    await this.whatsAppWebhookService.handleEvent(payload);
+    await this.WebhookService.handleEvent(channelName, payload);
   }
 }

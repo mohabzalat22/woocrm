@@ -11,17 +11,19 @@ import {
 } from './channels/whatsapp/whatsapp.channel';
 import { WorkspaceMembersModule } from '../workspace-members/workspace-members.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
-import { WhatsAppWebhookController } from './webhooks/whatsapp-webhook.controller';
-import { WhatsAppWebhookService } from './webhooks/whatsapp-webhook.service';
+import { RolesModule } from '../roles/roles.module';
 import { MessageChannelRegistry } from './registry/message-channel.registry';
+import { WorkspaceChannelController } from './workspace-channel.controller';
+import { WorkspaceChannelRepository } from './workspace-channel.repository';
+import { WorkspaceChannelService } from './workspace-channel.service';
 
 @Module({
-  imports: [WorkspaceMembersModule, AuthorizationModule],
+  imports: [WorkspaceMembersModule, AuthorizationModule, RolesModule],
   controllers: [
     WhatsAppConnectionController,
     WhatsAppOAuthController,
     MessagingController,
-    WhatsAppWebhookController,
+    WorkspaceChannelController,
   ],
   providers: [
     WhatsAppConnectionService,
@@ -30,8 +32,9 @@ import { MessageChannelRegistry } from './registry/message-channel.registry';
     InMemorySessionWindowStore,
     WhatsAppChannel,
     MessageChannelRegistry,
-    WhatsAppWebhookService,
+    WorkspaceChannelRepository,
+    WorkspaceChannelService,
   ],
-  exports: [WhatsAppConnectionService, MessageChannelRegistry],
+  exports: [MessageChannelRegistry, WorkspaceChannelService],
 })
 export class MessagingModule {}
