@@ -184,6 +184,76 @@ export class InboxService {
     return this.toResponse(saved, true);
   }
 
+  async retryMessage(
+    userId: string,
+    workspaceId: string,
+    conversationId: string,
+    messageId: string,
+  ): Promise<ConversationResponseDto> {
+    const conversation = await this.requireAccessibleConversation(
+      userId,
+      workspaceId,
+      conversationId,
+    );
+
+    const failedMessage = await this.inboxRepository.findFailedOutboundMessage(
+      messageId,
+      conversationId,
+      workspaceId,
+    );
+
+    if (!failedMessage) {
+      throw new NotFoundException('Failed outbound message not found');
+    }
+
+    const channel = await this.channelRegistry.getConnectedChannel(
+      workspaceId,
+      conversation.channel,
+    );
+
+    const contactInfo = await this.ContactsService.findContactChannelIdentity(
+      conversation.contactId,
+      conversation.channel,
+    );
+
+    if (!contactInfo) {
+      throw new BadRequestException(
+        'Contact has no identity for the workspace channel',
+      );
+    }
+
+    const result = await channel.send({
+      workspaceId,
+      recipient: channel.createRecipient(
+        conversation.contactId,
+        contactInfo.identity,
+      ),
+      text: failedMessage.content,
+    });
+
+    const updated = await this.inboxRepository.updateFailedOutboundMessage(
+      messageId,
+      conversationId,
+      workspaceId,
+      result.success ? 'SENT' : 'FAILED',
+      result.externalMessageId,
+    );
+
+    if (!updated) {
+      throw new NotFoundException('Failed outbound message not found');
+    }
+
+    this.inboxEvents.publish(
+      workspaceId,
+      'message.status.updated',
+      conversationId,
+    );
+    if (!result.success) {
+      throw new BadRequestException(result.error ?? 'Message retry failed');
+    }
+    return this.toResponse(updated, true);
+  }
+
   async ingestInbound(
     workspaceId: string,
     message: IncomingMessage,

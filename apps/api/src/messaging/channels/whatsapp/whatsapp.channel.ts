@@ -18,37 +18,13 @@ import { whatsappConfig } from '../../config/whatsapp.config';
 import { WhatsAppConnectionRepository } from '../../whatsapp-connection.repository';
 import { decryptCredential } from '../../security/credential-crypto';
 
-const SESSION_WINDOW_MS = 24 * 60 * 60 * 1000;
 const META_SIGNATURE_PREFIX = 'sha256=';
 
-/**
- * Tracks the last time each contact messaged you, so the channel can decide
- * whether it's allowed to send free-form text or must use an approved template.
- * Swap InMemorySessionWindowStore for a DB-backed one in production.
- */
 interface GraphApiResponse {
   messaging_product: 'whatsapp';
   contacts: { input: string; wa_id: string }[];
   messages: { id: string }[];
 } //TODO: use global types
-
-export interface SessionWindowStore {
-  getLastInboundAt(contactId: string): Promise<Date | null>;
-  recordInbound(contactId: string, at: Date): Promise<void>;
-}
-
-@Injectable()
-export class InMemorySessionWindowStore implements SessionWindowStore {
-  private readonly lastInbound = new Map<string, Date>(); //TODO: fix it in production to use table format
-
-  async getLastInboundAt(contactId: string): Promise<Date | null> {
-    return this.lastInbound.get(contactId) ?? null;
-  }
-
-  async recordInbound(contactId: string, at: Date): Promise<void> {
-    this.lastInbound.set(contactId, at);
-  }
-}
 
 /** WhatsApp strategy: send, verify, normalize, and handle WhatsApp webhooks. */
 // whatsapp channel + webhooks extending it
@@ -74,7 +50,6 @@ export class WhatsAppChannel implements WebhookMessageChannel {
 
   constructor(
     private readonly connectionRepository: WhatsAppConnectionRepository,
-    private readonly sessionStore: InMemorySessionWindowStore,
   ) {}
 
   async isAvailable(recipient: Recipient): Promise<boolean> {
@@ -114,15 +89,10 @@ export class WhatsAppChannel implements WebhookMessageChannel {
         decryptCredential(connection.encryptedAccessToken),
         connection.phoneNumberId,
       );
-      const lastInbound = await this.sessionStore.getLastInboundAt(
-        recipient.contactId,
-      );
-      const withinSession =
-        !!lastInbound && Date.now() - lastInbound.getTime() < SESSION_WINDOW_MS;
 
       let result: GraphApiResponse; // TODO: fix types
 
-      if (withinSession && message.text) {
+      if (message.text) {
         result = await client.sendText(recipient.phone, message.text);
       } else if (message.templateKey) {
         result = await client.sendTemplate(
@@ -136,15 +106,22 @@ export class WhatsAppChannel implements WebhookMessageChannel {
         return {
           success: false,
           channel: this.name,
-          error:
-            'Outside 24h session window and no templateKey provided - cannot send free-form text',
+          error: 'Message has no text or template',
         };
       }
 
+      const externalMessageId = result.messages[0]?.id;
+      if (!externalMessageId) {
+        return {
+          success: false,
+          channel: this.name,
+          error: 'WhatsApp API returned no message ID',
+        };
+      }
       return {
         success: true,
         channel: this.name,
-        externalMessageId: result.messages[0]?.id,
+        externalMessageId,
       };
     } catch (err) {
       return {
@@ -282,13 +259,6 @@ export class WhatsAppChannel implements WebhookMessageChannel {
         },
       ];
     });
-  }
-
-  async onIncoming(message: IncomingMessage): Promise<void> {
-    await this.sessionStore.recordInbound(
-      message.from.contactId,
-      message.receivedAt,
-    );
   }
 
   private getFirstWebhookValue(

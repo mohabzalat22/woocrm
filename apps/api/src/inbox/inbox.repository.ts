@@ -123,6 +123,23 @@ export class InboxRepository {
     });
   }
 
+  async findFailedOutboundMessage(
+    messageId: string,
+    conversationId: string,
+    workspaceId: string,
+  ): Promise<MessageWithConversationDto | null> {
+    return prisma.message.findFirst({
+      where: {
+        id: messageId,
+        conversationId,
+        direction: 'OUTBOUND',
+        status: 'FAILED',
+        conversation: { workspaceId },
+      },
+      include: { conversation: true },
+    });
+  }
+
   async appendInboundMessage(
     workspaceId: string,
     channel: string,
@@ -325,6 +342,38 @@ export class InboxRepository {
         where: { id: conversationId, workspaceId },
         data: { lastMessageAt: now, lastReadAt: now },
       });
+      return tx.conversation.findFirst({
+        where: { id: conversationId, workspaceId },
+        include: {
+          contact: { include: contactInclude },
+          assignedTo: { include: assigneeInclude },
+          messages: { orderBy: { createdAt: 'asc' } },
+        },
+      });
+    });
+  }
+
+  async updateFailedOutboundMessage(
+    messageId: string,
+    conversationId: string,
+    workspaceId: string,
+    status: 'SENT' | 'FAILED',
+    externalId?: string,
+  ): Promise<ConversationWithRelationsDto | null> {
+    return prisma.$transaction(async (tx) => {
+      const updated = await tx.message.updateMany({
+        where: {
+          id: messageId,
+          conversationId,
+          direction: 'OUTBOUND',
+          status: 'FAILED',
+          conversation: { workspaceId },
+        },
+        data: { status, externalId: externalId ?? null },
+      });
+
+      if (!updated.count) return null;
+
       return tx.conversation.findFirst({
         where: { id: conversationId, workspaceId },
         include: {

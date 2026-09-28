@@ -110,4 +110,22 @@ export class InboxController {
       data,
     );
   }
+
+  @Post(':conversationId/messages/:messageId/retry')
+  @RequirePermissions(Permission.INBOX_SEND_MESSAGE)
+  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ApiOperation({ summary: 'Retry a failed outbound message' })
+  retryMessage(
+    @CurrentUser('id') userId: string,
+    @Param('workspaceId') workspaceId: string,
+    @Param('conversationId') conversationId: string,
+    @Param('messageId') messageId: string,
+  ) {
+    return this.inboxService.retryMessage(
+      userId,
+      workspaceId,
+      conversationId,
+      messageId,
+    );
+  }
 }

@@ -5,10 +5,7 @@ import { MessagingController } from './messaging.controller';
 import { WhatsAppConnectionService } from './whatsapp-connection.service';
 import { WhatsAppConnectionRepository } from './whatsapp-connection.repository';
 import { MetaWhatsAppClient } from './channels/whatsapp/meta.client';
-import {
-  WhatsAppChannel,
-  InMemorySessionWindowStore,
-} from './channels/whatsapp/whatsapp.channel';
+import { WhatsAppChannel } from './channels/whatsapp/whatsapp.channel';
 import { WorkspaceMembersModule } from '../workspace-members/workspace-members.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { RolesModule } from '../roles/roles.module';
@@ -25,7 +22,6 @@ import { MessageChannelRegistry } from './registry/message-channel.registry';
     WhatsAppConnectionService,
     WhatsAppConnectionRepository,
     MetaWhatsAppClient,
-    InMemorySessionWindowStore,
     WhatsAppChannel,
     MessageChannelRegistry,
   ],
