@@ -33,8 +33,12 @@ export class MessagingController {
     @Param('channel') channelName: string,
     @Body() message: SendMessageDto,
   ): Promise<SendResult> {
-    const channel = this.channelRegistry.get(channelName); // TODO: make dynamic REGISTERY
+    const channel = await this.channelRegistry.getConnectedChannel(
+      workspaceId,
+      channelName,
+    );
 
+    //MOX: Registry entry point
     const recipient: Recipient = message.recipient;
 
     if (!(await channel.isAvailable(recipient))) {

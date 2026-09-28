@@ -23,7 +23,6 @@ import type {
 } from '../messaging/channels/message-channel.interface';
 
 import { MessageChannelRegistry } from '../messaging/registry/message-channel.registry';
-import { WorkspaceChannelService } from '../messaging/workspace-channel.service';
 import { WorkspaceContextService } from '../authorization/workspace-context.service';
 import { InboxRepository } from './inbox.repository';
 import { InboxEventsService } from './inbox-events.service';
@@ -37,7 +36,6 @@ export class InboxService {
     private readonly inboxRepository: InboxRepository,
     private readonly workspaceContext: WorkspaceContextService,
     private readonly channelRegistry: MessageChannelRegistry,
-    private readonly workspaceChannelService: WorkspaceChannelService,
     private readonly ContactsService: ContactsService,
     private readonly inboxEvents: InboxEventsService,
   ) {}
@@ -146,14 +144,14 @@ export class InboxService {
       id,
     );
 
-    const setting = await this.requireChannel(
+    const channel = await this.channelRegistry.getConnectedChannel(
       workspaceId,
       conversation.channel,
     );
 
     const contactInfo = await this.ContactsService.findContactChannelIdentity(
       conversation.contactId,
-      setting.channel,
+      conversation.channel,
     );
 
     if (!contactInfo) {
@@ -162,17 +160,12 @@ export class InboxService {
       );
     }
 
-    const channel = this.channelRegistry.get(setting.channel); // setting channel is the database set one by admin
-    // TODO: append upcomming channels
     const result = await channel.send({
       workspaceId,
-      recipient: {
-        contactId: contactInfo.identity,
-        phone:
-          setting.channel === 'whatsapp' ? contactInfo.identity : undefined,
-        externalUserId:
-          setting.channel != 'whatsapp' ? contactInfo.identity : undefined,
-      },
+      recipient: channel.createRecipient(
+        conversation.contactId,
+        contactInfo.identity,
+      ),
       text: data.content,
     });
 
@@ -195,10 +188,13 @@ export class InboxService {
     workspaceId: string,
     message: IncomingMessage,
   ): Promise<ConversationResponseDto> {
-    const setting = await this.requireChannel(workspaceId, message.channel);
+    const channel = await this.channelRegistry.getConnectedChannel(
+      workspaceId,
+      message.channel,
+    );
     const conversation = await this.inboxRepository.appendInboundMessage(
       workspaceId,
-      setting.channel,
+      channel.name,
       message.from.contactId,
       message.text,
       message.externalMessageId,
@@ -220,7 +216,7 @@ export class InboxService {
     channel: string,
     update: MessageStatusUpdate,
   ): Promise<void> {
-    await this.requireChannel(workspaceId, channel);
+    await this.channelRegistry.getConnectedChannel(workspaceId, channel);
     const message =
       await this.inboxRepository.findConversationByExternalMessageId(
         workspaceId,
@@ -288,10 +284,6 @@ export class InboxService {
     }
 
     return { member, roleName: member.role.name };
-  }
-
-  private requireChannel(workspaceId: string, channel: string) {
-    return this.workspaceChannelService.requireChannel(workspaceId, channel);
   }
 
   private canAdvanceStatus(

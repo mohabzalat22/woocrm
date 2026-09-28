@@ -56,6 +56,22 @@ export class InMemorySessionWindowStore implements SessionWindowStore {
 export class WhatsAppChannel implements WebhookMessageChannel {
   readonly name = 'whatsapp' as const;
 
+  createRecipient(contactId: string, identity: string): Recipient {
+    return { contactId, phone: identity, externalUserId: identity };
+  }
+
+  async isConnected(workspaceId: string): Promise<boolean> {
+    const connection =
+      await this.connectionRepository.findByWorkspaceId(workspaceId);
+
+    return Boolean(
+      connection &&
+        connection.status === 'ACTIVE' &&
+        (!connection.accessTokenExpiresAt ||
+          connection.accessTokenExpiresAt.getTime() > Date.now()),
+    );
+  }
+
   constructor(
     private readonly connectionRepository: WhatsAppConnectionRepository,
     private readonly sessionStore: InMemorySessionWindowStore,
@@ -183,31 +199,37 @@ export class WhatsAppChannel implements WebhookMessageChannel {
     if (!Array.isArray(messages)) return [];
 
     return messages.flatMap((candidate) => {
-      if (!isRecord(candidate) || typeof candidate.id !== "string" || typeof candidate.from !== "string") {
+      if (
+        !isRecord(candidate) ||
+        typeof candidate.id !== 'string' ||
+        typeof candidate.from !== 'string'
+      ) {
         return [];
       }
 
       const timestamp =
-        typeof candidate.timestamp === "string"
+        typeof candidate.timestamp === 'string'
           ? Number(candidate.timestamp)
-          : typeof candidate.timestamp === "number"
+          : typeof candidate.timestamp === 'number'
             ? candidate.timestamp
             : NaN;
       const text =
-        isRecord(candidate.text) && typeof candidate.text.body === "string"
+        isRecord(candidate.text) && typeof candidate.text.body === 'string'
           ? candidate.text.body
-          : "";
+          : '';
 
-      return [{
-        channel: this.name,
-        externalMessageId: candidate.id,
-        from: { contactId: candidate.from, phone: candidate.from },
-        text,
-        receivedAt: Number.isFinite(timestamp)
-          ? new Date(timestamp * 1000)
-          : new Date(),
-        raw: rawPayload,
-      }];
+      return [
+        {
+          channel: this.name,
+          externalMessageId: candidate.id,
+          from: { contactId: candidate.from, phone: candidate.from },
+          text,
+          receivedAt: Number.isFinite(timestamp)
+            ? new Date(timestamp * 1000)
+            : new Date(),
+          raw: rawPayload,
+        },
+      ];
     });
   }
 

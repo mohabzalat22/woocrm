@@ -41,6 +41,34 @@ export class MessageChannelRegistry {
     return channel;
   }
 
+  async getConnectedChannel(
+    workspaceId: string,
+    name: string,
+  ): Promise<MessageChannel> {
+    const channel = this.get(name);
+
+    if (!(await channel.isConnected(workspaceId))) {
+      throw new BadRequestException(
+        `Messaging channel is not connected for this workspace: ${name}`,
+      );
+    }
+
+    return channel;
+  }
+
+  /** Return every registered provider connected to the workspace. */
+  async getConnectedChannels(workspaceId: string): Promise<MessageChannel[]> {
+    const channels = await Promise.all(
+      [...this.channels.values()].map(async (channel) =>
+        (await channel.isConnected(workspaceId)) ? channel : null,
+      ),
+    );
+
+    return channels.filter(
+      (channel): channel is MessageChannel => channel !== null,
+    );
+  }
+
   getWebhookChannel(name: string): WebhookMessageChannel {
     const channel = this.get(name);
 

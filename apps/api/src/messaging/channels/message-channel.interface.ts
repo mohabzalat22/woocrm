@@ -44,6 +44,12 @@ export interface OutgoingMessage {
 export interface MessageChannel {
   readonly name: ChannelName;
 
+  /** Whether this provider has an active connection in the workspace. */
+  isConnected(workspaceId: string): Promise<boolean>;
+
+  /** Convert a stored contact identity into the provider-specific recipient. */
+  createRecipient(contactId: string, identity: string): Recipient;
+
   send(message: OutgoingMessage): Promise<SendResult>;
 
   isAvailable(recipient: Recipient): Promise<boolean>;

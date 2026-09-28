@@ -26,8 +26,8 @@ model User {
 }
 
 model Workspace {
-  id                  String                   @id @default(uuid())
-  name                String                   @default("Main Workspace")
+  id                  String               @id @default(uuid())
+  name                String               @default("Main Workspace")
   workspaceMembers    WorkspaceMember[]
   workspaceInvites    WorkspaceInvite[]
   roles               Role[]
@@ -35,7 +35,6 @@ model Workspace {
   contacts            Contact[]
   whatsappConnection  WhatsAppConnection?
   whatsappOAuthStates WhatsAppOAuthState[]
-  channelSetting      WorkspaceChannelSetting?
   conversations       Conversation[]
 }
 
@@ -259,13 +258,4 @@ model Message {
 
   @@index([conversationId, createdAt])
   @@index([externalId])
-}
-
-model WorkspaceChannelSetting {
-  id          String   @id @default(cuid())
-  workspaceId String   @unique
-  channel     String
-  lockedAt    DateTime @default(now())
-
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
