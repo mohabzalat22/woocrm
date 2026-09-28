@@ -7,9 +7,9 @@ import {
   CheckCircle2,
   Link2,
   Loader2,
-  MessageCircle,
   Unplug,
 } from "lucide-react";
+
 import { Button } from "@repo/ui/ui/button";
 import {
   Card,
@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@repo/ui/ui/card";
+
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
 import { useWhatsAppConnection } from "../hooks/use-whatsapp-connection";
 import { whatsappApi } from "../services/whatsapp.service";
@@ -67,10 +68,7 @@ export function ChannelsSettings() {
   return (
     <Card className="max-w-3xl">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="size-5 text-green-600" />
-          WhatsApp
-        </CardTitle>
+        <CardTitle className="flex items-center gap-2">WhatsApp</CardTitle>
         <CardDescription>
           Connect a WhatsApp Business account to this workspace.
         </CardDescription>

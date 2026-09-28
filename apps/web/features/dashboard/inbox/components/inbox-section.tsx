@@ -1,108 +1,61 @@
 "use client";
 
-import { useState } from "react";
-import { MoreHorizontal, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { Loader2, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { Button } from "@repo/ui/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@repo/ui/ui/input-group";
 import { Tabs, TabsList, TabsTrigger } from "@repo/ui/ui/tabs";
-import { Avatar, AvatarBadge, AvatarFallback } from "@repo/ui/ui/avatar";
-import { Button } from "@repo/ui/ui/button";
 import { cn } from "@/common/lib/utils";
-import Tag from "./tag";
+import { useDebouncedValue } from "../hooks/use-debounced-value";
+import { useInboxData } from "../hooks/use-inbox-data";
+import { useInboxStore, type InboxTab } from "../store";
+import ConversationRow from "./conversation-row";
+import InboxEmptyState from "./inbox-empty-state";
 
-type InboxSectionProps = {
-  className?: string;
-  onOpenConversation?: () => void;
-};
-
-const tabs = ["All", "Unread", "Open", "Resolved"];
-
-const conversations = [
-  {
-    id: "mohab",
-    name: "Mohab Ali",
-    initials: "MA",
-    message: "It’s always a one-line change 😭.",
-    time: "2m",
-    unread: 3,
-    tag: "LEAD",
-    tagClassName: "bg-red-100 text-red-700",
-    online: true,
-    avatarClassName: "bg-emerald-100 text-emerald-700",
-  },
-  {
-    id: "sarah",
-    name: "Sarah Johnson",
-    initials: "SJ",
-    message: "Thanks, that works perfectly for us.",
-    time: "18m",
-    unread: 0,
-    tag: "CUSTOMER",
-    tagClassName: "bg-blue-100 text-blue-700",
-    online: true,
-    avatarClassName: "bg-blue-100 text-blue-700",
-  },
-  {
-    id: "omar",
-    name: "Omar Khaled",
-    initials: "OK",
-    message: "Could you send over the updated quote?",
-    time: "1h",
-    unread: 1,
-    tag: "FOLLOW UP",
-    tagClassName: "bg-amber-100 text-amber-700",
-    online: false,
-    avatarClassName: "bg-amber-100 text-amber-700",
-  },
-  {
-    id: "nour",
-    name: "Nour Hassan",
-    initials: "NH",
-    message: "I’ll check with the team and get back to you.",
-    time: "3h",
-    unread: 0,
-    tag: "OPEN",
-    tagClassName: "bg-violet-100 text-violet-700",
-    online: false,
-    avatarClassName: "bg-violet-100 text-violet-700",
-  },
-  {
-    id: "alex",
-    name: "Alex Morgan",
-    initials: "AM",
-    message: "Conversation resolved",
-    time: "Yesterday",
-    unread: 0,
-    tag: "RESOLVED",
-    tagClassName: "bg-slate-100 text-slate-600",
-    online: false,
-    avatarClassName: "bg-slate-100 text-slate-700",
-  },
+const tabs: Array<{ value: InboxTab; label: string }> = [
+  { value: "unread", label: "Unread" },
+  { value: "open", label: "Open" },
+  { value: "resolved", label: "Resolved" },
 ];
 
-export default function InboxSection({
-  className,
-  onOpenConversation,
-}: InboxSectionProps) {
-  const [activeTab, setActiveTab] = useState("All");
-  const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState("mohab");
+export default function InboxSection({ className }: { className?: string }) {
+  const { conversations } = useInboxData();
+  const activeTab = useInboxStore((state) => state.activeTab);
+  const selectedConversationId = useInboxStore(
+    (state) => state.selectedConversationId,
+  );
+  const search = useInboxStore((state) => state.search);
+  const setActiveTab = useInboxStore((state) => state.setActiveTab);
+  const selectConversation = useInboxStore(
+    (state) => state.selectConversation,
+  );
+  const setMobileView = useInboxStore((state) => state.setMobileView);
+  const setSearch = useInboxStore((state) => state.setSearch);
+  const debouncedSearch = useDebouncedValue(search);
+  const conversationList = useMemo(
+    () => conversations.data?.pages.flatMap((page) => page.data) ?? [],
+    [conversations.data],
+  );
+  const filteredConversations = useMemo(() => {
+    const normalizedSearch = debouncedSearch.trim().toLowerCase();
+    if (!normalizedSearch) return conversationList;
+    return conversationList.filter((conversation) =>
+      conversation.contact.name.toLowerCase().includes(normalizedSearch),
+    );
+  }, [conversationList, debouncedSearch]);
+  const isSearchPending = search !== debouncedSearch;
+  const isEmpty =
+    !conversations.isLoading && filteredConversations.length === 0;
 
-  const filteredConversations = conversations.filter((conversation) => {
-    const matchesSearch = conversation.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesTab =
-      activeTab === "All" ||
-      (activeTab === "Unread" && conversation.unread > 0) ||
-      (activeTab === "Open" && conversation.tag !== "RESOLVED") ||
-      (activeTab === "Resolved" && conversation.tag === "RESOLVED");
-
-    return matchesSearch && matchesTab;
-  });
+  useEffect(() => {
+    if (!selectedConversationId && conversationList[0]) {
+      selectConversation(conversationList[0].id);
+    }
+  }, [conversationList, selectConversation, selectedConversationId]);
 
   return (
     <aside
@@ -117,7 +70,9 @@ export default function InboxSection({
             <div className="flex items-center gap-2">
               <h1 className="text-xl font-semibold tracking-tight">Inbox</h1>
               <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
-                12
+                {debouncedSearch
+                  ? filteredConversations.length
+                  : conversations.data?.pages[0]?.meta.total ?? 0}
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -148,14 +103,16 @@ export default function InboxSection({
             <Search className="size-4" />
           </InputGroupAddon>
           <InputGroupInput
-            aria-label="Search conversations"
-            placeholder="Search conversations"
+            aria-label="Search conversations by contact name"
+            placeholder="Search contact names"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
           <InputGroupAddon align="inline-end">
             <span className="text-[11px]">
-              {filteredConversations.length} results
+              {isSearchPending
+                ? "Searching…"
+                : `${filteredConversations.length} shown`}
             </span>
           </InputGroupAddon>
         </InputGroup>
@@ -163,19 +120,20 @@ export default function InboxSection({
         <Tabs
           className="mt-4 w-full"
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={(value) => setActiveTab(value as InboxTab)}
         >
           <TabsList className="w-full gap-1 overflow-x-auto bg-muted/70 p-1">
             {tabs.map((tab) => (
               <TabsTrigger
-                key={tab}
-                value={tab}
+                key={tab.value}
+                value={tab.value}
                 className={cn(
-                  "flex-none px-2 text-xs data-active:bg-background data-active:text-primary data-active:shadow-sm",
-                  tab == activeTab && "bg-primary",
+                  "px-2 text-xs",
+                  activeTab === tab.value &&
+                    "!bg-primary !text-primary-foreground",
                 )}
               >
-                {tab}
+                {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -187,73 +145,50 @@ export default function InboxSection({
           <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Recent conversations
           </p>
-          <Button
-            variant="ghost"
-            size="icon-xs"
-            aria-label="More inbox options"
-          >
-            <MoreHorizontal />
-          </Button>
         </div>
-
-        <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto px-2 pb-4">
-          {filteredConversations.map((conversation) => (
-            <li key={conversation.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedId(conversation.id);
-                  onOpenConversation?.();
-                }}
-                className={cn(
-                  "flex w-full items-start gap-3 rounded-xl p-3 text-left transition-colors hover:bg-muted/70",
-                  selectedId === conversation.id && "bg-muted",
-                )}
-              >
-                <Avatar className="size-10">
-                  <AvatarFallback className={conversation.avatarClassName}>
-                    {conversation.initials}
-                  </AvatarFallback>
-                  {conversation.online && (
-                    <AvatarBadge className="bg-emerald-500" />
-                  )}
-                </Avatar>
-                <span className="min-w-0 flex-1">
-                  <span className="flex items-center justify-between gap-2">
-                    <span className="truncate text-sm font-semibold">
-                      {conversation.name}
-                    </span>
-                    <span className="shrink-0 text-[11px] text-muted-foreground">
-                      {conversation.time}
-                    </span>
-                  </span>
-                  <span className="mt-1 block truncate text-xs text-muted-foreground">
-                    {conversation.message}
-                  </span>
-                  <span className="mt-2 flex items-center justify-between gap-2">
-                    <Tag
-                      className={cn(
-                        "px-2 py-1 text-[10px] font-semibold tracking-wide",
-                        conversation.tagClassName,
-                      )}
-                      name={conversation.tag}
-                    />
-                    {conversation.unread > 0 && (
-                      <span className="flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                        {conversation.unread}
-                      </span>
-                    )}
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))}
-          {filteredConversations.length === 0 && (
-            <li className="px-4 py-10 text-center text-sm text-muted-foreground">
-              No conversations found.
-            </li>
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
+          {conversations.isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="size-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : isEmpty ? (
+            <InboxEmptyState searching={Boolean(debouncedSearch)} />
+          ) : (
+            <ul className="space-y-1">
+              {filteredConversations.map((conversation) => (
+                <li key={conversation.id}>
+                  <ConversationRow
+                    conversation={conversation}
+                    selected={selectedConversationId === conversation.id}
+                    onSelect={() => {
+                      selectConversation(conversation.id);
+                      setMobileView("conversation");
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
           )}
-        </ul>
+          {conversations.hasNextPage && !debouncedSearch && (
+            <Button
+              variant="ghost"
+              className="mt-2 w-full"
+              onClick={() => void conversations.fetchNextPage()}
+              disabled={conversations.isFetchingNextPage}
+            >
+              {conversations.isFetchingNextPage ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                "Load more"
+              )}
+            </Button>
+          )}
+          {!conversations.hasNextPage && conversationList.length > 0 && (
+            <p className="py-3 text-center text-[11px] text-muted-foreground">
+              You’re all caught up
+            </p>
+          )}
+        </div>
       </div>
     </aside>
   );

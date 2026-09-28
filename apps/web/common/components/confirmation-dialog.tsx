@@ -16,6 +16,7 @@ interface ConfirmationDialogProps {
   title: string;
   description: string;
   confirmLabel?: string;
+  pendingLabel?: string;
   isPending?: boolean;
   onConfirm: () => void | Promise<void>;
 }
@@ -26,6 +27,7 @@ export function ConfirmationDialog({
   title,
   description,
   confirmLabel = "Confirm",
+  pendingLabel = "Working…",
   isPending = false,
   onConfirm,
 }: ConfirmationDialogProps) {
@@ -51,7 +53,7 @@ export function ConfirmationDialog({
             onClick={() => void onConfirm()}
             disabled={isPending}
           >
-            {isPending ? "Deleting..." : confirmLabel}
+            {isPending ? pendingLabel : confirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

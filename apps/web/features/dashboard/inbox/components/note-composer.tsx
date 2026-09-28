@@ -1,16 +1,14 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type TransitionEvent,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "#/ui/components/input";
 import { Button } from "#/ui/components/button";
 import { AtSign, Check, X } from "lucide-react";
+import {
+  getMentionQuery,
+  mentionableUsers,
+  renderHighlightedNote,
+} from "../utils/note-mentions";
 
 type NoteComposerProps = {
   open: boolean;
@@ -18,50 +16,6 @@ type NoteComposerProps = {
   onOpenChange: (open: boolean) => void;
   onSaved?: () => void;
 };
-
-const mentionableUsers = [
-  { name: "Mohab Ali", initials: "MA" },
-  { name: "Sarah Johnson", initials: "SJ" },
-  { name: "Omar Khaled", initials: "OK" },
-  { name: "Nour Hassan", initials: "NH" },
-  { name: "Alex Morgan", initials: "AM" },
-];
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-const mentionPattern = new RegExp(
-  `(${mentionableUsers.map(({ name }) => `@${escapeRegExp(name)}`).join("|")}|@[a-zA-Z0-9._-]+)`,
-  "g",
-);
-
-function getMentionQuery(value: string, cursorPosition: number) {
-  const textBeforeCursor = value.slice(0, cursorPosition);
-  const mention = textBeforeCursor.match(/(?:^|\s)@([^\s@]*)$/);
-
-  return mention?.[1] ?? null;
-}
-
-function renderHighlightedNote(value: string) {
-  return value.split(mentionPattern).map((part, index) => {
-    const isKnownMention = mentionableUsers.some(
-      ({ name }) => part === `@${name}`,
-    );
-    const isMention = isKnownMention || /^@[a-zA-Z0-9._-]+$/.test(part);
-
-    return isMention ? (
-      <mark
-        key={`${part}-${index}`}
-        className="rounded bg-amber-200/80 px-0.5 text-amber-950 dark:bg-amber-400/30 dark:text-amber-100"
-      >
-        {part}
-      </mark>
-    ) : (
-      <span key={`${part}-${index}`}>{part}</span>
-    );
-  });
-}
 
 export default function NoteComposer({
   open,
@@ -95,7 +49,7 @@ export default function NoteComposer({
   }, [open]);
 
   function handleExpansionTransitionEnd(
-    event: TransitionEvent<HTMLDivElement>,
+    event: React.TransitionEvent<HTMLDivElement>,
   ) {
     if (open && event.propertyName === "grid-template-rows") {
       setCanOverflow(true);
@@ -140,7 +94,7 @@ export default function NoteComposer({
     onOpenChange(false);
   }
 
-  function handleNoteKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function handleNoteKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Escape" && mentionQuery !== null) {
       event.preventDefault();
       setMentionQuery(null);

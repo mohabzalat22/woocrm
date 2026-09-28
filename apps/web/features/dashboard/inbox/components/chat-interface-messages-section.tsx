@@ -1,102 +1,129 @@
-import { Avatar, AvatarFallback } from "#/ui/components/avatar";
-import {
-  Bubble,
-  BubbleContent,
-  BubbleGroup,
-  BubbleReactions,
-} from "#/ui/components/bubble";
+import { AlertCircle, Check, CheckCheck, Clock3 } from "lucide-react";
+import { Button } from "@repo/ui/ui/button";
+import { Bubble, BubbleContent } from "#/ui/components/bubble";
 import {
   Message,
-  MessageAvatar,
   MessageContent,
   MessageFooter,
 } from "#/ui/components/message";
-import { Marker } from "#/ui/components/marker";
+import { cn } from "@/common/lib/utils";
+import { useInboxActions } from "../hooks/use-inbox-actions";
+import { useInboxData } from "../hooks/use-inbox-data";
+import { useInboxStore } from "../store";
+import {
+  formatDateLabel,
+  formatTime,
+  getMessageStatusLabel,
+} from "../utils/inbox-formatters";
+import type { InboxMessage } from "../types/inbox.interface";
+
+function StatusIcon({ message }: { message: InboxMessage }) {
+  if (message.status === "FAILED") return <AlertCircle className="size-3" />;
+  if (message.status === "SENT") return <Check className="size-3" />;
+  return <CheckCheck className="size-3" />;
+}
 
 export default function ChatInterfaceMessagesSection() {
+  const { conversation: conversationQuery } = useInboxData();
+  const conversation = conversationQuery.data ?? null;
+  const pendingContent = useInboxStore((state) => state.pendingContent);
+  const retryingMessageId = useInboxStore((state) => state.retryingMessageId);
+  const { retry } = useInboxActions();
+
+  if (!conversation) return null;
+
+  const retryError = retry.error?.message;
+  const messages = conversation.messages ?? [];
+
+  let lastDateLabel = "";
+
   return (
     <div className="min-h-0 flex-1 overflow-y-auto bg-muted/25">
       <div className="flex w-full flex-col gap-5 p-4 sm:gap-6 sm:p-6 lg:p-8">
-        <Marker
-          variant="separator"
-          className="text-[11px] uppercase tracking-wider"
-        >
-          Today · 4:55 PM
-        </Marker>
+        {retry.error?.message && (
+          <div
+            role="alert"
+            className="rounded-lg bg-destructive/10 px-3 py-2 text-xs text-destructive"
+          >
+            Retry failed: {retryError}
+          </div>
+        )}
+        {messages.map((message) => {
+          const dateLabel = formatDateLabel(message.createdAt);
+          const showDate = dateLabel !== lastDateLabel;
+          lastDateLabel = dateLabel;
+          const isOutbound = message.direction === "OUTBOUND";
+          const canRetry = isOutbound && message.status === "FAILED";
+          const isRetrying = retryingMessageId === message.id;
 
-        <Message align="end">
-          <MessageAvatar>
-            <Avatar>
-              <AvatarFallback className="bg-primary/20 text-primary-foreground">
-                ME
-              </AvatarFallback>
-            </Avatar>
-          </MessageAvatar>
-          <MessageContent>
-            <Bubble>
-              <BubbleContent>Deploying to prod real quick.</BubbleContent>
-            </Bubble>
-            <MessageFooter>4:52 PM · Delivered</MessageFooter>
-          </MessageContent>
-        </Message>
+          return (
+            <div key={message.id} className="contents">
+              {showDate && (
+                <div className="relative  mx-auto w-2/3 flex items-center justify-center px-10">
+                  <div className="absolute inset-x-0 top-1/2 h-px bg-border" />
 
-        <Message>
-          <MessageAvatar>
-            <Avatar>
-              <AvatarFallback className="bg-emerald-100 text-emerald-700">
-                MA
-              </AvatarFallback>
-            </Avatar>
-          </MessageAvatar>
-          <MessageContent>
-            <Bubble variant="muted">
-              <BubbleContent>It&apos;s 4:55 PM. On a Friday.</BubbleContent>
-            </Bubble>
-            <MessageFooter>4:55 PM</MessageFooter>
-          </MessageContent>
-        </Message>
-
-        <Message align="end">
-          <MessageAvatar>
-            <Avatar>
-              <AvatarFallback className="bg-primary/20 text-primary-foreground">
-                ME
-              </AvatarFallback>
-            </Avatar>
-          </MessageAvatar>
-          <MessageContent>
-            <Bubble>
-              <BubbleContent>It&apos;s a one-line change.</BubbleContent>
-            </Bubble>
-            <MessageFooter>4:56 PM · Delivered</MessageFooter>
-          </MessageContent>
-        </Message>
-
-        <Message>
-          <MessageAvatar>
-            <Avatar>
-              <AvatarFallback className="bg-emerald-100 text-emerald-700">
-                MA
-              </AvatarFallback>
-            </Avatar>
-          </MessageAvatar>
-          <MessageContent>
-            <BubbleGroup>
-              <Bubble variant="muted">
-                <BubbleContent>
-                  It&apos;s always a one-line change 😭.
-                </BubbleContent>
+                  <div className="z-10 bg-background px-3 py-1 text-sm font-medium text-muted-foreground">
+                    {dateLabel}
+                  </div>
+                </div>
+              )}
+              <Message align={isOutbound ? "end" : "start"}>
+                <MessageContent>
+                  <Bubble variant={isOutbound ? "default" : "muted"}>
+                    <BubbleContent>{message.content}</BubbleContent>
+                  </Bubble>
+                  <MessageFooter className={cn(isOutbound && "justify-end")}>
+                    {formatTime(message.createdAt)}
+                    {isOutbound && (
+                      <>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1">
+                          <StatusIcon message={message} />
+                          {getMessageStatusLabel(message)}
+                        </span>
+                        {canRetry && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-5 px-1 text-[10px] text-destructive"
+                            disabled={retry.isPending}
+                            onClick={() =>
+                              void retry.mutateAsync({
+                                conversationId: conversation.id,
+                                messageId: message.id,
+                              })
+                            }
+                          >
+                            {isRetrying ? "Retrying…" : "Retry"}
+                          </Button>
+                        )}
+                      </>
+                    )}
+                  </MessageFooter>
+                </MessageContent>
+              </Message>
+            </div>
+          );
+        })}
+        {pendingContent && (
+          <Message align="end">
+            <MessageContent>
+              <Bubble>
+                <BubbleContent>{pendingContent}</BubbleContent>
               </Bubble>
-              <Bubble variant="muted">
-                <BubbleContent>Alright, let me take a look.</BubbleContent>
-                <BubbleReactions aria-label="Reactions: thumbs up">
-                  <span>👍</span>
-                </BubbleReactions>
-              </Bubble>
-            </BubbleGroup>
-            <MessageFooter>4:58 PM</MessageFooter>
-          </MessageContent>
-        </Message>
+              <MessageFooter className="justify-end">
+                <Clock3 className="size-3" />
+                Sending…
+              </MessageFooter>
+            </MessageContent>
+          </Message>
+        )}
+        {messages.length === 0 && !pendingContent && (
+          <p className="py-16 text-center text-sm text-muted-foreground">
+            Start the conversation with a thoughtful reply.
+          </p>
+        )}
       </div>
     </div>
   );

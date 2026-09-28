@@ -3,12 +3,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "#/ui/components/avatar";
 import { Button } from "#/ui/components/button";
 import { Card, CardContent } from "#/ui/components/card";
 import { cn } from "@/common/lib/utils";
+import { useInboxStore } from "../store";
 import { contactProfile } from "../data/contact-profile";
 
-type ProfileSectionProps = {
-  className?: string;
-  onClose?: () => void;
-};
 
 function Timeline() {
   return (
@@ -61,10 +58,8 @@ function Timeline() {
   );
 }
 
-export default function ProfileSection({
-  className,
-  onClose,
-}: ProfileSectionProps) {
+export default function ProfileSection({ className }: { className?: string }) {
+  const closeProfile = useInboxStore((state) => state.closeProfile);
   return (
     <aside
       className={cn(
@@ -95,7 +90,7 @@ export default function ProfileSection({
             type="button"
             variant="ghost"
             size="icon-sm"
-            onClick={onClose}
+            onClick={closeProfile}
           >
             <X aria-hidden="true" />
           </Button>
