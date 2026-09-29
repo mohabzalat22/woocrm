@@ -16,6 +16,7 @@ import {
   getMessageStatusLabel,
 } from "../utils/inbox-formatters";
 import type { InboxMessage } from "../types/inbox.interface";
+import { Markdown } from "@/common/components/markdown";
 
 function StatusIcon({ message }: { message: InboxMessage }) {
   if (message.status === "FAILED") return <AlertCircle className="size-3" />;
@@ -70,7 +71,9 @@ export default function ChatInterfaceMessagesSection() {
               <Message align={isOutbound ? "end" : "start"}>
                 <MessageContent>
                   <Bubble variant={isOutbound ? "default" : "muted"}>
-                    <BubbleContent>{message.content}</BubbleContent>
+                    <BubbleContent>
+                      <Markdown text={message.content} />
+                    </BubbleContent>
                   </Bubble>
                   <MessageFooter className={cn(isOutbound && "justify-end")}>
                     {formatTime(message.createdAt)}
