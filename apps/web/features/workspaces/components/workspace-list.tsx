@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Building2, Pencil, Plus, Trash2 } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import { WorkspaceDialog } from "@/common/components/workspace-dialog";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
+} from "#/ui/components/card";
 import { useActiveWorkspace } from "../hooks/active-workspace";
 import { useWorkspaces } from "../hooks/use-workspaces";
 import type { Workspace } from "../types/workspace.interface";

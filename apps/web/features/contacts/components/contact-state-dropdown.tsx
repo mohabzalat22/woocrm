@@ -2,7 +2,7 @@
 
 import { ChevronDown, ListFilter } from "lucide-react";
 import { CONTACT_STATES, type ContactState } from "@repo/shared-types";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/ui/dropdown-menu";
+} from "#/ui/components/dropdown-menu";
 
 export type ContactStateValue = ContactState | "ALL";
 

@@ -1,5 +1,5 @@
-import { SidebarInset, SidebarProvider } from "@repo/ui/ui/sidebar";
-import { TooltipProvider } from "@repo/ui/ui/tooltip";
+import { SidebarInset, SidebarProvider } from "#/ui/components/sidebar";
+import { TooltipProvider } from "#/ui/components/tooltip";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
 import { AuthGuard } from "@/common/guards/auth-guard";

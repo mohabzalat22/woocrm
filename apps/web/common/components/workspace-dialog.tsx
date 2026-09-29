@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useState } from "react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -9,9 +9,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@repo/ui/ui/dialog";
-import { Input } from "@repo/ui/ui/input";
-import { Label } from "@repo/ui/ui/label";
+} from "#/ui/components/dialog";
+import { Input } from "#/ui/components/input";
+import { Label } from "#/ui/components/label";
 import { useCreateWorkspace } from "@/features/workspaces/hooks/use-create-workspace";
 import { useDeleteWorkspace } from "@/features/workspaces/hooks/use-delete-workspace";
 import { useUpdateWorkspace } from "@/features/workspaces/hooks/use-update-workspace";

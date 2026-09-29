@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { SidebarTrigger } from "@repo/ui/ui/sidebar";
+import { SidebarTrigger } from "#/ui/components/sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,8 +10,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@repo/ui/ui/breadcrumb";
-import { Separator } from "@repo/ui/ui/separator";
+} from "#/ui/components/breadcrumb";
+import { Separator } from "#/ui/components/separator";
 
 const pageLabels: Record<string, string> = {
   dashboard: "Dashboard",

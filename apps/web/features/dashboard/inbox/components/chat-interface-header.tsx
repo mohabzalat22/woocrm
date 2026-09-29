@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowLeft, Check, EllipsisVertical, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback } from "#/ui/components/avatar";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/ui/dropdown-menu";
+} from "#/ui/components/dropdown-menu";
 import { ConfirmationDialog } from "@/common/components/confirmation-dialog";
 import { useMe } from "@/features/auth/hooks/me";
 import { useInboxActions } from "../hooks/use-inbox-actions";

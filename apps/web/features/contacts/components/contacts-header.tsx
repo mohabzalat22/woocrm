@@ -1,5 +1,5 @@
 import { Download, Plus } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 
 type ContactsHeaderProps = {
   isExporting: boolean;

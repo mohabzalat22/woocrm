@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui/ui/button"
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardContent,
@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card"
+} from "#/ui/components/card";
 
 export default function page() {
   return (

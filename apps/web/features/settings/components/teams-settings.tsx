@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Users, X } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
-import { Card, CardContent } from "@repo/ui/ui/card";
+import { Button } from "#/ui/components/button";
+import { Card, CardContent } from "#/ui/components/card";
 import { ConfirmationDialog } from "@/common/components/confirmation-dialog";
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
 import {

@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@repo/ui/ui/table";
+} from "#/ui/components/table";
 import { ContactInfoList } from "./contact-info-list";
 import { ContactRowActions } from "./contact-row-actions";
 import { ContactStateBadge } from "./contact-state-badge";

@@ -1,13 +1,13 @@
 import { Trash2, Users } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
-import { Avatar, AvatarFallback } from "@repo/ui/ui/avatar";
+} from "#/ui/components/card";
+import { Avatar, AvatarFallback } from "#/ui/components/avatar";
 import type {
   TeamRole,
   WorkspaceMember,

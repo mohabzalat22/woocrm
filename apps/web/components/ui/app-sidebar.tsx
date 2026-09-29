@@ -9,7 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-} from "@repo/ui/ui/sidebar";
+} from "#/ui/components/sidebar";
 
 import {
   DropdownMenu,
@@ -20,7 +20,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
-} from "@repo/ui/ui/dropdown-menu";
+} from "#/ui/components/dropdown-menu";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";

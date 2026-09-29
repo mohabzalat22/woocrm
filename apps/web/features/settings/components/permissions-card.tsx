@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { KeyRound, Pencil, Plus, Trash2 } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
-import { Label } from "@repo/ui/ui/label";
+} from "#/ui/components/card";
+import { Label } from "#/ui/components/label";
 import type {
   TeamRole,
   WorkspacePermission,

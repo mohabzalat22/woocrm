@@ -1,13 +1,13 @@
 import { MoreHorizontal } from "lucide-react";
 import type { Contact } from "@repo/shared-types";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/ui/dropdown-menu";
+} from "#/ui/components/dropdown-menu";
 
 type ContactRowActionsProps = {
   contact: Contact;

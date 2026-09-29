@@ -1,5 +1,5 @@
 import { AlertCircle, Check, CheckCheck, Clock3 } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import { Bubble, BubbleContent } from "#/ui/components/bubble";
 import {
   Message,

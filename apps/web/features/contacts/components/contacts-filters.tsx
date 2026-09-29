@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
 import type { ContactState } from "@repo/shared-types";
-import { Input } from "@repo/ui/ui/input";
+import { Input } from "#/ui/components/input";
 import {
   ContactStateDropdown,
   type ContactStateValue,

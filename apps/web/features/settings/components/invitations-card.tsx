@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardAction,
@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
+} from "#/ui/components/card";
 
 export function InvitationsCard({
   onInvite,

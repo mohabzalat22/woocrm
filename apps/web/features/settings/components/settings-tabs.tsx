@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "cn"; // fix: not a real package named "cn"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@repo/ui/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/ui/components/tabs";
 import { UserSettingsForm } from "@/features/auth/components/user-settings-form";
 import { TeamsSettings } from "@/features/settings/components/teams-settings";
 import { ChannelsSettings } from "@/features/settings/components/channels-settings";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@repo/ui/ui/dialog";
+} from "#/ui/components/dialog";
 
 interface ConfirmationDialogProps {
   open: boolean;

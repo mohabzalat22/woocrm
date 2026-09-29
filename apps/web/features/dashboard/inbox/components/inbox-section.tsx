@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { Loader2, Plus, Search, SlidersHorizontal } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Loader2, Plus, Search } from "lucide-react";
+import { Button } from "#/ui/components/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-} from "@repo/ui/ui/input-group";
-import { Tabs, TabsList, TabsTrigger } from "@repo/ui/ui/tabs";
+} from "#/ui/components/input-group";
+import { Tabs, TabsList, TabsTrigger } from "#/ui/components/tabs";
 import { cn } from "@/common/lib/utils";
 import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { useInboxData } from "../hooks/use-inbox-data";

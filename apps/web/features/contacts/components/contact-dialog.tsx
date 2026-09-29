@@ -6,7 +6,7 @@ import {
   type ContactInfoInput,
   type ContactState,
 } from "@repo/shared-types";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +14,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@repo/ui/ui/dialog";
-import { Input } from "@repo/ui/ui/input";
-import { Label } from "@repo/ui/ui/label";
+} from "#/ui/components/dialog";
+import { Input } from "#/ui/components/input";
+import { Label } from "#/ui/components/label";
 import { useSaveContact } from "../hooks/use-save-contact";
 import { Plus, Trash2 } from "lucide-react";
 import { ContactStateDropdown } from "./contact-state-dropdown";

@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import Link from "next/link";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import { Eye, EyeOff } from "lucide-react";
 import {
   Card,
@@ -12,9 +12,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
-import { Input } from "@repo/ui/ui/input";
-import { Label } from "@repo/ui/ui/label";
+} from "#/ui/components/card";
+import { Input } from "#/ui/components/input";
+import { Label } from "#/ui/components/label";
 import { useRegister } from "../hooks/register";
 import { RegisterSchema } from "../schemas";
 

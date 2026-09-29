@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,7 +7,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@repo/ui/ui/dropdown-menu";
+} from "#/ui/components/dropdown-menu";
 
 export interface TeamSettingsDropdownOption {
   value: string;

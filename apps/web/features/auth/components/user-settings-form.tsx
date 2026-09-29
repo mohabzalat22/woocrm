@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useState } from "react";
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardContent,
@@ -9,9 +9,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
-import { Input } from "@repo/ui/ui/input";
-import { Label } from "@repo/ui/ui/label";
+} from "#/ui/components/card";
+import { Input } from "#/ui/components/input";
+import { Label } from "#/ui/components/label";
 import { Eye, EyeOff, LogOut } from "lucide-react";
 import { useLogout } from "../hooks/logout";
 import { useMe, useUpdateMe } from "../hooks/me";

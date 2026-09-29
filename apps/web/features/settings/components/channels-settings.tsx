@@ -10,14 +10,14 @@ import {
   Unplug,
 } from "lucide-react";
 
-import { Button } from "@repo/ui/ui/button";
+import { Button } from "#/ui/components/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@repo/ui/ui/card";
+} from "#/ui/components/card";
 
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
 import { useWhatsAppConnection } from "../hooks/use-whatsapp-connection";

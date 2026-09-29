@@ -1,5 +1,5 @@
-import { Button } from "@repo/ui/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@repo/ui/ui/avatar";
+import { Button } from "#/ui/components/button";
+import { Avatar, AvatarFallback, AvatarImage } from "#/ui/components/avatar";
 import { Settings } from "lucide-react";
 import { useMe } from "@/features/auth/hooks/me";
 import Link from "next/link";
