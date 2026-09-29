@@ -8,7 +8,7 @@ import type {
 } from './schemas';
 
 import type { ContactDto, ContactInfoDto, ContactsPageDto } from './dto';
-const contactInclude = { contactInfos: true } as const;
+const contactInclude = { contactInfo: true } as const;
 
 @Injectable()
 export class ContactsRepository {
@@ -25,8 +25,8 @@ export class ContactsRepository {
             OR: [
               { name: { contains: search, mode: 'insensitive' as const } },
               {
-                contactInfos: {
-                  some: {
+                contactInfo: {
+                  is: {
                     identity: {
                       contains: search,
                       mode: 'insensitive' as const,
@@ -80,8 +80,8 @@ export class ContactsRepository {
         workspaceId,
         name: data.name,
         state: data.state,
-        contactInfos: data.contactInfos?.length
-          ? { create: data.contactInfos }
+        contactInfo: data.contactInfo
+          ? { create: data.contactInfo }
           : undefined,
       },
       include: contactInclude,
@@ -106,16 +106,18 @@ export class ContactsRepository {
         });
       }
 
-      if (data.contactInfos !== undefined) {
-        await tx.contactInfo.deleteMany({ where: { contactId: id } });
-
-        if (data.contactInfos.length > 0) {
-          await tx.contactInfo.createMany({
-            data: data.contactInfos.map((info) => ({ ...info, contactId: id })),
+      if (data.contactInfo !== undefined) {
+        if (data.contactInfo === null) {
+          // deleteMany used to never throw error if infos doesnot exists
+          await tx.contactInfo.deleteMany({ where: { contactId: id } });
+        } else {
+          await tx.contactInfo.upsert({
+            where: { contactId: id },
+            create: { ...data.contactInfo, contactId: id },
+            update: data.contactInfo,
           });
         }
       }
-
       return tx.contact.findFirst({
         where: { id, workspaceId },
         include: contactInclude,
@@ -153,11 +155,13 @@ export class ContactsRepository {
     contactInfoId: string,
     data: { identity?: string; source?: string },
   ): Promise<ContactInfoDto | null> {
-    await prisma.contactInfo.updateMany({
-      where: { id: contactInfoId, contactId },
+    const existing = await this.findInfo(contactId, contactInfoId);
+    if (!existing) return null;
+
+    return prisma.contactInfo.update({
+      where: { id: existing.id },
       data,
     });
-    return this.findInfo(contactId, contactInfoId);
   }
 
   async deleteInfo(
@@ -166,19 +170,15 @@ export class ContactsRepository {
   ): Promise<ContactInfoDto | null> {
     const existing = await this.findInfo(contactId, contactInfoId);
     if (!existing) return null;
-    await prisma.contactInfo.deleteMany({
-      where: { id: contactInfoId, contactId },
-    });
+    await prisma.contactInfo.delete({ where: { id: existing.id } });
     return existing;
   }
-
   async findContactChannelIdentity(
     contactId: string,
     channel: string,
   ): Promise<ContactInfoDto | null> {
     return prisma.contactInfo.findFirst({
       where: { contactId, source: channel },
-      orderBy: { createdAt: 'asc' },
     });
   }
 }

@@ -20,7 +20,7 @@ export interface InboxContact {
   id: string;
   name: string;
   state: ContactState;
-  contactInfos: Array<{ id: string; identity: string; source: string }>;
+  contactInfo: { id: string; identity: string; source: string } | null;
 }
 
 export interface ConversationAssignee {

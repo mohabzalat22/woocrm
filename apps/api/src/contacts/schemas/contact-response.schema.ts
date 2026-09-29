@@ -18,7 +18,7 @@ export const ContactResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
   state: ContactStateSchema,
-  contactInfos: z.array(ContactInfoResponseSchema),
+  contactInfo: ContactInfoResponseSchema.nullable(),
   createdAt: IsoDateTimeSchema,
   updatedAt: IsoDateTimeSchema,
 });

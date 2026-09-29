@@ -4,12 +4,12 @@ import { CreateContactInfoSchema } from './create-contact-info.schema';
 
 export const UpdateContactSchema = ContactSchema.omit({
   id: true,
-  contactInfos: true,
+  contactInfo: true,
   createdAt: true,
   updatedAt: true,
 })
   .extend({
-    contactInfos: z.array(CreateContactInfoSchema), // fixing nested dates
+    contactInfo: CreateContactInfoSchema.nullable().optional(),
   })
   .partial();
 

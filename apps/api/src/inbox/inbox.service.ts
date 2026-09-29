@@ -90,9 +90,7 @@ export class InboxService {
         workspaceId,
       );
       if (!target) {
-        throw new BadRequestException(
-          'Assignee must belong to this workspace',
-        );
+        throw new BadRequestException('Assignee must belong to this workspace');
       }
     }
 
@@ -241,7 +239,7 @@ export class InboxService {
       conversationId,
       workspaceId,
       result.success ? 'SENT' : 'FAILED',
-      result.externalMessageId,
+      result.externalMessageId, //MOX same as identity for all
     );
 
     if (!updated) {
@@ -270,9 +268,9 @@ export class InboxService {
     const conversation = await this.inboxRepository.appendInboundMessage(
       workspaceId,
       channel.name,
-      message.from.contactId,
+      message.from.contactId, // contact id is identity here
       message.text,
-      message.externalMessageId,
+      message.externalMessageId, // TODO: fix interfaces external message id of external id or external contact id
       message.receivedAt,
       message.raw,
     );
@@ -442,11 +440,13 @@ export class InboxService {
       ...contact,
       createdAt: this.toIsoDate(contact.createdAt),
       updatedAt: this.toIsoDate(contact.updatedAt),
-      contactInfos: contact.contactInfos.map((info) => ({
-        ...info,
-        createdAt: this.toIsoDate(info.createdAt),
-        updatedAt: this.toIsoDate(info.updatedAt),
-      })),
+      contactInfo: contact.contactInfo
+        ? {
+            ...contact.contactInfo,
+            createdAt: this.toIsoDate(contact.contactInfo.createdAt),
+            updatedAt: this.toIsoDate(contact.contactInfo.updatedAt),
+          }
+        : null,
     };
   }
 

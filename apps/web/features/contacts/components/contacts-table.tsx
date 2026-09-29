@@ -54,7 +54,7 @@ export function ContactsTable({
                   <ContactStateBadge state={contact.state} />
                 </TableCell>
                 <TableCell className="min-w-[18rem]">
-                  <ContactInfoList infos={contact.contactInfos} />
+                  <ContactInfoList info={contact.contactInfo} />
                 </TableCell>
                 <TableCell className="text-right">
                   <ContactRowActions

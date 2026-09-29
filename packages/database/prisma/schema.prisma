@@ -180,7 +180,7 @@ enum ContactState {
 model Contact {
   id           String        @id @default(uuid())
   name         String
-  contactInfos ContactInfo[]
+  contactInfo  ContactInfo?
   state        ContactState  @default(NEW)
   workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   workspaceId  String
@@ -196,11 +196,9 @@ model ContactInfo {
   identity  String // phone , email etc
   source    String // linkedin etc
   contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  contactId String
+  contactId String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([contactId])
 }
 
 enum ConversationStatus {

@@ -8,7 +8,7 @@ export const ContactSchema = z.object({
   id: z.string(),
   name: z.string(),
   state: ContactStateSchema,
-  contactInfos: z.array(ContactInfoSchema),
+  contactInfo: ContactInfoSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

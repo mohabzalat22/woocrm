@@ -18,7 +18,6 @@ import {
 import { Input } from "#/ui/components/input";
 import { Label } from "#/ui/components/label";
 import { useSaveContact } from "../hooks/use-save-contact";
-import { Plus, Trash2 } from "lucide-react";
 import { ContactStateDropdown } from "./contact-state-dropdown";
 
 type ContactDialogProps = {
@@ -28,13 +27,7 @@ type ContactDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-type ContactInfoForm = ContactInfoInput & { key: string };
-
-const newInfo = (): ContactInfoForm => ({
-  key: crypto.randomUUID(),
-  identity: "",
-  source: "",
-});
+type ContactInfoForm = ContactInfoInput;
 
 export function ContactDialog({
   workspaceId,
@@ -44,7 +37,7 @@ export function ContactDialog({
 }: ContactDialogProps) {
   const [name, setName] = useState("");
   const [state, setState] = useState<ContactState>("NEW");
-  const [contactInfos, setContactInfos] = useState<ContactInfoForm[]>([]);
+  const [contactInfo, setContactInfo] = useState<ContactInfoForm | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mutation = useSaveContact(workspaceId);
 
@@ -53,9 +46,7 @@ export function ContactDialog({
     if (!open) return;
     setName(contact?.name ?? "");
     setState(contact?.state ?? "NEW");
-    setContactInfos(
-      contact?.contactInfos.map((info) => ({ ...info, key: info.id })) ?? [],
-    );
+    setContactInfo(contact?.contactInfo ?? null);
     setError(null);
     resetMutation();
   }, [contact, open, resetMutation]);
@@ -64,18 +55,20 @@ export function ContactDialog({
     event.preventDefault();
     setError(null);
 
-    const infos = contactInfos.map(({ identity, source }) => ({
-      identity: identity.trim(),
-      source: source.trim(),
-    }));
+    const info = contactInfo
+      ? {
+          identity: contactInfo.identity.trim(),
+          source: contactInfo.source.trim(),
+        }
+      : undefined;
 
     if (!name.trim()) {
       setError("Name is required");
       return;
     }
 
-    if (infos.some((info) => !info.identity || !info.source)) {
-      setError("Complete or remove every contact-info row");
+    if (info && (!info.identity || !info.source)) {
+      setError("Complete both contact-info fields or leave them empty");
       return;
     }
 
@@ -85,7 +78,7 @@ export function ContactDialog({
         data: {
           name: name.trim(),
           state,
-          contactInfos: infos,
+          contactInfo: info ?? (contact ? null : undefined),
         },
       });
       onOpenChange(false);
@@ -98,16 +91,12 @@ export function ContactDialog({
     }
   }
 
-  function updateInfo(
-    key: string,
-    field: keyof ContactInfoInput,
-    value: string,
-  ) {
-    setContactInfos((current) =>
-      current.map((info) =>
-        info.key === key ? { ...info, [field]: value } : info,
-      ),
-    );
+  function updateInfo(field: keyof ContactInfoInput, value: string) {
+    setContactInfo((current) => ({
+      identity: current?.identity ?? "",
+      source: current?.source ?? "",
+      [field]: value,
+    }));
   }
 
   return (
@@ -119,8 +108,7 @@ export function ContactDialog({
               {contact ? "Edit contact" : "Add contact"}
             </DialogTitle>
             <DialogDescription>
-              Keep the contact details and as many phone, email, or social
-              identities as needed.
+              Keep the contact details and one phone, email, or social identity.
             </DialogDescription>
           </DialogHeader>
 
@@ -149,74 +137,46 @@ export function ContactDialog({
             </div>
 
             <div className="grid gap-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Contact information</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Add multiple ways to reach this contact.
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setContactInfos((current) => [...current, newInfo()])
-                  }
-                >
-                  <Plus /> Add info
-                </Button>
-              </div>
-              {contactInfos.length === 0 && (
-                <p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
-                  No contact information added yet.
+              <div>
+                <Label>Contact information</Label>
+                <p className="text-xs text-muted-foreground">
+                  Add one phone, email, or social identity.
                 </p>
-              )}
-              {contactInfos.map((info, index) => (
-                <div
-                  key={info.key}
-                  className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_9rem_auto] sm:items-end"
-                >
-                  <div className="grid gap-1.5">
-                    <Label htmlFor={`contact-identity-${info.key}`}>
-                      Identity {index + 1}
-                    </Label>
-                    <Input
-                      id={`contact-identity-${info.key}`}
-                      value={info.identity}
-                      onChange={(event) =>
-                        updateInfo(info.key, "identity", event.target.value)
-                      }
-                      placeholder="+201001234567 or john@example.com"
-                    />
-                  </div>
-                  <div className="grid gap-1.5">
-                    <Label htmlFor={`contact-source-${info.key}`}>Source</Label>
-                    <Input
-                      id={`contact-source-${info.key}`}
-                      value={info.source}
-                      onChange={(event) =>
-                        updateInfo(info.key, "source", event.target.value)
-                      }
-                      placeholder="whatsapp"
-                    />
-                  </div>
+              </div>
+              <div className="grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_9rem_auto] sm:items-end">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="contact-identity">Identity</Label>
+                  <Input
+                    id="contact-identity"
+                    value={contactInfo?.identity ?? ""}
+                    onChange={(event) =>
+                      updateInfo("identity", event.target.value)
+                    }
+                    placeholder="+201001234567 or john@example.com"
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="contact-source">Source</Label>
+                  <Input
+                    id="contact-source"
+                    value={contactInfo?.source ?? ""}
+                    onChange={(event) =>
+                      updateInfo("source", event.target.value)
+                    }
+                    placeholder="whatsapp"
+                  />
+                </div>
+                {contactInfo && (
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
                     className="text-destructive"
-                    onClick={() =>
-                      setContactInfos((current) =>
-                        current.filter((item) => item.key !== info.key),
-                      )
-                    }
-                    aria-label={`Remove contact information ${index + 1}`}
+                    onClick={() => setContactInfo(null)}
                   >
-                    <Trash2 />
+                    Remove
                   </Button>
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           </div>
 

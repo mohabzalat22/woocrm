@@ -85,7 +85,7 @@ export class ContactsController {
   }
 
   @Get(':contactId')
-  @ApiOperation({ summary: 'Get a contact and all contact information' })
+  @ApiOperation({ summary: 'Get a contact and its contact information' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
   @ZodResponse({ status: 200, type: ContactResponseDto })
@@ -126,9 +126,8 @@ export class ContactsController {
   ) {
     return this.contactsService.delete(userId, workspaceId, contactId);
   }
-
   @Post(':contactId/contact-infos')
-  @ApiOperation({ summary: 'Add contact information' })
+  @ApiOperation({ summary: 'Create contact information' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
   @ZodResponse({ status: 201, type: ContactResponseDto })
@@ -140,6 +139,28 @@ export class ContactsController {
     @Body() data: CreateContactInfoDto,
   ) {
     await this.contactsService.createInfo(userId, workspaceId, contactId, data);
+    return this.contactsService.findById(userId, workspaceId, contactId);
+  }
+
+  @Get(':contactId/contact-infos/:contactInfoId')
+  @ApiOperation({ summary: 'Read contact information' })
+  @ApiParam({ name: 'workspaceId' })
+  @ApiParam({ name: 'contactId' })
+  @ApiParam({ name: 'contactInfoId' })
+  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @RequirePermissions(Permission.CONTACT_VIEW)
+  async findInfo(
+    @CurrentUser('id') userId: string,
+    @CurrentWorkspace('workspaceId') workspaceId: string,
+    @Param('contactId') contactId: string,
+    @Param('contactInfoId') contactInfoId: string,
+  ) {
+    await this.contactsService.findInfo(
+      userId,
+      workspaceId,
+      contactId,
+      contactInfoId,
+    );
     return this.contactsService.findById(userId, workspaceId, contactId);
   }
 

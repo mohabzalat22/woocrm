@@ -5,7 +5,7 @@ import { contactsApi, contactsKey } from "../services/contacts.service";
 type SaveContactData = {
   name: string;
   state?: ContactState;
-  contactInfos?: ContactInfoInput[];
+  contactInfo?: ContactInfoInput | null;
 };
 
 type SaveContactInput = {
@@ -20,7 +20,10 @@ export function useSaveContact(workspaceId: string) {
     mutationFn: ({ contactId, data }: SaveContactInput) =>
       contactId
         ? contactsApi.update(workspaceId, contactId, data)
-        : contactsApi.create(workspaceId, data),
+        : contactsApi.create(workspaceId, {
+            ...data,
+            contactInfo: data.contactInfo ?? undefined,
+          }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: contactsKey(workspaceId),

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import prisma from '@repo/database';
 import type { CreateMessageInput, ListConversationsInput } from './schemas';
-import type { ContactDto } from '../contacts/dto';
 import type {
   ConversationListRecordDto,
   ConversationWithRelationsDto,
@@ -10,7 +9,7 @@ import type {
 } from './dto';
 
 const contactInclude = {
-  contactInfos: true,
+  contactInfo: true,
 } as const;
 
 const assigneeInclude = {
@@ -94,29 +93,13 @@ export class InboxRepository {
     });
   }
 
-  async findContactByExternalId(
-    workspaceId: string,
-    channel: string,
-    externalContactId: string,
-  ): Promise<ContactDto | null> {
-    return prisma.contact.findFirst({
-      where: {
-        workspaceId,
-        contactInfos: {
-          some: { source: channel, identity: externalContactId },
-        },
-      },
-      include: { contactInfos: true },
-    });
-  }
-
   async findConversationByExternalMessageId(
     workspaceId: string,
-    externalMessageId: string,
+    externalId: string,
   ): Promise<MessageWithConversationDto | null> {
     return prisma.message.findFirst({
       where: {
-        externalId: externalMessageId,
+        externalId,
         conversation: { workspaceId },
       },
       include: { conversation: true },
@@ -143,7 +126,7 @@ export class InboxRepository {
   async appendInboundMessage(
     workspaceId: string,
     channel: string,
-    externalContactId: string,
+    contactIdentity: string,
     content: string,
     externalId: string,
     receivedAt: Date,
@@ -153,24 +136,24 @@ export class InboxRepository {
       const contact = await tx.contact.findFirst({
         where: {
           workspaceId,
-          contactInfos: {
-            some: { source: channel, identity: externalContactId },
+          contactInfo: {
+            is: { source: channel, identity: contactIdentity },
           },
         },
       });
 
-      // if contact is not saved create new one
+      //MOX: if contact is not saved create new one
       const savedContact =
         contact ??
         (await tx.contact.create({
           data: {
             workspaceId,
-            name: externalContactId,
+            name: contactIdentity,
             state: 'NEW',
-            contactInfos: {
+            contactInfo: {
               create: {
                 source: channel,
-                identity: externalContactId,
+                identity: contactIdentity,
               },
             },
           },

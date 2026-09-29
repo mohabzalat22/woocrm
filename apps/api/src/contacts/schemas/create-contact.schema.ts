@@ -4,11 +4,11 @@ import { CreateContactInfoSchema } from './create-contact-info.schema';
 
 export const CreateContactSchema = ContactSchema.omit({
   id: true,
-  contactInfos: true,
+  contactInfo: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
-  contactInfos: z.array(CreateContactInfoSchema), // fixing nested dates
+  contactInfo: CreateContactInfoSchema.optional(),
 });
 
 export type CreateContactInput = z.infer<typeof CreateContactSchema>;

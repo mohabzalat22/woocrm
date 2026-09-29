@@ -22,7 +22,7 @@ export interface Contact {
   id: string;
   name: string;
   state: ContactState;
-  contactInfos: ContactInfo[];
+  contactInfo: ContactInfo | null;
 }
 
 export interface ContactsPage {
@@ -43,11 +43,11 @@ export interface ContactInfoInput {
 export interface CreateContactPayload {
   name: string;
   state?: ContactState;
-  contactInfos?: ContactInfoInput[];
+  contactInfo?: ContactInfoInput;
 }
 
 export interface UpdateContactPayload {
   name?: string;
   state?: ContactState;
-  contactInfos?: ContactInfoInput[];
+  contactInfo?: ContactInfoInput | null;
 }

@@ -84,12 +84,12 @@ export class ContactsService {
       contact.id,
       contact.name,
       contact.state,
-      contact.contactInfos
-        .map((info) => info.source + ':' + info.identity)
-        .join(';'),
+      contact.contactInfo
+        ? contact.contactInfo.source + ':' + contact.contactInfo.identity
+        : '',
     ]);
 
-    return [['id', 'name', 'state', 'contact_infos'], ...rows]
+    return [['id', 'name', 'state', 'contact_info'], ...rows]
       .map((row) => row.map((value) => this.escapeCsv(value)).join(','))
       .join('\n');
   }
@@ -103,6 +103,16 @@ export class ContactsService {
     await this.workspaceContext.requireMembership(userId, workspaceId);
     await this.getContact(workspaceId, contactId);
     return this.contactsRepository.createInfo(contactId, data);
+  }
+
+  async findInfo(
+    userId: string,
+    workspaceId: string,
+    contactId: string,
+    contactInfoId: string,
+  ): Promise<ContactInfoDto> {
+    await this.workspaceContext.requireMembership(userId, workspaceId);
+    return this.getContactInfo(workspaceId, contactId, contactInfoId);
   }
 
   async updateInfo(
