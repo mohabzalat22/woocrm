@@ -30,9 +30,7 @@ export default function InboxSection({ className }: { className?: string }) {
   );
   const search = useInboxStore((state) => state.search);
   const setActiveTab = useInboxStore((state) => state.setActiveTab);
-  const selectConversation = useInboxStore(
-    (state) => state.selectConversation,
-  );
+  const selectConversation = useInboxStore((state) => state.selectConversation);
   const setMobileView = useInboxStore((state) => state.setMobileView);
   const setSearch = useInboxStore((state) => state.setSearch);
   const debouncedSearch = useDebouncedValue(search);
@@ -72,7 +70,7 @@ export default function InboxSection({ className }: { className?: string }) {
               <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
                 {debouncedSearch
                   ? filteredConversations.length
-                  : conversations.data?.pages[0]?.meta.total ?? 0}
+                  : (conversations.data?.pages[0]?.meta.total ?? 0)}
               </span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -80,14 +78,6 @@ export default function InboxSection({ className }: { className?: string }) {
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              aria-label="Filter conversations"
-              title="Filter conversations"
-              variant="ghost"
-              size="icon-sm"
-            >
-              <SlidersHorizontal />
-            </Button>
             <Button
               aria-label="Start a new conversation"
               title="Start a new conversation"
