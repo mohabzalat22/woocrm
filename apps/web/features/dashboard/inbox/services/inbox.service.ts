@@ -43,7 +43,7 @@ export const inboxApi = {
   members: (workspaceId: string): Promise<InboxMember[]> =>
     request(`workspaces/${workspaceId}/members`, { method: "GET" }),
 
-  assign: (workspaceId: string, conversationId: string, memberId: string) =>
+  assign: (workspaceId: string, conversationId: string, memberId: string | null) =>
     request<InboxConversation>(
       `${conversationPath(workspaceId, conversationId)}/assign`,
       {

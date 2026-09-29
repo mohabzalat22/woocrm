@@ -92,6 +92,21 @@ export default function ChatInterfaceHeader() {
             >
               <DropdownMenuLabel>Assign conversation</DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={conversation.assignedToId === null}
+                onSelect={() =>
+                  assign.mutate({
+                    conversationId: conversation.id,
+                    memberId: null,
+                  })
+                }
+              >
+                <span className="flex-1">Unassigned</span>
+                {conversation.assignedToId === null && (
+                  <Check className="size-4 text-emerald-600" />
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               {memberList.length === 0 ? (
                 <p className="px-2 py-3 text-xs text-muted-foreground">
                   No eligible members found.

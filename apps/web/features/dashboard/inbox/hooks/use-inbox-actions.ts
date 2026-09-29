@@ -23,7 +23,7 @@ export function useInboxActions() {
       memberId,
     }: {
       conversationId: string;
-      memberId: string;
+      memberId: string | null;
     }) => inboxApi.assign(id, conversationId, memberId),
     onSuccess: refreshInbox,
   });

@@ -84,17 +84,22 @@ export class InboxService {
     data: AssignConversationDto,
   ): Promise<ConversationResponseDto> {
     await this.requireAccessibleConversation(userId, workspaceId, id);
-    const target = await this.inboxRepository.findMemberById(
-      data.memberId,
-      workspaceId,
-    );
-    if (!target)
-      throw new BadRequestException('Assignee must belong to this workspace');
+    if (data.memberId) {
+      const target = await this.inboxRepository.findMemberById(
+        data.memberId,
+        workspaceId,
+      );
+      if (!target) {
+        throw new BadRequestException(
+          'Assignee must belong to this workspace',
+        );
+      }
+    }
 
     const conversation = await this.inboxRepository.assignConversation(
       id,
       workspaceId,
-      target.id,
+      data.memberId,
     );
     if (!conversation) throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);

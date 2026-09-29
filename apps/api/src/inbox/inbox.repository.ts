@@ -267,7 +267,7 @@ export class InboxRepository {
   async assignConversation(
     id: string,
     workspaceId: string,
-    memberId: string,
+    memberId: string | null,
   ): Promise<ConversationWithRelationsDto | null> {
     await prisma.conversation.updateMany({
       where: { id, workspaceId },
