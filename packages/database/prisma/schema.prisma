@@ -50,6 +50,7 @@ model WorkspaceMember {
   createdAt     DateTime       @default(now())
   conversations Conversation[]
   messages      Message[]
+  notes         Note[]
 
   @@unique([userId, workspaceId])
 }
@@ -234,14 +235,15 @@ model Conversation {
   contact    Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   assignedTo WorkspaceMember? @relation(fields: [assignedToId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   messages   Message[]
+  notes      Note[]
 
+  @@unique([id, workspaceId])
   @@index([workspaceId, status])
   @@index([assignedToId])
-  @@index([contactId])
 }
 
 model Message {
-  id             String           @id @default(cuid())
+  id             String           @id @default(uuid())
   conversationId String
   direction      MessageDirection
   content        String
@@ -256,4 +258,20 @@ model Message {
 
   @@index([conversationId, createdAt])
   @@index([externalId])
+}
+
+model Note {
+  id      String @id @default(uuid())
+  content String
+
+  conversation      Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  conversationId    String
+  workspaceMember   WorkspaceMember @relation(fields: [workspaceMemberId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  workspaceMemberId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([id, conversationId])
+  @@index([conversationId, createdAt])
 }

@@ -17,6 +17,7 @@ import { InvitationsModule } from './invitations/invitations.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { InboxModule } from './inbox/inbox.module';
+import { NotesModule } from './notes/notes.module';
 
 @Module({
   controllers: [AppController],
@@ -47,6 +48,7 @@ import { InboxModule } from './inbox/inbox.module';
     MessagingModule,
     ContactsModule,
     InboxModule,
+    NotesModule,
   ],
 })
 export class AppModule {}
