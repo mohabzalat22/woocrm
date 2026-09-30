@@ -59,7 +59,10 @@ export function ContactStateDropdown({
           <ChevronDown className="size-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
+      <DropdownMenuContent
+        align="end"
+        className="max-h-56 w-52 overflow-y-auto scrollbar-none"
+      >
         <DropdownMenuLabel>Filter by state</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup

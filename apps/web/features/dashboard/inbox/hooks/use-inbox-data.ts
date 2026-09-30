@@ -9,7 +9,7 @@ export function useInboxData() {
   const { activeWorkspaceId: workspaceId } = useActiveWorkspace();
   const tab = useInboxStore((state) => state.activeTab);
   const conversationId = useInboxStore((state) => state.selectedConversationId);
-  const id = workspaceId ?? "";
+  const id = workspaceId as string;
 
   const conversations = useInfiniteQuery({
     queryKey: inboxKeys.conversations(id, tab),

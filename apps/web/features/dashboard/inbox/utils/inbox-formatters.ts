@@ -64,3 +64,20 @@ export function getMessageStatusLabel(message: InboxMessage) {
 export function getContactStateLabel(state: InboxContact["state"]) {
   return state.charAt(0) + state.slice(1).toLowerCase();
 }
+
+export function formatFirstContact(value: string | null | undefined) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
+export function getAssigneeName(
+  assignee: { name: string | null; email: string } | null,
+) {
+  return assignee?.name?.trim() || "Unassigned";
+}

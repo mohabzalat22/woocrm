@@ -6,7 +6,7 @@ export const ContactStateSchema = z.enum(CONTACT_STATES);
 
 export const ContactSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().trim().min(1, 'Name is required'),
   state: ContactStateSchema,
   contactInfo: ContactInfoSchema.nullable(),
   createdAt: z.date(),

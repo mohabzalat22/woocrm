@@ -28,6 +28,9 @@ export function useSaveContact(workspaceId: string) {
       await queryClient.invalidateQueries({
         queryKey: contactsKey(workspaceId),
       });
+      await queryClient.invalidateQueries({
+        queryKey: ["inbox", workspaceId],
+      });
     },
   });
 }

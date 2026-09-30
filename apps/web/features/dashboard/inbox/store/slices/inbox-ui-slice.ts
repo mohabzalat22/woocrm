@@ -9,6 +9,7 @@ export type InboxUiSlice = {
   selectedConversationId: string | null;
   mobileView: MobileView;
   profileOpen: boolean;
+  contactProfileDirty: boolean;
   search: string;
   setActiveTab: (tab: InboxTab) => void;
   selectConversation: (conversationId: string | null) => void;
@@ -16,6 +17,7 @@ export type InboxUiSlice = {
   openProfile: () => void;
   closeProfile: () => void;
   toggleProfile: () => void;
+  setContactProfileDirty: (dirty: boolean) => void;
   setSearch: (search: string) => void;
 };
 
@@ -29,6 +31,7 @@ export const createInboxUiSlice: StateCreator<
   selectedConversationId: null,
   mobileView: "inbox",
   profileOpen: false,
+  contactProfileDirty: false,
   search: "",
 
   setActiveTab: (activeTab) =>
@@ -48,6 +51,8 @@ export const createInboxUiSlice: StateCreator<
       profileOpen: !state.profileOpen,
       mobileView: state.profileOpen ? "conversation" : "profile",
     })),
+
+  setContactProfileDirty: (contactProfileDirty) => set({ contactProfileDirty }),
 
   setSearch: (search) => set({ search }),
 });
