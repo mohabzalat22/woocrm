@@ -38,7 +38,7 @@ import SettingsButton from "./settings-button";
 import { useEffect, useState } from "react";
 import { useWorkspaces } from "@/features/workspaces/hooks/use-workspaces";
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
-
+import Image from "next/image";
 const menuItems = [
   { label: "Inbox", href: "/inbox", icon: Inbox },
   { label: "Contacts", href: "/contacts", icon: Users },
@@ -73,11 +73,6 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarHeader className="gap-3 p-3">
         <SidebarMenu>
-          <SidebarMenuItem>
-            <div className="px-2 pb-1 text-2xl font-semibold tracking-tight text-primary group-data-[collapsible=icon]:hidden">
-              wasel.com
-            </div>
-          </SidebarMenuItem>
           <SidebarMenuItem className="my-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
