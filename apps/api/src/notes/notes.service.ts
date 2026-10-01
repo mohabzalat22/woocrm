@@ -68,9 +68,12 @@ export class NotesService {
     workspaceId: string,
     data: CreateNoteInput, // content text
   ): Promise<NoteDto> {
-    await this.workspaceContextService.requireMembership(userId, workspaceId);
+    const member = await this.workspaceContextService.requireMembership(
+      userId,
+      workspaceId,
+    );
 
-    return await this.notesRepository.create(conversationId, workspaceId, data);
+    return await this.notesRepository.create(conversationId, member.id, data);
   }
 
   async updateById(

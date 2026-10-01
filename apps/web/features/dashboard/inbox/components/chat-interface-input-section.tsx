@@ -15,7 +15,7 @@ export default function ChatInterfaceInputSection() {
   const selectedConversationId = useInboxStore(
     (state) => state.selectedConversationId,
   );
-  const { send } = useInboxActions();
+  const { send, createNote } = useInboxActions();
   const errorMessage = send.error?.message;
   const retryContent = send.isError ? send.variables?.content : undefined;
 
@@ -35,12 +35,20 @@ export default function ChatInterfaceInputSection() {
     setMessage("");
   }
 
+  async function handleCreateNote(content: string) {
+    if (!selectedConversationId) return;
+    await createNote.mutateAsync({
+      conversationId: selectedConversationId,
+      content,
+    });
+  }
+
   return (
     <div className="shrink-0 border-t bg-background p-3 sm:p-4">
       <NoteComposer
         open={noteOpen}
         onOpenChange={setNoteOpen}
-        onSaved={() => setNoteSaved(true)}
+        onSaved={(content) => void handleCreateNote(content)}
       />
       {errorMessage && (
         <div

@@ -14,7 +14,7 @@ type NoteComposerProps = {
   open: boolean;
   onDirty?: () => void;
   onOpenChange: (open: boolean) => void;
-  onSaved?: () => void;
+  onSaved?: (content: string) => void;
 };
 
 export default function NoteComposer({
@@ -90,7 +90,7 @@ export default function NoteComposer({
     }
 
     setMentionQuery(null);
-    onSaved?.();
+    onSaved?.(note);
     onOpenChange(false);
   }
 

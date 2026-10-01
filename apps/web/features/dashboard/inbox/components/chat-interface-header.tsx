@@ -22,7 +22,11 @@ import { getContactName, getInitials } from "../utils/inbox-formatters";
 export default function ChatInterfaceHeader() {
   const [resolveDialogOpen, setResolveDialogOpen] = useState(false);
   const { data: currentUser } = useMe();
-  const { conversation: conversationQuery, members } = useInboxData();
+  const {
+    conversation: conversationQuery,
+    members,
+    getLastNote,
+  } = useInboxData();
   const conversation = conversationQuery.data ?? null;
   const profileOpen = useInboxStore((state) => state.profileOpen);
   const setMobileView = useInboxStore((state) => state.setMobileView);
@@ -41,6 +45,7 @@ export default function ChatInterfaceHeader() {
   const contactName = getContactName(conversation.contact);
   const assigneeName = conversation.assignedTo?.name ?? "Unassigned";
   const actionError = assign.error?.message ?? resolve.error?.message;
+  const lastNote = getLastNote.data?.content ?? "Not Noted Yet";
 
   return (
     <>
@@ -66,7 +71,7 @@ export default function ChatInterfaceHeader() {
               {contactName}
             </p>
             <div className="mt-1 flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-              <span className="truncate">Usually replies within an hour</span>
+              <span className="truncate">{lastNote}</span>
               <span className="hidden shrink-0 sm:inline">·</span>
               <span className="hidden max-w-32 shrink-0 truncate sm:inline">
                 Agent: {assigneeName}

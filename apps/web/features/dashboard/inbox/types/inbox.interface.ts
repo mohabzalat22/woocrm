@@ -67,3 +67,10 @@ export interface InboxQueryOptions {
   page: number;
   limit: number;
 }
+
+export interface Note {
+  id: string;
+  content: string;
+  conversationId: string;
+  workspaceMemberId: string;
+}

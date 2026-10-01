@@ -68,5 +68,25 @@ export function useInboxActions() {
     },
   });
 
-  return { assign, resolve, read, send, retry };
+  const createNote = useMutation({
+    mutationFn: ({
+      conversationId,
+      content,
+    }: {
+      conversationId: string;
+      content: string;
+    }) => inboxApi.createNote(id, conversationId, content),
+
+    onMutate: ({ content, conversationId }) => {
+      setPendingContent(content);
+      // Invalidate the lastNote query for this conversation
+      queryClient.invalidateQueries({
+        queryKey: inboxKeys.lastNote(id, conversationId),
+      });
+    },
+    onSuccess: refreshInbox,
+    onSettled: () => setPendingContent(null),
+  });
+
+  return { assign, resolve, read, send, retry, createNote };
 }

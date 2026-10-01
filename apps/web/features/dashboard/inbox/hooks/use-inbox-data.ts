@@ -40,5 +40,12 @@ export function useInboxData() {
     staleTime: 60_000,
   });
 
-  return { conversations, conversation, members };
+  const getLastNote = useQuery({
+    queryKey: inboxKeys.lastNote(id, conversationId ?? ""),
+    queryFn: () => inboxApi.getLastNote(id, conversationId ?? ""),
+    enabled: Boolean(workspaceId && conversationId),
+    staleTime: 10_000,
+  });
+
+  return { conversations, conversation, members, getLastNote };
 }

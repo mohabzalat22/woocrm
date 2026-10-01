@@ -30,8 +30,8 @@ import { CurrentWorkspace } from '../common/decorators/current-workspace.decorat
 import { ZodSerializerDto } from 'nestjs-zod';
 
 @ApiTags('Notes')
-@ApiCookieAuth()
-@Controller('conversations/:conversationId/notes')
+@ApiCookieAuth('access_token')
+@Controller('workspaces/:workspaceId/conversations/:conversationId/notes')
 export class NotesController {
   constructor(private readonly notesService: NotesService) {}
 
@@ -131,7 +131,7 @@ export class NotesController {
     @CurrentWorkspace('workspaceId') workspaceId: string,
     @Param('conversationId') conversationId: string,
     @Body() data: CreateNoteDto,
-  ): Promise<NoteDto> {
+  ) {
     return this.notesService.create(conversationId, userId, workspaceId, data);
   }
 
@@ -163,7 +163,7 @@ export class NotesController {
     @CurrentUser('id') userId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,
     @Body() data: UpdateNoteDto,
-  ): Promise<NoteDto> {
+  ) {
     return this.notesService.updateById(
       noteId,
       conversationId,
