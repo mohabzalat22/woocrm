@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { resolve } from 'node:path';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { ConfigModule } from '@nestjs/config';
@@ -18,7 +18,7 @@ import { MessagingModule } from './messaging/messaging.module';
 import { ContactsModule } from './contacts/contacts.module';
 import { InboxModule } from './inbox/inbox.module';
 import { NotesModule } from './notes/notes.module';
-
+import { AllExceptionsFilter } from './common/filters/all-exceptions-filer';
 @Module({
   controllers: [AppController],
   providers: [
@@ -31,6 +31,7 @@ import { NotesModule } from './notes/notes.module';
       provide: APP_INTERCEPTOR,
       useClass: ZodSerializerInterceptor,
     },
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
   imports: [
     ConfigModule.forRoot({
