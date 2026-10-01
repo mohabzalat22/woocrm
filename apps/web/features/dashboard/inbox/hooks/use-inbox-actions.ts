@@ -7,7 +7,7 @@ import { useInboxStore } from "../store";
 
 export function useInboxActions() {
   const { activeWorkspaceId: workspaceId } = useActiveWorkspace();
-  const setPendingContent = useInboxStore((state) => state.setPendingContent);
+  const setPendingContent = useInboxStore((state) => state.setPendingContent); //message content
   const setRetryingMessageId = useInboxStore(
     (state) => state.setRetryingMessageId,
   );
@@ -77,15 +77,13 @@ export function useInboxActions() {
       content: string;
     }) => inboxApi.createNote(id, conversationId, content),
 
-    onMutate: ({ content, conversationId }) => {
-      setPendingContent(content);
+    onMutate: ({ conversationId }) => {
       // Invalidate the lastNote query for this conversation
       queryClient.invalidateQueries({
         queryKey: inboxKeys.lastNote(id, conversationId),
       });
     },
     onSuccess: refreshInbox,
-    onSettled: () => setPendingContent(null),
   });
 
   return { assign, resolve, read, send, retry, createNote };

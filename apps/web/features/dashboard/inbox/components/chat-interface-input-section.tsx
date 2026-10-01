@@ -11,7 +11,6 @@ import NoteComposer from "./note-composer";
 export default function ChatInterfaceInputSection() {
   const [message, setMessage] = useState("");
   const [noteOpen, setNoteOpen] = useState(false);
-  const [noteSaved, setNoteSaved] = useState(false);
   const selectedConversationId = useInboxStore(
     (state) => state.selectedConversationId,
   );
@@ -125,11 +124,6 @@ export default function ChatInterfaceInputSection() {
           )}
         </Button>
       </form>
-      {noteSaved && (
-        <p className="mt-2 text-center text-[11px] text-emerald-600">
-          Note saved
-        </p>
-      )}
     </div>
   );
 }
