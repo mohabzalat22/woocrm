@@ -11,7 +11,7 @@ import { ZodSerializerDto } from 'nestjs-zod';
 import { Permission } from '@repo/shared-types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
-import { PermissionResponseDto } from './dto/permission-response.dto';
+import { PermissionListResponseDto } from './dto';
 import { PermissionsService } from './permissions.service';
 
 @ApiTags('permissions')
@@ -25,8 +25,8 @@ export class WorkspacePermissionsController {
   @RequirePermissions(Permission.SETTINGS_VIEW)
   @ApiOperation({ summary: 'List all permissions in a workspace' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: [PermissionResponseDto] })
-  @ZodSerializerDto(PermissionResponseDto)
+  @ApiOkResponse({ type: [PermissionListResponseDto] })
+  @ZodSerializerDto(PermissionListResponseDto)
   findAll(
     @Param('workspaceId') workspaceId: string,
     @CurrentUser('id') currentUserId: string,

@@ -10,7 +10,7 @@ import {
 import { ZodSerializerDto } from 'nestjs-zod';
 import { Permission } from '@repo/shared-types';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
-import { RoleResponseDto } from './dto/role-response.dto';
+import { RoleListResponseDto } from './dto';
 import { RolesService } from './roles.service';
 
 @ApiTags('roles')
@@ -24,8 +24,8 @@ export class RolesController {
   @RequirePermissions(Permission.TEAM_VIEW)
   @ApiOperation({ summary: 'List roles in a workspace' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: [RoleResponseDto] })
-  @ZodSerializerDto(RoleResponseDto)
+  @ApiOkResponse({ type: [RoleListResponseDto.Output] })
+  @ZodSerializerDto(RoleListResponseDto)
   findAll(@Param('workspaceId') workspaceId: string) {
     return this.rolesService.findAllByWorkspaceId(workspaceId);
   }
