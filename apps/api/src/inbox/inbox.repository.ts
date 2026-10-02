@@ -305,13 +305,17 @@ export class InboxRepository {
   async markAsRead(
     id: string,
     workspaceId: string,
+    memberId: string,
     readAt: Date,
   ): Promise<ConversationWithRelationsDto | null> {
     return prisma.$transaction(async (tx) => {
-      await tx.conversation.updateMany({
-        where: { id, workspaceId },
+      const updated = await tx.conversation.updateMany({
+        where: { id, workspaceId, assignedToId: memberId },
         data: { lastReadAt: readAt },
       });
+
+      if (updated.count === 0) return null;
+
       await tx.message.updateMany({
         where: {
           conversationId: id,

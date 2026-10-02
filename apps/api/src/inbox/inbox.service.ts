@@ -123,15 +123,23 @@ export class InboxService {
     workspaceId: string,
     id: string,
   ): Promise<ConversationDto> {
-    await this.requireAccessibleConversation(userId, workspaceId, id);
-    const conversation = await this.inboxRepository.markAsRead(
+    const conversation = await this.requireAccessibleConversation(userId, workspaceId, id);
+    
+    if (!conversation.assignedToId) {
+      throw new ForbiddenException('Conversation is not assigned to a user');
+    }
+
+    const assignedToMemberId = conversation.assignedToId;
+
+    const targetConversation = await this.inboxRepository.markAsRead(
       id,
       workspaceId,
+      assignedToMemberId,
       new Date(),
     );
-    if (!conversation) throw new NotFoundException('Conversation not found');
+    if (!targetConversation) throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);
-    return conversation;
+    return targetConversation;
   }
 
   async sendMessage(

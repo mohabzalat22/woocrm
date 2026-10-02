@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { cn } from "@/common/lib/utils";
+import { useMe } from "@/features/auth/hooks/me";
 import { useInboxActions } from "../hooks/use-inbox-actions";
 import { useInboxData } from "../hooks/use-inbox-data";
 import { useInboxStore } from "../store";
@@ -16,21 +17,30 @@ export default function ChatInterfaceSection({
 }) {
   const { conversation: conversationQuery } = useInboxData();
   const conversation = conversationQuery.data ?? null;
+  const { data: currentUser } = useMe();
   const selectedConversationId = useInboxStore(
     (state) => state.selectedConversationId,
   );
   const { read } = useInboxActions();
   const { isPending: isReadPending, mutate: markAsRead } = read;
+  const isAssignedUser = conversation?.assignedTo?.userId === currentUser?.id;
 
   useEffect(() => {
     if (
       conversation?.unread &&
+      isAssignedUser &&
       selectedConversationId &&
       !isReadPending
     ) {
       markAsRead(selectedConversationId);
     }
-  }, [conversation?.unread, isReadPending, markAsRead, selectedConversationId]);
+  }, [
+    conversation?.unread,
+    isAssignedUser,
+    isReadPending,
+    markAsRead,
+    selectedConversationId,
+  ]);
 
   if (!conversation) {
     return (
