@@ -28,7 +28,8 @@ import { WorkspaceDialog } from "@/common/components/workspace-dialog";
 import {
   BarChart3,
   Building2,
-  ChevronDown,
+  ChevronsUpDown,
+  GalleryVerticalEnd,
   Inbox,
   Kanban,
   Plus,
@@ -77,13 +78,20 @@ export function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   title={activeWorkspace?.name ?? "Select Workspace"}
-                  className="h-9 !bg-transparent"
+                  className="h-auto w-full rounded-xl border border-sidebar-border bg-card p-2 text-left transition-colors hover:bg-accent hover:text-accent-foreground group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0"
                 >
-                  <Building2 />
-                  <span className="group-data-[collapsible=icon]:hidden">
-                    {activeWorkspace?.name ?? "Select Workspace"}
-                  </span>
-                  <ChevronDown className="ml-auto group-data-[collapsible=icon]:hidden" />
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-slate-900 text-white group-data-[collapsible=icon]:size-8">
+                    <GalleryVerticalEnd className="size-5" />
+                  </div>
+                  <div className="grid flex-1 leading-tight group-data-[collapsible=icon]:hidden">
+                    <span className="truncate font-semibold">
+                      {activeWorkspace?.name ?? "Select Workspace"}
+                    </span>
+                    <span className="truncate text-sm text-muted-foreground">
+                      Workspace
+                    </span>
+                  </div>
+                  <ChevronsUpDown className="size-4 text-muted-foreground group-data-[collapsible=icon]:hidden" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -152,7 +160,7 @@ export function AppSidebar() {
                     asChild
                     isActive={pathname === item.href}
                     title={item.label}
-                    className="h-9 !bg-transparent"
+                    className="h-9 bg-transparent!"
                   >
                     <Link href={item.href}>
                       <Icon />
