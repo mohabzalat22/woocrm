@@ -3,4 +3,5 @@ import { RolePermissionResponseSchema } from '../schemas/role-permission-respons
 
 export class RolePermissionResponseDto extends createZodDto(
   RolePermissionResponseSchema,
+  { codec: true },
 ) {}

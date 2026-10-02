@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 import { WhatsAppConnectionResponseDto } from './dto';
 import { WhatsAppConnectionService } from './whatsapp-connection.service';
 
@@ -20,7 +20,7 @@ export class WhatsAppConnectionController {
   ) {}
 
   @Get()
-  @ZodResponse({ status: 200, type: WhatsAppConnectionResponseDto })
+  @ZodSerializerDto(WhatsAppConnectionResponseDto)
   getStatus(
     @CurrentUser('id') userId: string,
     @Param('workspaceId') workspaceId: string,

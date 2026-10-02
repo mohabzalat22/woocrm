@@ -19,6 +19,39 @@ const assigneeInclude = {
 
 @Injectable()
 export class InboxRepository {
+  private mapConversation(conversation: any) {
+    if (!conversation) return null;
+
+    const assigned = conversation.assignedTo
+      ? {
+          id: conversation.assignedTo.id,
+          userId:
+            conversation.assignedTo.userId ?? conversation.assignedTo.user?.id ?? null,
+          name:
+            conversation.assignedTo.user?.name ?? conversation.assignedTo.name ?? null,
+          email:
+            conversation.assignedTo.user?.email ?? conversation.assignedTo.email ?? null,
+          role:
+            typeof conversation.assignedTo.role === 'string'
+              ? conversation.assignedTo.role
+              : conversation.assignedTo.role?.name ?? null,
+        }
+      : null;
+
+    const msgs = Array.isArray(conversation.messages) ? conversation.messages : [];
+    const lastMessage = msgs.length ? msgs[msgs.length - 1] : null;
+
+    const lastMessageAt = (conversation.lastMessageAt as Date) ?? null;
+    const lastReadAt = (conversation.lastReadAt as Date) ?? null;
+
+    return {
+      ...conversation,
+      assignedTo: assigned,
+      unread: this.isUnread(lastMessageAt, lastReadAt),
+      lastMessage,
+    };
+  }
+
   async findMemberById(
     id: string,
     workspaceId: string,
@@ -74,7 +107,7 @@ export class InboxRepository {
     const skip = (query.page - 1) * query.limit; // TODO: use cursor pagination in the future
 
     return {
-      data: filtered.slice(skip, skip + query.limit),
+      data: filtered.slice(skip, skip + query.limit).map((c) => this.mapConversation(c)),
       total: filtered.length,
     };
   }
@@ -83,7 +116,7 @@ export class InboxRepository {
     id: string,
     workspaceId: string,
   ): Promise<ConversationWithRelationsDto | null> {
-    return prisma.conversation.findFirst({
+    const conv = await prisma.conversation.findFirst({
       where: { id, workspaceId },
       include: {
         contact: { include: contactInclude },
@@ -91,6 +124,7 @@ export class InboxRepository {
         messages: { orderBy: { createdAt: 'asc' } },
       },
     });
+    return conv ? this.mapConversation(conv) : null;
   }
 
   async findConversationByExternalMessageId(
@@ -175,7 +209,7 @@ export class InboxRepository {
         },
       });
 
-      if (duplicate) return duplicate.conversation; // if the message is already existing return the conversation it relates to
+      if (duplicate) return this.mapConversation(duplicate.conversation); // if the message is already existing return the conversation it relates to
 
       const existingConversation = await tx.conversation.findUnique({
         where: { contactId: savedContact.id },
@@ -228,11 +262,8 @@ export class InboxRepository {
         },
       });
 
-      if (
-        !conversation.lastMessageAt ||
-        receivedAt > conversation.lastMessageAt
-      ) {
-        return tx.conversation.update({
+      if (!conversation.lastMessageAt || receivedAt > conversation.lastMessageAt) {
+        const updated = await tx.conversation.update({
           where: { id: conversation.id },
           data: { lastMessageAt: receivedAt },
           include: {
@@ -241,9 +272,10 @@ export class InboxRepository {
             messages: { orderBy: { createdAt: 'asc' } },
           },
         });
+        return this.mapConversation(updated);
       }
 
-      return conversation;
+      return this.mapConversation(conversation);
     });
   }
 
@@ -289,7 +321,7 @@ export class InboxRepository {
         },
         data: { status: 'READ' },
       });
-      return tx.conversation.findFirst({
+      const conv = await tx.conversation.findFirst({
         where: { id, workspaceId },
         include: {
           contact: { include: contactInclude },
@@ -297,6 +329,7 @@ export class InboxRepository {
           messages: { orderBy: { createdAt: 'asc' } },
         },
       });
+      return this.mapConversation(conv);
     });
   }
 
@@ -325,7 +358,7 @@ export class InboxRepository {
         where: { id: conversationId, workspaceId },
         data: { lastMessageAt: now, lastReadAt: now },
       });
-      return tx.conversation.findFirst({
+      const conv = await tx.conversation.findFirst({
         where: { id: conversationId, workspaceId },
         include: {
           contact: { include: contactInclude },
@@ -333,6 +366,7 @@ export class InboxRepository {
           messages: { orderBy: { createdAt: 'asc' } },
         },
       });
+      return this.mapConversation(conv);
     });
   }
 
@@ -357,7 +391,7 @@ export class InboxRepository {
 
       if (!updated.count) return null;
 
-      return tx.conversation.findFirst({
+      const conv = await tx.conversation.findFirst({
         where: { id: conversationId, workspaceId },
         include: {
           contact: { include: contactInclude },
@@ -365,6 +399,7 @@ export class InboxRepository {
           messages: { orderBy: { createdAt: 'asc' } },
         },
       });
+      return this.mapConversation(conv);
     });
   }
 

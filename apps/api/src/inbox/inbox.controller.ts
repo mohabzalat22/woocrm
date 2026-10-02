@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Permission } from '@repo/shared-types';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import {
@@ -21,7 +21,7 @@ export class InboxController {
 
   @Get()
   @RequirePermissions(Permission.INBOX_VIEW_OWN)
-  @ZodResponse({ status: 200, type: ConversationsPageResponseDto })
+  @ZodSerializerDto(ConversationsPageResponseDto)
   @ApiOperation({ summary: 'List visible conversations' })
   list(
     @CurrentUser('id') userId: string,
@@ -33,7 +33,7 @@ export class InboxController {
 
   @Get(':conversationId')
   @RequirePermissions(Permission.INBOX_VIEW_OWN)
-  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Get a conversation with its contact and messages' })
   get(
     @CurrentUser('id') userId: string,
@@ -49,7 +49,7 @@ export class InboxController {
 
   @Post(':conversationId/assign')
   @RequirePermissions(Permission.INBOX_ASSIGN)
-  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Assign a conversation to a workspace member' })
   assign(
     @CurrentUser('id') userId: string,
@@ -67,7 +67,7 @@ export class InboxController {
 
   @Post(':conversationId/resolve')
   @RequirePermissions(Permission.INBOX_VIEW_OWN)
-  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Resolve a conversation' })
   resolve(
     @CurrentUser('id') userId: string,
@@ -83,7 +83,7 @@ export class InboxController {
 
   @Post(':conversationId/read')
   @RequirePermissions(Permission.INBOX_VIEW_OWN)
-  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Mark a conversation as read' })
   read(
     @CurrentUser('id') userId: string,
@@ -95,7 +95,7 @@ export class InboxController {
 
   @Post(':conversationId/messages')
   @RequirePermissions(Permission.INBOX_SEND_MESSAGE)
-  @ZodResponse({ status: 201, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Send and persist an outbound message' })
   sendMessage(
     @CurrentUser('id') userId: string,
@@ -113,7 +113,7 @@ export class InboxController {
 
   @Post(':conversationId/messages/:messageId/retry')
   @RequirePermissions(Permission.INBOX_SEND_MESSAGE)
-  @ZodResponse({ status: 200, type: ConversationResponseDto })
+  @ZodSerializerDto(ConversationResponseDto)
   @ApiOperation({ summary: 'Retry a failed outbound message' })
   retryMessage(
     @CurrentUser('id') userId: string,

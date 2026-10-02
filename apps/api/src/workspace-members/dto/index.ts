@@ -4,3 +4,4 @@ export { WorkspaceMemberWithRelationsDto } from './workspace-member-with-relatio
 export { CreateWorkspaceMemberDto } from './create-workspace-member.dto';
 export { UpdateWorkspaceMemberDto } from './update-workspace-member.dto';
 export { WorkspaceMemberWithRelationsResponseDto } from './WorkspaceMemberWithRelationsResponse.dto';
+export { WorkspaceMembersListResponseDto } from './workspace-members-list-response.dto';

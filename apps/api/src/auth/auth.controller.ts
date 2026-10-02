@@ -18,7 +18,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 import { AuthService } from './auth.service';
 import { Public } from '../common/decorators/public.decorator';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
@@ -46,11 +46,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user' })
   @ApiConflictResponse({ description: 'Email is already registered' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ZodResponse({
-    status: 201,
-    description: 'Created user; tokens are set as HttpOnly cookies',
-    type: AuthResponseDto,
-  })
+  @ZodSerializerDto(AuthResponseDto)
   async register(
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) response: Response,
@@ -65,11 +61,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign in and receive secure auth cookies' })
   @ApiUnauthorizedResponse({ description: 'Invalid email or password' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ZodResponse({
-    status: 200,
-    description: 'Signed-in user; tokens are set as HttpOnly cookies',
-    type: AuthResponseDto,
-  })
+  @ZodSerializerDto(AuthResponseDto)
   async signIn(
     @Body() dto: SignInDto,
     @Res({ passthrough: true }) response: Response,
@@ -86,11 +78,7 @@ export class AuthController {
     summary: 'Rotate the refresh token and issue a new access token',
   })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired refresh token' })
-  @ZodResponse({
-    status: 200,
-    description: 'Rotated auth cookies',
-    type: AuthResponseDto,
-  })
+  @ZodSerializerDto(AuthResponseDto)
   async refresh(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,

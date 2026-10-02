@@ -27,10 +27,9 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   const document = cleanupOpenApiDoc(
-    SwaggerModule.createDocument(app, config, {
-      ignoreGlobalPrefix: true,
-    }),
+    SwaggerModule.createDocument(app, config, { ignoreGlobalPrefix: true }),
   );
+  document.servers = [{ url: '/api' }];
   SwaggerModule.setup('api/doc', app, document);
 
   await app.listen(3000);

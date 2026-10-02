@@ -5,14 +5,13 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
 import { Permission } from '@repo/shared-types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
 import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { CreateInvitationDto, InvitationResponseDto } from './dto';
 import { InvitationsService } from './invitations.service';
-
+import { ZodSerializerDto } from 'nestjs-zod';
 @ApiTags('invitations')
 @ApiCookieAuth('access_token')
 @Controller()
@@ -22,7 +21,7 @@ export class InvitationsController {
   @Post('workspaces/:workspaceId/invitations')
   @RequirePermissions(Permission.TEAM_MANAGE)
   @ApiParam({ name: 'workspaceId' })
-  @ZodResponse({ status: 201, type: InvitationResponseDto })
+  @ZodSerializerDto(InvitationResponseDto)
   create(
     @CurrentUser('id') userId: string,
     @CurrentWorkspace('workspaceId') workspaceId: string,

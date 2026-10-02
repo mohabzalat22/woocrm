@@ -17,7 +17,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 
 import { WorkspacesService } from './workspaces.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -65,11 +65,7 @@ export class WorkspacesController {
   @PlatformRoles(SystemRole.ADMIN)
   @ApiOperation({ summary: 'Create a workspace' })
   @ApiBadRequestResponse({ description: 'Validation failed' })
-  @ZodResponse({
-    status: 201,
-    description: 'Created workspace',
-    type: WorkspaceResponseDto,
-  })
+  @ZodSerializerDto(WorkspaceResponseDto)
   async create(
     @CurrentUser('id') userId: string,
     @Body() data: CreateWorkspaceDto,

@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { NoteSchema } from './note.schema';
-import { dateToString } from '../../common/types/dateToString';
+import { stringToDate } from '../../common/types/stringToDate';
 
 export const NoteResponseSchema = NoteSchema.extend({
-  createdAt: dateToString,
-  updatedAt: dateToString,
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export const NoteListResponseSchema = z.array(NoteResponseSchema);

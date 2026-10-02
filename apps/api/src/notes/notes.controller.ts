@@ -20,7 +20,6 @@ import {
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { NotesService } from './notes.service';
 import {
-  NoteDto,
   CreateNoteDto,
   UpdateNoteDto,
   NoteResponseDto,

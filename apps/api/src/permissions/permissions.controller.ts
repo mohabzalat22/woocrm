@@ -18,7 +18,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 
 import { PermissionsService } from './permissions.service';
 import {
@@ -167,11 +167,7 @@ export class PermissionsController {
   @ApiConflictResponse({
     description: 'Permission already assigned to this role',
   })
-  @ZodResponse({
-    status: 201,
-    description: 'Assigned role permission',
-    type: RolePermissionResponseDto,
-  })
+  @ZodSerializerDto(RolePermissionResponseDto)
   assignPermissionToRole(
     @Param('permissionId') permissionId: string,
     @Param('roleId') roleId: string,

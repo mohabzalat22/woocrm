@@ -8,3 +8,4 @@ export * from './create-message.dto';
 export * from './list-conversations.dto';
 export * from './message-with-conversation.dto';
 export * from './workspace-member-with-role.dto';
+export * from './conversation-page.dto';

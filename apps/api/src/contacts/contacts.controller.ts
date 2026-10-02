@@ -17,7 +17,7 @@ import {
   ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 import type { Response } from 'express';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspace } from '../common/decorators/current-workspace.decorator';
@@ -43,7 +43,7 @@ export class ContactsController {
   @Get()
   @ApiOperation({ summary: 'List, search, filter, and paginate contacts' })
   @ApiParam({ name: 'workspaceId' })
-  @ZodResponse({ status: 200, type: ContactsPageResponseDto })
+  @ZodSerializerDto(ContactsPageResponseDto)
   @RequirePermissions(Permission.CONTACT_VIEW)
   findAll(
     @CurrentUser('id') userId: string,
@@ -56,7 +56,7 @@ export class ContactsController {
   @Post()
   @ApiOperation({ summary: 'Create a contact' })
   @ApiParam({ name: 'workspaceId' })
-  @ZodResponse({ status: 201, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_CREATE)
   create(
     @CurrentUser('id') userId: string,
@@ -88,7 +88,7 @@ export class ContactsController {
   @ApiOperation({ summary: 'Get a contact and its contact information' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_VIEW)
   findById(
     @CurrentUser('id') userId: string,
@@ -102,7 +102,7 @@ export class ContactsController {
   @ApiOperation({ summary: 'Update a contact' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_EDIT)
   update(
     @CurrentUser('id') userId: string,
@@ -117,7 +117,7 @@ export class ContactsController {
   @ApiOperation({ summary: 'Delete a contact and its contact information' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_DELETE)
   delete(
     @CurrentUser('id') userId: string,
@@ -130,7 +130,7 @@ export class ContactsController {
   @ApiOperation({ summary: 'Create contact information' })
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
-  @ZodResponse({ status: 201, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_CREATE)
   async createInfo(
     @CurrentUser('id') userId: string,
@@ -147,7 +147,7 @@ export class ContactsController {
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
   @ApiParam({ name: 'contactInfoId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_VIEW)
   async findInfo(
     @CurrentUser('id') userId: string,
@@ -169,7 +169,7 @@ export class ContactsController {
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
   @ApiParam({ name: 'contactInfoId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_EDIT)
   async updateInfo(
     @CurrentUser('id') userId: string,
@@ -193,7 +193,7 @@ export class ContactsController {
   @ApiParam({ name: 'workspaceId' })
   @ApiParam({ name: 'contactId' })
   @ApiParam({ name: 'contactInfoId' })
-  @ZodResponse({ status: 200, type: ContactResponseDto })
+  @ZodSerializerDto(ContactResponseDto)
   @RequirePermissions(Permission.CONTACT_DELETE)
   async deleteInfo(
     @CurrentUser('id') userId: string,

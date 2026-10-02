@@ -8,10 +8,9 @@ import {
 
 import type {
   AssignConversationDto,
-  ConversationListRecordDto,
-  ConversationResponseDto,
+  ConversationDto,
   ConversationWithRelationsDto,
-  ConversationsPageResponseDto,
+  ConversationsPageDto,
   CreateMessageDto,
   ListConversationsDto,
   WorkspaceMemberWithRoleDto,
@@ -44,7 +43,7 @@ export class InboxService {
     userId: string,
     workspaceId: string,
     query: ListConversationsDto,
-  ): Promise<ConversationsPageResponseDto> {
+  ): Promise<ConversationsPageDto> {
     const access = await this.requireMemberAccess(userId, workspaceId);
     const result = await this.inboxRepository.findConversations(
       workspaceId,
@@ -54,7 +53,7 @@ export class InboxService {
     );
 
     return {
-      data: result.data.map((conversation) => this.toResponse(conversation)),
+      data: result.data,
       meta: {
         page: query.page,
         limit: query.limit,
@@ -68,13 +67,13 @@ export class InboxService {
     userId: string,
     workspaceId: string,
     id: string,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     const conversation = await this.requireAccessibleConversation(
       userId,
       workspaceId,
       id,
     );
-    return this.toResponse(conversation, true);
+    return conversation;
   }
 
   async assignConversation(
@@ -82,7 +81,7 @@ export class InboxService {
     workspaceId: string,
     id: string,
     data: AssignConversationDto,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     await this.requireAccessibleConversation(userId, workspaceId, id);
     if (data.memberId) {
       const target = await this.inboxRepository.findMemberById(
@@ -101,14 +100,14 @@ export class InboxService {
     );
     if (!conversation) throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);
-    return this.toResponse(conversation, true);
+    return conversation;
   }
 
   async resolveConversation(
     userId: string,
     workspaceId: string,
     id: string,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     await this.requireAccessibleConversation(userId, workspaceId, id);
     const resolved = await this.inboxRepository.resolveConversation(
       id,
@@ -116,14 +115,14 @@ export class InboxService {
     );
     if (!resolved) throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);
-    return this.toResponse(resolved, true);
+    return resolved;
   }
 
   async markAsRead(
     userId: string,
     workspaceId: string,
     id: string,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     await this.requireAccessibleConversation(userId, workspaceId, id);
     const conversation = await this.inboxRepository.markAsRead(
       id,
@@ -132,7 +131,7 @@ export class InboxService {
     );
     if (!conversation) throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);
-    return this.toResponse(conversation, true);
+    return conversation;
   }
 
   async sendMessage(
@@ -140,7 +139,7 @@ export class InboxService {
     workspaceId: string,
     id: string,
     data: CreateMessageDto,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     const conversation = await this.requireAccessibleConversation(
       userId,
       workspaceId,
@@ -184,7 +183,7 @@ export class InboxService {
     if (!saved) throw new NotFoundException('Conversation not found');
 
     this.inboxEvents.publish(workspaceId, 'message.created', id); // to update ui using sse
-    return this.toResponse(saved, true);
+    return saved;
   }
 
   async retryMessage(
@@ -192,7 +191,7 @@ export class InboxService {
     workspaceId: string,
     conversationId: string,
     messageId: string,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     const conversation = await this.requireAccessibleConversation(
       userId,
       workspaceId,
@@ -254,13 +253,13 @@ export class InboxService {
     if (!result.success) {
       throw new BadRequestException(result.error ?? 'Message retry failed');
     }
-    return this.toResponse(updated, true);
+    return updated;
   }
 
   async ingestInbound(
     workspaceId: string,
     message: IncomingMessage,
-  ): Promise<ConversationResponseDto> {
+  ): Promise<ConversationDto> {
     const channel = await this.channelRegistry.getConnectedChannel(
       workspaceId,
       message.channel,
@@ -281,7 +280,7 @@ export class InboxService {
       );
     }
     this.inboxEvents.publish(workspaceId, 'message.created', conversation.id);
-    return this.toResponse(conversation, true);
+    return conversation;
   }
 
   async updateMessageStatus(
@@ -367,94 +366,5 @@ export class InboxService {
     if (next === 'FAILED') return true;
     const rank = { SENT: 0, DELIVERED: 1, READ: 2 } as const;
     return rank[next] > rank[current];
-  }
-
-  private toResponse(
-    conversation: ConversationWithRelationsDto | ConversationListRecordDto,
-    includeMessages = false,
-  ): ConversationResponseDto {
-    const messages =
-      'messages' in conversation ? conversation.messages : undefined;
-    const lastMessage = messages?.[messages.length - 1];
-
-    return {
-      id: conversation.id,
-      workspaceId: conversation.workspaceId,
-      channel: conversation.channel,
-      contactId: conversation.contactId,
-      status: conversation.status,
-      assignedToId: conversation.assignedToId,
-      assignedTo: conversation.assignedTo
-        ? this.toAssigneeResponse(conversation.assignedTo)
-        : null,
-      lastMessageAt: this.toIsoDateOrNull(conversation.lastMessageAt),
-      lastReadAt: this.toIsoDateOrNull(conversation.lastReadAt),
-      unread: Boolean(
-        conversation.lastMessageAt &&
-          (!conversation.lastReadAt ||
-            conversation.lastMessageAt > conversation.lastReadAt),
-      ),
-      createdAt: this.toIsoDate(conversation.createdAt),
-      updatedAt: this.toIsoDate(conversation.updatedAt),
-      lastMessage: lastMessage ? this.toMessageResponse(lastMessage) : null,
-      contact: this.toContactResponse(conversation.contact),
-      ...(includeMessages && messages
-        ? {
-            messages: messages.map((message) =>
-              this.toMessageResponse(message),
-            ),
-          }
-        : {}),
-    };
-  }
-
-  private toAssigneeResponse(
-    assignee: NonNullable<ConversationListRecordDto['assignedTo']>,
-  ) {
-    return {
-      id: assignee.id,
-      userId: assignee.userId,
-      name: assignee.user.name,
-      email: assignee.user.email,
-      role: assignee.role.name,
-    };
-  }
-
-  private toMessageResponse(
-    message: ConversationWithRelationsDto['messages'][number],
-  ) {
-    return {
-      id: message.id,
-      conversationId: message.conversationId,
-      direction: message.direction,
-      content: message.content,
-      status: message.status,
-      senderMemberId: message.senderMemberId,
-      externalId: message.externalId,
-      createdAt: this.toIsoDate(message.createdAt),
-    };
-  }
-
-  private toContactResponse(contact: ConversationListRecordDto['contact']) {
-    return {
-      ...contact,
-      createdAt: this.toIsoDate(contact.createdAt),
-      updatedAt: this.toIsoDate(contact.updatedAt),
-      contactInfo: contact.contactInfo
-        ? {
-            ...contact.contactInfo,
-            createdAt: this.toIsoDate(contact.contactInfo.createdAt),
-            updatedAt: this.toIsoDate(contact.contactInfo.updatedAt),
-          }
-        : null,
-    };
-  }
-
-  private toIsoDate(value: Date): string {
-    return value.toISOString();
-  }
-
-  private toIsoDateOrNull(value: Date | null): string | null {
-    return value ? this.toIsoDate(value) : null;
   }
 }

@@ -1,17 +1,13 @@
 import { z } from 'zod';
 import { ContactStateSchema } from './contact.schema';
-
-const IsoDateTimeSchema = z.preprocess(
-  (value) => (value instanceof Date ? value.toISOString() : value),
-  z.iso.datetime(),
-);
+import { stringToDate } from '../../common/types/stringToDate';
 
 const ContactInfoResponseSchema = z.object({
   id: z.string(),
   identity: z.string(),
   source: z.string(),
-  createdAt: IsoDateTimeSchema,
-  updatedAt: IsoDateTimeSchema,
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export const ContactResponseSchema = z.object({
@@ -19,8 +15,8 @@ export const ContactResponseSchema = z.object({
   name: z.string(),
   state: ContactStateSchema,
   contactInfo: ContactInfoResponseSchema.nullable(),
-  createdAt: IsoDateTimeSchema,
-  updatedAt: IsoDateTimeSchema,
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export const ContactsPageResponseSchema = z.object({

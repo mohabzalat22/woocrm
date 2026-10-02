@@ -19,7 +19,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 import { UsersService } from './users.service';
 
 import {
@@ -41,11 +41,7 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get the authenticated user from the access token' })
-  @ZodResponse({
-    status: 200,
-    description: 'Authenticated user identity',
-    type: UserResponseDto,
-  })
+  @ZodSerializerDto(UserResponseDto)
   me(@CurrentUser() currentUser: UserDto) {
     return currentUser;
   }

@@ -3,4 +3,5 @@ import { WorkspaceMemberResponseSchema } from '../schemas/workspace-member-respo
 
 export class WorkspaceMemberResponseDto extends createZodDto(
   WorkspaceMemberResponseSchema,
+  { codec: true },
 ) {}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { stringToDate } from '../../common/types/stringToDate';
 
 export const WhatsAppConnectionStateSchema = z.enum([
   'ACTIVE',
@@ -17,11 +18,11 @@ export const WhatsAppConnectionSchema = z.object({
   verifiedName: z.string().nullable(),
   businessName: z.string().nullable(),
   encryptedAccessToken: z.string(),
-  accessTokenExpiresAt: z.date().nullable(),
+  accessTokenExpiresAt: stringToDate.nullable(),
   status: WhatsAppConnectionStateSchema,
   lastError: z.string().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export type WhatsAppConnection = z.infer<typeof WhatsAppConnectionSchema>;

@@ -3,4 +3,5 @@ import { ConversationsPageResponseSchema } from '../schemas';
 
 export class ConversationsPageResponseDto extends createZodDto(
   ConversationsPageResponseSchema,
+  { codec: true },
 ) {}

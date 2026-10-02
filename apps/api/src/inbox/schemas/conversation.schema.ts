@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ConversationStatusSchema } from './conversation-status.schema';
+import { stringToDate } from '../../common/types/stringToDate';
 
 export const ConversationSchema = z.object({
   id: z.string(),
@@ -8,10 +9,10 @@ export const ConversationSchema = z.object({
   contactId: z.string(),
   status: ConversationStatusSchema,
   assignedToId: z.string().nullable(),
-  lastMessageAt: z.date().nullable(),
-  lastReadAt: z.date().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  lastMessageAt: stringToDate.nullable(),
+  lastReadAt: stringToDate.nullable(),
+  createdAt: stringToDate,
+  updatedAt: stringToDate,
 });
 
 export type ConversationInput = z.infer<typeof ConversationSchema>;

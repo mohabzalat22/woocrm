@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { stringToDate } from '../../common/types/stringToDate';
 
 export const WorkspaceChannelSettingSchema = z.object({
   id: z.string(),
   workspaceId: z.string(),
   channel: z.string(),
-  lockedAt: z.date(),
+  lockedAt: stringToDate,
 });
 
 export type WorkspaceChannelSettingInput = z.infer<

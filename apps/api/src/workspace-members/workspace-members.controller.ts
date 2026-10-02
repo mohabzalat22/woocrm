@@ -18,7 +18,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { ZodResponse } from 'nestjs-zod';
+import { ZodSerializerDto } from 'nestjs-zod';
 
 import { WorkspaceMembersService } from './workspace-members.service';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -29,7 +29,7 @@ import {
   // CreateWorkspaceMemberDto,
   UpdateWorkspaceMemberDto,
   WorkspaceMemberResponseDto,
-  WorkspaceMemberWithRelationsResponseDto,
+  WorkspaceMembersListResponseDto,
 } from './dto';
 @ApiTags('workspace-members')
 @ApiCookieAuth('access_token')
@@ -44,8 +44,8 @@ export class WorkspaceMembersController {
   @RequirePermissions(Permission.TEAM_VIEW)
   @ApiOperation({ summary: 'List members of a workspace' })
   @ApiParam({ name: 'workspaceId' })
-  @ApiOkResponse({ type: [WorkspaceMemberWithRelationsResponseDto] })
-  @ZodResponse({ status: 200, type: [WorkspaceMemberWithRelationsResponseDto] })
+  @ApiOkResponse({ type: [WorkspaceMembersListResponseDto] })
+  @ZodSerializerDto(WorkspaceMembersListResponseDto)
   @ApiNotFoundResponse({ description: 'Member not found in this workspace' })
   async findAll(
     @CurrentUser('id') currentUserId: string,

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { MessageDirectionSchema } from './message-direction.schema';
 import { MessageStatusSchema } from './message-status.schema';
-import { IsoDateTimeSchema } from './iso-date-time.schema';
+import { stringToDate } from '../../common/types/stringToDate';
 
 export const MessageResponseSchema = z.object({
   id: z.string(),
@@ -11,5 +11,5 @@ export const MessageResponseSchema = z.object({
   status: MessageStatusSchema,
   senderMemberId: z.string().nullable(),
   externalId: z.string().nullable(),
-  createdAt: IsoDateTimeSchema,
+  createdAt: stringToDate,
 });
