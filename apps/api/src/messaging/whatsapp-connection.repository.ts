@@ -51,7 +51,22 @@ export class WhatsAppConnectionRepository {
   createOAuthState(
     data: CreateWhatsAppOAuthStateDto,
   ): Promise<WhatsAppOAuthStateDto> {
-    return prisma.whatsAppOAuthState.create({ data });
+    return prisma.whatsAppOAuthState.create({
+      data: {
+        stateHash: data.stateHash,
+        expiresAt: data.expiresAt,
+        workspace: {
+          connect: {
+            id: data.workspaceId,
+          },
+        },
+        user: {
+          connect: {
+            id: data.userId,
+          },
+        },
+      },
+    });
   }
 
   consumeOAuthState(stateHash: string): Promise<WhatsAppOAuthStateDto | null> {
