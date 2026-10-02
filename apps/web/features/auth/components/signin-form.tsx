@@ -56,27 +56,28 @@ export function SignInForm() {
   }
 
   return (
-    <Card className="w-full max-w-xl">
-      <CardHeader className="grid-cols-1 sm:grid-cols-[1fr_auto]">
-        <CardTitle className="text-2xl">Login to your account</CardTitle>
+    <Card className="w-full max-w-2xl rounded-[1.5rem] border border-border/70 bg-white shadow-xl shadow-[#202820]/5">
+      <CardHeader className="grid-cols-1 gap-2 px-6 pb-2 pt-7 sm:grid-cols-[1fr_auto] sm:px-8 sm:pt-8">
+        <CardTitle className="text-3xl font-semibold tracking-tight">Welcome back</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Sign in to continue to your Wasel workspace.
         </CardDescription>
-        <CardAction className="col-auto row-auto justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end">
-          <Button asChild variant="link">
-            <Link href="/register">Sign Up</Link>
+        <CardAction className="col-auto row-auto mt-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:mt-0 sm:justify-self-end">
+          <Button asChild variant="link" className="px-0">
+            <Link href="/register">Create account</Link>
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-6 py-6 sm:px-8">
         <form id="sign-in-form" onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="wasel@example.com"
+                className="h-11 rounded-xl px-3"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
@@ -84,26 +85,26 @@ export function SignInForm() {
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium">Password</Label>
                 <a
                   href="#"
-                  className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                  className="ml-auto inline-block text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                 >
-                  Forgot your password?
+                  Forgot password?
                 </a>
               </div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  className="pr-16"
+                  className="h-11 rounded-xl px-3 pr-12"
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-2 text-sm text-muted-foreground hover:text-foreground"
+                  className="absolute inset-y-0 right-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   onClick={() => setShowPassword((visible) => !visible)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
@@ -118,22 +119,23 @@ export function SignInForm() {
             </div>
           </div>
           {error && (
-            <p className="mt-4 text-sm text-destructive" role="alert">
+            <p className="mt-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
               {error}
             </p>
           )}
         </form>
       </CardContent>
-      <CardFooter className="flex-col gap-2">
+      <CardFooter className="flex-col gap-3 border-0 bg-transparent px-6 pb-7 pt-0 sm:px-8 sm:pb-8">
         <Button
           form="sign-in-form"
           type="submit"
-          className="w-full"
+          size="lg"
+          className="h-11 w-full rounded-xl font-semibold"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Logging in..." : "Login"}
+          {isSubmitting ? "Signing in..." : "Sign in"}
         </Button>
-        <Button type="button" variant="outline" className="w-full">
+        <Button type="button" variant="outline" size="lg" className="h-11 w-full rounded-xl">
           Continue with Google
         </Button>
       </CardFooter>

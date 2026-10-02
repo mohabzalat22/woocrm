@@ -1,18 +1,11 @@
 import { SignInForm } from "@/features/auth/components/signin-form";
-import Image from "next/image";
+import { AuthVisual } from "@/features/auth/components/auth-visual";
+
 export default function page() {
   return (
-    <div className="grid min-h-screen grid-cols-1 items-center gap-8 py-8 md:grid-cols-2 md:gap-12 md:py-12">
-      <div className="hidden w-full md:block">
-        <Image
-          src="/signin.png"
-          width={500}
-          height={500}
-          alt="signin image"
-          className="mx-auto h-auto w-full max-w-md d-none xl:d-block"
-        />
-      </div>
-      <div className="w-full">
+    <div className="mx-auto grid min-h-[calc(100svh-105px)] w-full max-w-[1440px] items-center gap-10 px-4 py-8 sm:px-6 lg:px-10 lg:py-14 xl:grid-cols-[minmax(0,1fr)_minmax(520px,600px)] xl:gap-20">
+      <AuthVisual mode="login" />
+      <div className="flex w-full items-center justify-center xl:py-8">
         <SignInForm />
       </div>
     </div>
