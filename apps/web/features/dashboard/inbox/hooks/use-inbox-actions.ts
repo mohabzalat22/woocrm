@@ -7,7 +7,7 @@ import { useInboxStore } from "../store";
 
 export function useInboxActions() {
   const { activeWorkspaceId: workspaceId } = useActiveWorkspace();
-  const setPendingContent = useInboxStore((state) => state.setPendingContent); //message content
+  const setPendingMessage = useInboxStore((state) => state.setPendingMessage);
   const setRetryingMessageId = useInboxStore(
     (state) => state.setRetryingMessageId,
   );
@@ -47,9 +47,13 @@ export function useInboxActions() {
       conversationId: string;
       content: string;
     }) => inboxApi.send(id, conversationId, content),
-    onMutate: ({ content }) => setPendingContent(content),
-    onSuccess: refreshInbox,
-    onSettled: () => setPendingContent(null),
+    onMutate: ({ conversationId, content }) =>
+      setPendingMessage({ conversationId, content }),
+    onSuccess: () => {
+      setPendingMessage(null);
+      refreshInbox();
+    },
+    onSettled: () => setPendingMessage(null),
   });
 
   const retry = useMutation({

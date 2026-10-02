@@ -54,6 +54,29 @@ export function formatDateLabel(value: string | null | undefined) {
   }).format(date);
 }
 
+export function normalizeMessageContent(value: string | null | undefined) {
+  return (value ?? "").replace(/\s+/g, " ").trim();
+}
+
+export function isMatchingPendingMessage(
+  message: Pick<InboxMessage, "direction" | "content">,
+  pendingMessage: { conversationId: string; content: string } | null,
+  conversationId: string,
+) {
+  if (!pendingMessage || pendingMessage.conversationId !== conversationId) {
+    return false;
+  }
+
+  if (message.direction !== "OUTBOUND") {
+    return false;
+  }
+
+  return (
+    normalizeMessageContent(message.content) ===
+    normalizeMessageContent(pendingMessage.content)
+  );
+}
+
 export function getMessageStatusLabel(message: InboxMessage) {
   if (message.status === "FAILED") return "Failed";
   if (message.status === "READ") return "Read";

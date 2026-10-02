@@ -14,6 +14,7 @@ import {
   formatDateLabel,
   formatTime,
   getMessageStatusLabel,
+  isMatchingPendingMessage,
 } from "../utils/inbox-formatters";
 import type { InboxMessage } from "../types/inbox.interface";
 import { Markdown } from "@/common/components/markdown";
@@ -27,7 +28,7 @@ function StatusIcon({ message }: { message: InboxMessage }) {
 export default function ChatInterfaceMessagesSection() {
   const { conversation: conversationQuery } = useInboxData();
   const conversation = conversationQuery.data ?? null;
-  const pendingContent = useInboxStore((state) => state.pendingContent);
+  const pendingMessage = useInboxStore((state) => state.pendingMessage);
   const retryingMessageId = useInboxStore((state) => state.retryingMessageId);
   const { retry } = useInboxActions();
 
@@ -35,6 +36,13 @@ export default function ChatInterfaceMessagesSection() {
 
   const retryError = retry.error?.message;
   const messages = conversation.messages ?? [];
+  const hasMatchingPendingMessage = messages.some((message) =>
+    isMatchingPendingMessage(message, pendingMessage, conversation.id),
+  );
+  const shouldRenderPendingMessage =
+    !!pendingMessage &&
+    pendingMessage.conversationId === conversation.id &&
+    !hasMatchingPendingMessage;
 
   let lastDateLabel = "";
 
@@ -109,11 +117,11 @@ export default function ChatInterfaceMessagesSection() {
             </div>
           );
         })}
-        {pendingContent && (
+        {shouldRenderPendingMessage && (
           <Message align="end">
             <MessageContent>
               <Bubble>
-                <BubbleContent>{pendingContent}</BubbleContent>
+                <BubbleContent>{pendingMessage.content}</BubbleContent>
               </Bubble>
               <MessageFooter className="justify-end">
                 <Clock3 className="size-3" />
@@ -122,7 +130,7 @@ export default function ChatInterfaceMessagesSection() {
             </MessageContent>
           </Message>
         )}
-        {messages.length === 0 && !pendingContent && (
+        {messages.length === 0 && !shouldRenderPendingMessage && (
           <p className="py-16 text-center text-sm text-muted-foreground">
             Start the conversation with a thoughtful reply.
           </p>
