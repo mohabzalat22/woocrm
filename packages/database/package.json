@@ -21,7 +21,6 @@
     "dev": "prisma generate && tsc --watch",
     "format": "prisma format",
     "generate": "prisma generate",
-    "lint": "eslint . --max-warnings 0",
     "studio": "prisma studio"
   },
   "keywords": [],
@@ -34,7 +33,6 @@
     "pg": "^8.23.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^26.4.1",
     "@types/pg": "^8.23.1",

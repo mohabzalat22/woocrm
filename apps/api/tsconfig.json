@@ -1,4 +1,3 @@
-// apps/api/tsconfig.json
 {
   "extends": "@repo/typescript-config/nestjs.json",
   "compilerOptions": {
@@ -11,5 +10,5 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "test"]
+  "exclude": ["node_modules", "dist"]
 }

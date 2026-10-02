@@ -38,7 +38,6 @@ import SettingsButton from "./settings-button";
 import { useEffect, useState } from "react";
 import { useWorkspaces } from "@/features/workspaces/hooks/use-workspaces";
 import { useActiveWorkspace } from "@/features/workspaces/hooks/active-workspace";
-import Image from "next/image";
 const menuItems = [
   { label: "Inbox", href: "/inbox", icon: Inbox },
   { label: "Contacts", href: "/contacts", icon: Users },
