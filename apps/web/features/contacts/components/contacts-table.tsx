@@ -9,7 +9,7 @@ import {
 } from "#/ui/components/table";
 import { ContactInfoList } from "./contact-info-list";
 import { ContactRowActions } from "./contact-row-actions";
-import { ContactStateBadge } from "./contact-state-badge";
+import { ContactStateBadge } from "@/common/components/contact-state-badge";
 
 type ContactsTableProps = {
   contacts: Contact[];

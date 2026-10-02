@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "#/ui/components/avatar";
 import { Button } from "#/ui/components/button";
 import { Input } from "#/ui/components/input";
 import { Label } from "#/ui/components/label";
+import { ContactStateBadge } from "@/common/components/contact-state-badge";
 import { cn } from "@/common/lib/utils";
 import { useMe } from "@/features/auth/hooks/me";
 import { ContactStateDropdown } from "@/features/contacts/components/contact-state-dropdown";
@@ -182,7 +183,7 @@ export default function ProfileSection({ className }: { className?: string }) {
   return (
     <aside
       className={cn(
-        "min-h-0 w-full shrink-0 flex-col overflow-y-auto border-s bg-background md:w-[20rem] xl:w-[22rem]",
+        "min-h-0 w-full shrink-0 flex-col overflow-y-auto border-s bg-background md:w-[20rem] xl:w-88",
         className,
       )}
     >
@@ -258,12 +259,14 @@ export default function ProfileSection({ className }: { className?: string }) {
       ) : (
         <div className="p-4">
           <div className="relative h-28">
-            <div className="absolute inset-0 overflow-hidden rounded-xl bg-gradient-to-br from-emerald-100 via-lime-100 to-amber-100">
+            <div className="absolute inset-0 overflow-hidden rounded-xl bg-linear-to-br from-emerald-100 via-lime-100 to-amber-100">
               <div className="absolute -right-5 -top-10 size-36 rounded-full bg-white/35 blur-2xl" />
               <div className="absolute -bottom-16 -left-4 size-40 rounded-full bg-primary/20 blur-2xl" />
-              <div className="absolute bottom-3 left-4 rounded-full bg-background/70 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground/70 backdrop-blur">
-                {getContactStateLabel(contact.state)}
-              </div>
+              <ContactStateBadge
+                state={contact.state}
+                label={getContactStateLabel(contact.state)}
+                className="absolute bottom-3 left-4 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+              />
             </div>
             <div className="absolute bottom-0 left-1/2 z-10 size-20 -translate-x-1/2 translate-y-1/2 rounded-full border-4 border-background bg-emerald-100">
               <Avatar className="size-full">
@@ -340,12 +343,16 @@ export default function ProfileSection({ className }: { className?: string }) {
                     if (value !== "ALL") updateDraft("state", value);
                   }}
                   includeAll={false}
-                  className="!w-full"
+                  className="w-full!"
                 />
               ) : (
-                <p className="text-right font-medium">
-                  {getContactStateLabel(contact.state)}
-                </p>
+                <div className="flex justify-end">
+                  <ContactStateBadge
+                    state={contact.state}
+                    label={getContactStateLabel(contact.state)}
+                    className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+                  />
+                </div>
               )}
             </div>
             <div className="grid grid-cols-2 gap-3 p-3 text-xs">

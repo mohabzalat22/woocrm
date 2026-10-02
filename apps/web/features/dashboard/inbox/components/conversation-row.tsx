@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback } from "#/ui/components/avatar";
 import { cn } from "@/common/lib/utils";
+import { ContactStateBadge } from "@/common/components/contact-state-badge";
 import {
   formatTime,
   getContactName,
@@ -47,9 +48,11 @@ export default function ConversationRow({
           {conversation.lastMessage?.content ?? "No messages yet"}
         </span>
         <span className="mt-2 flex items-center justify-between gap-2">
-          <span className="rounded-full bg-muted-foreground/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-            {getContactStateLabel(conversation.contact.state)}
-          </span>
+          <ContactStateBadge
+            state={conversation.contact.state}
+            label={getContactStateLabel(conversation.contact.state)}
+            className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
+          />
           <span className="flex items-center gap-2">
             {conversation.status === "RESOLVED" && (
               <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
