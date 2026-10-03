@@ -5,11 +5,11 @@ import { MessagingController } from './messaging.controller';
 import { WhatsAppConnectionService } from './whatsapp-connection.service';
 import { WhatsAppConnectionRepository } from './whatsapp-connection.repository';
 import { MetaWhatsAppClient } from './channels/whatsapp/meta.client';
-import { WhatsAppChannel } from './channels/whatsapp/whatsapp.channel';
+import { WhatsAppMessagingStrategy } from './channels/whatsapp/whatsapp-messaging-channel.strategy';
 import { WorkspaceMembersModule } from '../workspace-members/workspace-members.module';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { RolesModule } from '../roles/roles.module';
-import { MessageChannelRegistry } from './registry/message-channel.registry';
+import { MessagingStrategyRegistry } from './registry/messaging-strategy.registry';
 import { ChannelOAuthStateRepository } from './channel-oauth-state.repository';
 
 @Module({
@@ -23,10 +23,10 @@ import { ChannelOAuthStateRepository } from './channel-oauth-state.repository';
     WhatsAppConnectionService,
     WhatsAppConnectionRepository,
     MetaWhatsAppClient,
-    WhatsAppChannel,
-    MessageChannelRegistry,
-    ChannelOAuthStateRepository
+    WhatsAppMessagingStrategy,
+    MessagingStrategyRegistry,
+    ChannelOAuthStateRepository,
   ],
-  exports: [MessageChannelRegistry],
+  exports: [MessagingStrategyRegistry],
 })
 export class MessagingModule {}

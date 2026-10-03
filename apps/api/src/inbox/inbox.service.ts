@@ -19,9 +19,9 @@ import type {
 import type {
   IncomingMessage,
   MessageStatusUpdate,
-} from '../messaging/channels/message-channel.interface';
+} from '../messaging/channels/messaging-strategy.interface';
 
-import { MessageChannelRegistry } from '../messaging/registry/message-channel.registry';
+import { MessagingStrategyRegistry } from '../messaging/registry/messaging-strategy.registry';
 import { WorkspaceContextService } from '../authorization/workspace-context.service';
 import { InboxRepository } from './inbox.repository';
 import { InboxEventsService } from './inbox-events.service';
@@ -34,7 +34,7 @@ export class InboxService {
   constructor(
     private readonly inboxRepository: InboxRepository,
     private readonly workspaceContext: WorkspaceContextService,
-    private readonly channelRegistry: MessageChannelRegistry,
+    private readonly messagingStrategyRegistry: MessagingStrategyRegistry,
     private readonly ContactsService: ContactsService,
     private readonly inboxEvents: InboxEventsService,
   ) {}
@@ -123,8 +123,12 @@ export class InboxService {
     workspaceId: string,
     id: string,
   ): Promise<ConversationDto> {
-    const conversation = await this.requireAccessibleConversation(userId, workspaceId, id);
-    
+    const conversation = await this.requireAccessibleConversation(
+      userId,
+      workspaceId,
+      id,
+    );
+
     if (!conversation.assignedToId) {
       throw new ForbiddenException('Conversation is not assigned to a user');
     }
@@ -137,7 +141,8 @@ export class InboxService {
       assignedToMemberId,
       new Date(),
     );
-    if (!targetConversation) throw new NotFoundException('Conversation not found');
+    if (!targetConversation)
+      throw new NotFoundException('Conversation not found');
     this.inboxEvents.publish(workspaceId, 'conversation.updated', id);
     return targetConversation;
   }
@@ -154,7 +159,7 @@ export class InboxService {
       id,
     );
 
-    const channel = await this.channelRegistry.getConnectedChannel(
+    const strategy = await this.messagingStrategyRegistry.getConnectedChannelStrategy(
       workspaceId,
       conversation.channel,
     );
@@ -170,9 +175,9 @@ export class InboxService {
       );
     }
 
-    const result = await channel.send({
+    const result = await strategy.send({
       workspaceId,
-      recipient: channel.createRecipient(
+      recipient: strategy.createRecipient(
         conversation.contactId,
         contactInfo.identity,
       ),
@@ -216,7 +221,7 @@ export class InboxService {
       throw new NotFoundException('Failed outbound message not found');
     }
 
-    const channel = await this.channelRegistry.getConnectedChannel(
+    const strategy = await this.messagingStrategyRegistry.getConnectedChannelStrategy(
       workspaceId,
       conversation.channel,
     );
@@ -232,9 +237,9 @@ export class InboxService {
       );
     }
 
-    const result = await channel.send({
+    const result = await strategy.send({
       workspaceId,
-      recipient: channel.createRecipient(
+      recipient: strategy.createRecipient(
         conversation.contactId,
         contactInfo.identity,
       ),
@@ -268,13 +273,13 @@ export class InboxService {
     workspaceId: string,
     message: IncomingMessage,
   ): Promise<ConversationDto> {
-    const channel = await this.channelRegistry.getConnectedChannel(
+    const strategy = await this.messagingStrategyRegistry.getConnectedChannelStrategy(
       workspaceId,
       message.channel,
     );
     const conversation = await this.inboxRepository.appendInboundMessage(
       workspaceId,
-      channel.name,
+      strategy.channelName,
       message.from.contactId, // contact id is identity here
       message.text,
       message.externalMessageId, // TODO: fix interfaces external message id of external id or external contact id
@@ -296,7 +301,7 @@ export class InboxService {
     channel: string,
     update: MessageStatusUpdate,
   ): Promise<void> {
-    await this.channelRegistry.getConnectedChannel(workspaceId, channel);
+    await this.messagingStrategyRegistry.getConnectedChannelStrategy(workspaceId, channel);
     const message =
       await this.inboxRepository.findConversationByExternalMessageId(
         workspaceId,

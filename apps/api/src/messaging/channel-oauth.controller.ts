@@ -1,16 +1,24 @@
-import { ConflictException, Controller, Get, Param, Query, Req, Res } from '@nestjs/common';
+import {
+  ConflictException,
+  Controller,
+  Get,
+  Param,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ChannelOAuthCallbackDto } from './dto';
 import { Public as PublicRoute } from '../common/decorators/public.decorator';
-import { WhatsAppConnectionService } from './whatsapp-connection.service';
+import { MessagingStrategyRegistry } from './registry/messaging-strategy.registry';
 
 const STATE_COOKIE_SUFFIX = 'oauth_state';
 
 @Controller('messaging/:channel/oauth')
 export class ChannelOAuthController {
   constructor(
-    private readonly whatsappConnectionService: WhatsAppConnectionService,
+    private readonly strategyRegistry: MessagingStrategyRegistry,
     private readonly configService: ConfigService,
   ) {}
 
@@ -24,9 +32,9 @@ export class ChannelOAuthController {
   ) {
     const { state, code, error } = query;
     if (!channel) {
-      throw new ConflictException("error selecting channel")
+      throw new ConflictException('error selecting channel');
     }
-    const STATE_COOKIE_NAME = `${channel}_${STATE_COOKIE_SUFFIX}`
+    const STATE_COOKIE_NAME = `${channel}_${STATE_COOKIE_SUFFIX}`;
 
     const webOrigin = this.configService.get<string>(
       'WEB_ORIGIN',
@@ -54,7 +62,9 @@ export class ChannelOAuthController {
     }
 
     try {
-      await this.whatsappConnectionService.completeAuthorization(state, code); // use strategy pattern here
+      await this.strategyRegistry
+        .getOAuthChannelStrategy(channel)
+        .completeAuthorization(state, code);
       return redirect('connected');
     } catch {
       return redirect('failed');

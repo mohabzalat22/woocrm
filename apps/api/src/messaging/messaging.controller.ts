@@ -14,14 +14,14 @@ import type {
   OutgoingMessage,
   Recipient,
   SendResult,
-} from './channels/message-channel.interface';
-import { MessageChannelRegistry } from './registry/message-channel.registry';
+} from './channels/messaging-strategy.interface';
+import { MessagingStrategyRegistry } from './registry/messaging-strategy.registry';
 
 @ApiTags('messaging')
 @ApiCookieAuth('access_token')
 @Controller('workspaces/:workspaceId/messaging')
 export class MessagingController {
-  constructor(private readonly channelRegistry: MessageChannelRegistry) {}
+  constructor(private readonly strategyRegistry: MessagingStrategyRegistry) {}
 
   @Post(':channel/messages')
   @RequirePermissions(Permission.INBOX_SEND_MESSAGE)
@@ -33,7 +33,7 @@ export class MessagingController {
     @Param('channel') channelName: string,
     @Body() message: SendMessageDto,
   ): Promise<SendResult> {
-    const channel = await this.channelRegistry.getConnectedChannel(
+    const strategy = await this.strategyRegistry.getConnectedChannelStrategy(
       workspaceId,
       channelName,
     );
@@ -41,7 +41,7 @@ export class MessagingController {
     //MOX: Registry entry point
     const recipient: Recipient = message.recipient;
 
-    if (!(await channel.isAvailable(recipient))) {
+    if (!(await strategy.isAvailable(recipient))) {
       throw new BadRequestException(
         `Recipient is not available on the ${channelName} channel`,
       );
@@ -52,6 +52,6 @@ export class MessagingController {
       ...message,
     };
 
-    return channel.send(outgoing);
+    return strategy.send(outgoing);
   }
 }

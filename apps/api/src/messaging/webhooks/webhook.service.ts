@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import type { IncomingMessage } from '../channels/message-channel.interface';
-import { MessageChannelRegistry } from '../registry/message-channel.registry';
+import type { IncomingMessage } from '../channels/messaging-strategy.interface';
+import { MessagingStrategyRegistry } from '../registry/messaging-strategy.registry';
 import { InboxService } from '../../inbox/inbox.service';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class WebhookService {
   private readonly logger = new Logger(WebhookService.name);
 
   constructor(
-    private readonly channelRegistry: MessageChannelRegistry,
+    private readonly strategyRegistry: MessagingStrategyRegistry,
     private readonly inboxService: InboxService,
   ) {}
 
@@ -18,8 +18,8 @@ export class WebhookService {
     verifyToken: string | undefined,
     challenge: string | undefined,
   ): string {
-    return this.channelRegistry
-      .getWebhookChannel(channelName)
+    return this.strategyRegistry
+      .getWebhookChannelStrategy(channelName)
       .verifySubscription(mode, verifyToken, challenge);
   }
 
@@ -28,8 +28,8 @@ export class WebhookService {
     signature: string | undefined,
     rawBody: Buffer | undefined,
   ): void {
-    this.channelRegistry
-      .getWebhookChannel(channelName)
+    this.strategyRegistry
+      .getWebhookChannelStrategy(channelName)
       .assertValidSignature(signature, rawBody);
   }
 
@@ -37,24 +37,24 @@ export class WebhookService {
     channelName: string,
     payload: unknown,
   ): Promise<IncomingMessage | null> {
-    const channel = this.channelRegistry.getWebhookChannel(channelName);
-    const incomingMessages = channel.parseIncomingMessages?.(payload) ?? [];
+    const strategy = this.strategyRegistry.getWebhookChannelStrategy(channelName);
+    const incomingMessages = strategy.parseIncomingMessages?.(payload) ?? [];
     if (incomingMessages.length === 0) {
-      const incoming = channel.parseIncoming(payload);
+      const incoming = strategy.parseIncoming(payload);
       if (incoming) incomingMessages.push(incoming);
     }
-    const statusUpdates = channel.parseStatusUpdates?.(payload) ?? [];
+    const statusUpdates = strategy.parseStatusUpdates?.(payload) ?? [];
     if (incomingMessages.length === 0 && statusUpdates.length === 0)
       return null;
 
-    const workspaceId = await channel.resolveWorkspaceId?.(payload);
+    const workspaceId = await strategy.resolveWorkspaceId?.(payload);
     if (!workspaceId) {
       throw new BadRequestException('Unable to route webhook to a workspace');
     }
 
     for (const incoming of incomingMessages) {
       await this.inboxService.ingestInbound(workspaceId, incoming); // TODO: FIX CIRCULAR DEPENDENCY
-      await channel.onIncoming?.(incoming);
+      await strategy.onIncoming?.(incoming); // TODO: FIX CIRCULAR DEPENDENCY
       this.logger.log(
         channelName +
           ' message ' +

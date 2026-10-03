@@ -1,6 +1,7 @@
 /**
  * Channel names are intentionally open-ended. A new provider only needs to
- * implement MessageChannel and register it with MessageChannelRegistry.
+ * implement MessagingChannelStrategy and register it with
+ * MessagingStrategyRegistry.
  */
 export type ChannelName = string;
 
@@ -41,8 +42,8 @@ export interface OutgoingMessage {
   metadata?: Record<string, unknown>;
 }
 
-export interface MessageChannel {
-  readonly name: ChannelName;
+export interface MessagingChannelStrategy {
+  readonly channelName: ChannelName;
 
   /** Whether this provider has an active connection in the workspace. */
   isConnected(workspaceId: string): Promise<boolean>;
@@ -65,7 +66,7 @@ export interface MessageChannel {
   onIncoming?(message: IncomingMessage): Promise<void>;
 }
 
-export interface WebhookMessageChannel extends MessageChannel {
+export interface MessagingWebhookStrategy extends MessagingChannelStrategy {
   verifySubscription(
     mode: string | undefined,
     verifyToken: string | undefined,
@@ -76,4 +77,10 @@ export interface WebhookMessageChannel extends MessageChannel {
     signature: string | undefined,
     rawBody: Buffer | undefined,
   ): void;
+}
+
+export interface MessagingOAuthStrategy {
+  readonly channelName: ChannelName;
+
+  completeAuthorization(state: string, code: string): Promise<string>;
 }

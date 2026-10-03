@@ -10,12 +10,14 @@ import {
   Recipient,
   IncomingMessage,
   MessageStatusUpdate,
-  WebhookMessageChannel,
-} from '../message-channel.interface';
+  MessagingOAuthStrategy,
+  MessagingWebhookStrategy,
+} from '../messaging-strategy.interface';
 import { WhatsAppClient } from './whatsapp.client';
 import { buildTemplatePayload } from './whatsapp.templates';
 import { whatsappConfig } from '../../config/whatsapp.config';
 import { WhatsAppConnectionRepository } from '../../whatsapp-connection.repository';
+import { WhatsAppConnectionService } from '../../whatsapp-connection.service';
 import { decryptCredential } from '../../security/credential-crypto';
 
 const META_SIGNATURE_PREFIX = 'sha256=';
@@ -29,8 +31,10 @@ interface GraphApiResponse {
 /** WhatsApp strategy: send, verify, normalize, and handle WhatsApp webhooks. */
 // whatsapp channel + webhooks extending it
 @Injectable()
-export class WhatsAppChannel implements WebhookMessageChannel {
-  readonly name = 'whatsapp' as const;
+export class WhatsAppMessagingStrategy
+  implements MessagingWebhookStrategy, MessagingOAuthStrategy
+{
+  readonly channelName = 'whatsapp' as const;
 
   createRecipient(contactId: string, identity: string): Recipient {
     return { contactId, phone: identity, externalUserId: identity };
@@ -50,7 +54,12 @@ export class WhatsAppChannel implements WebhookMessageChannel {
 
   constructor(
     private readonly connectionRepository: WhatsAppConnectionRepository,
+    private readonly connectionService: WhatsAppConnectionService,
   ) {}
+
+  completeAuthorization(state: string, code: string): Promise<string> {
+    return this.connectionService.completeAuthorization(state, code);
+  }
 
   async isAvailable(recipient: Recipient): Promise<boolean> {
     return Boolean(recipient.phone);
@@ -62,7 +71,7 @@ export class WhatsAppChannel implements WebhookMessageChannel {
     if (!recipient.phone) {
       return {
         success: false,
-        channel: this.name,
+        channel: this.channelName,
         error: 'Recipient has no phone number on file',
       };
     }
@@ -79,7 +88,7 @@ export class WhatsAppChannel implements WebhookMessageChannel {
     if (expired) {
       return {
         success: false,
-        channel: this.name,
+        channel: this.channelName,
         error: 'WhatsApp is not connected for this workspace',
       };
     }
@@ -105,7 +114,7 @@ export class WhatsAppChannel implements WebhookMessageChannel {
       } else {
         return {
           success: false,
-          channel: this.name,
+          channel: this.channelName,
           error: 'Message has no text or template',
         };
       }
@@ -114,19 +123,19 @@ export class WhatsAppChannel implements WebhookMessageChannel {
       if (!externalMessageId) {
         return {
           success: false,
-          channel: this.name,
+          channel: this.channelName,
           error: 'WhatsApp API returned no message ID',
         };
       }
       return {
         success: true,
-        channel: this.name,
+        channel: this.channelName,
         externalMessageId,
       };
     } catch (err) {
       return {
         success: false,
-        channel: this.name,
+        channel: this.channelName,
         error:
           err instanceof Error ? err.message : 'Unknown WhatsApp send error',
       };
@@ -197,7 +206,7 @@ export class WhatsAppChannel implements WebhookMessageChannel {
 
       return [
         {
-          channel: this.name,
+          channel: this.channelName,
           externalMessageId: candidate.id,
           from: { contactId: candidate.from, phone: candidate.from },
           text,
