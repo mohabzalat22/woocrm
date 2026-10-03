@@ -13,6 +13,7 @@ import { MetaWhatsAppClient } from './channels/whatsapp/meta.client';
 import { WhatsAppConnectionRepository } from './whatsapp-connection.repository';
 import { randomBytes } from 'node:crypto';
 import type { WhatsAppConnectionStatus } from '@repo/shared-types';
+import { ChannelOAuthStateRepository } from './channel-oauth-state.repository';
 
 const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 
@@ -22,6 +23,7 @@ export class WhatsAppConnectionService {
     private readonly workspaceContext: WorkspaceContextService,
     private readonly whatsAppConnectionRepository: WhatsAppConnectionRepository,
     private readonly metaClient: MetaWhatsAppClient,
+    private readonly channelOAuthStateRepository:ChannelOAuthStateRepository
   ) {}
 
   async createAuthorizationUrl(
@@ -41,8 +43,9 @@ export class WhatsAppConnectionService {
     }
 
     const state = randomBytes(32).toString('base64url');
-    await this.whatsAppConnectionRepository.createOAuthState({
+    await this.channelOAuthStateRepository.createOAuthState({
       stateHash: hashOAuthState(state),
+      channel:'whatsapp',
       userId,
       workspaceId,
       expiresAt: new Date(Date.now() + OAUTH_STATE_TTL_MS),
@@ -61,7 +64,7 @@ export class WhatsAppConnectionService {
 
   async completeAuthorization(state: string, code: string) {
     const oauthState =
-      await this.whatsAppConnectionRepository.consumeOAuthState(
+      await this.channelOAuthStateRepository.consumeOAuthState(
         hashOAuthState(state),
       );
 

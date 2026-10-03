@@ -1,8 +1,9 @@
 import { z } from 'zod';
 import { stringToDate } from '../../common/types/stringToDate';
 
-export const WhatsAppOAuthStateSchema = z.object({
+export const ChannelOAuthStateSchema = z.object({
   id: z.string(),
+  channel: z.string(),
   stateHash: z.string(),
   workspaceId: z.string(),
   userId: z.string(),
@@ -11,4 +12,4 @@ export const WhatsAppOAuthStateSchema = z.object({
   createdAt: stringToDate,
 });
 
-export type WhatsAppOAuthState = z.infer<typeof WhatsAppOAuthStateSchema>;
+export type ChannelOAuthState = z.infer<typeof ChannelOAuthStateSchema>;

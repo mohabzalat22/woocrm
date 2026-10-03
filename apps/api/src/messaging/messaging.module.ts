@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { WhatsAppConnectionController } from './whatsapp-connection.controller';
-import { WhatsAppOAuthController } from './whatsapp-oauth.controller';
+import { ChannelOAuthController } from './channel-oauth.controller';
 import { MessagingController } from './messaging.controller';
 import { WhatsAppConnectionService } from './whatsapp-connection.service';
 import { WhatsAppConnectionRepository } from './whatsapp-connection.repository';
@@ -10,12 +10,13 @@ import { WorkspaceMembersModule } from '../workspace-members/workspace-members.m
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { RolesModule } from '../roles/roles.module';
 import { MessageChannelRegistry } from './registry/message-channel.registry';
+import { ChannelOAuthStateRepository } from './channel-oauth-state.repository';
 
 @Module({
   imports: [WorkspaceMembersModule, AuthorizationModule, RolesModule],
   controllers: [
     WhatsAppConnectionController,
-    WhatsAppOAuthController,
+    ChannelOAuthController,
     MessagingController,
   ],
   providers: [
@@ -24,6 +25,7 @@ import { MessageChannelRegistry } from './registry/message-channel.registry';
     MetaWhatsAppClient,
     WhatsAppChannel,
     MessageChannelRegistry,
+    ChannelOAuthStateRepository
   ],
   exports: [MessageChannelRegistry],
 })

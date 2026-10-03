@@ -14,27 +14,27 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(uuid())
-  email               String               @unique
+  id                  String              @id @default(uuid())
+  email               String              @unique
   name                String?
   password            String
   refreshTokenHash    String? // TODO: fix multiple sessions
-  systemRole          SystemRole           @default(USER)
+  systemRole          SystemRole          @default(USER)
   workspaceMembers    WorkspaceMember[]
-  workspaceInvites    WorkspaceInvite[]    @relation("InviteCreator")
-  whatsappOAuthStates WhatsAppOAuthState[]
+  workspaceInvites    WorkspaceInvite[]   @relation("InviteCreator")
+  whatsappOAuthStates ChannelOAuthState[]
 }
 
 model Workspace {
-  id                  String               @id @default(uuid())
-  name                String               @default("Main Workspace")
+  id                  String              @id @default(uuid())
+  name                String              @default("Main Workspace")
   workspaceMembers    WorkspaceMember[]
   workspaceInvites    WorkspaceInvite[]
   roles               Role[]
   permissions         Permission[]
   contacts            Contact[]
   whatsappConnection  WhatsAppConnection?
-  whatsappOAuthStates WhatsAppOAuthState[]
+  whatsappOAuthStates ChannelOAuthState[]
   conversations       Conversation[]
 }
 
@@ -150,8 +150,9 @@ model WhatsAppConnection {
   @@index([status])
 }
 
-model WhatsAppOAuthState {
+model ChannelOAuthState {
   id          String    @id @default(uuid())
+  channel     String
   stateHash   String    @unique
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onUpdate: Cascade, onDelete: Cascade)

@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import prisma from '@repo/database';
 import {
-  CreateWhatsAppOAuthStateDto,
   UpsertWhatsAppConnectionDto,
   WhatsAppConnectionDto,
-  WhatsAppOAuthStateDto,
 } from './dto';
 
 @Injectable()
@@ -46,45 +44,5 @@ export class WhatsAppConnectionRepository {
     });
 
     return result.count;
-  }
-
-  createOAuthState(
-    data: CreateWhatsAppOAuthStateDto,
-  ): Promise<WhatsAppOAuthStateDto> {
-    return prisma.whatsAppOAuthState.create({
-      data: {
-        stateHash: data.stateHash,
-        expiresAt: data.expiresAt,
-        workspace: {
-          connect: {
-            id: data.workspaceId,
-          },
-        },
-        user: {
-          connect: {
-            id: data.userId,
-          },
-        },
-      },
-    });
-  }
-
-  consumeOAuthState(stateHash: string): Promise<WhatsAppOAuthStateDto | null> {
-    return prisma.$transaction(async (tx) => {
-      const result = await tx.whatsAppOAuthState.updateMany({
-        where: {
-          stateHash,
-          consumedAt: null,
-          expiresAt: { gt: new Date() },
-        },
-        data: { consumedAt: new Date() },
-      });
-
-      if (result.count !== 1) {
-        return null;
-      }
-
-      return tx.whatsAppOAuthState.findUnique({ where: { stateHash } });
-    });
   }
 }
