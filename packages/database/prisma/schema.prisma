@@ -123,16 +123,16 @@ model RolePermission {
   @@index([permissionId])
 }
 
-enum WhatsAppConnectionStatus {
+enum ConnectionStatus {
   ACTIVE
   EXPIRED
   REVOKED
 }
 
 model WhatsAppConnection {
-  id                        String                   @id @default(uuid())
-  workspaceId               String                   @unique
-  workspace                 Workspace                @relation(fields: [workspaceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  id                        String           @id @default(uuid())
+  workspaceId               String           @unique
+  workspace                 Workspace        @relation(fields: [workspaceId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   metaUserId                String?
   metaBusinessAccountId     String
   whatsappBusinessAccountId String
@@ -142,10 +142,10 @@ model WhatsAppConnection {
   businessName              String?
   encryptedAccessToken      String
   accessTokenExpiresAt      DateTime?
-  status                    WhatsAppConnectionStatus @default(ACTIVE)
+  status                    ConnectionStatus @default(ACTIVE)
   lastError                 String?
-  createdAt                 DateTime                 @default(now())
-  updatedAt                 DateTime                 @updatedAt
+  createdAt                 DateTime         @default(now())
+  updatedAt                 DateTime         @updatedAt
 
   @@index([status])
 }
@@ -224,7 +224,7 @@ model Conversation {
   id            String             @id @default(uuid())
   workspaceId   String
   channel       String
-  contactId     String             @unique
+  contactId     String             @unique // could be WABA.id // PID for meta its external api contact id
   status        ConversationStatus @default(OPEN)
   assignedToId  String? // WorkspaceMember.id
   lastMessageAt DateTime?
